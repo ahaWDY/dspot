@@ -125,20 +125,6 @@ public class JacocoCoverageSelector extends TakeAllSelector {
         }
         final CoveragePerTestMethod coveragePerTestMethod = computeCoverageForGivenTestMethods(amplifiedTestToBeKept);
         final List<CtMethod<?>> methodsKept = amplifiedTestToBeKept.stream()
-                .peek(ctMethod -> {
-                    Coverage oldCoverage = this.selectedToBeAmplifiedCoverageResultsMap.get(getFirstParentThatHasBeenRun(ctMethod).getSimpleName());
-                    Coverage newCoverage = coveragePerTestMethod.getCoverageOf(ctMethod.getSimpleName());
-                    if (oldCoverage != null) {
-                        DSpotUtils.addComment(ctMethod, "JacocoCoverageSelector: Improves instruction coverage from "
-                                        + oldCoverage.getInstructionsCovered() + "/" + oldCoverage.getInstructionsTotal(),
-                                CtComment.CommentType.INLINE);
-                    }
-                    if (newCoverage != null) {
-                        DSpotUtils.addComment(ctMethod, "JacocoCoverageSelector: Improves instruction coverage to "
-                                        + newCoverage.getInstructionsCovered() + "/" + newCoverage.getInstructionsTotal(),
-                                CtComment.CommentType.INLINE);
-                    }
-                })
                 .filter(ctMethod -> {
                     final String simpleNameOfFirstParent = getFirstParentThatHasBeenRun(ctMethod).getSimpleName();
                     return this.selectedToBeAmplifiedCoverageResultsMap.get(simpleNameOfFirstParent) == null ||
@@ -152,6 +138,20 @@ public class JacocoCoverageSelector extends TakeAllSelector {
                     } else {
                         pathExecuted.add(pathByExecInstructions);
                         return true;
+                    }
+                })
+                .peek(ctMethod -> {
+                    Coverage oldCoverage = this.selectedToBeAmplifiedCoverageResultsMap.get(getFirstParentThatHasBeenRun(ctMethod).getSimpleName());
+                    Coverage newCoverage = coveragePerTestMethod.getCoverageOf(ctMethod.getSimpleName());
+                    if (oldCoverage != null) {
+                        DSpotUtils.addComment(ctMethod, "JacocoCoverageSelector: Improves instruction coverage from "
+                                        + oldCoverage.getInstructionsCovered() + "/" + oldCoverage.getInstructionsTotal(),
+                                CtComment.CommentType.INLINE);
+                    }
+                    if (newCoverage != null) {
+                        DSpotUtils.addComment(ctMethod, "JacocoCoverageSelector: Improves instruction coverage to "
+                                        + newCoverage.getInstructionsCovered() + "/" + newCoverage.getInstructionsTotal(),
+                                CtComment.CommentType.INLINE);
                     }
                 })
                 .collect(Collectors.toList());
