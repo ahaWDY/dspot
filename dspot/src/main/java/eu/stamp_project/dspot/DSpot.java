@@ -179,7 +179,10 @@ public class DSpot {
     private List<CtMethod<?>> assertionAmplification(CtType<?> classTest, List<CtMethod<?>> testMethods) {
         final List<CtMethod<?>> testsWithAssertions;
         try {
-            testsWithAssertions = dSpotState.getAssertionGenerator().assertionAmplification(classTest, testMethods);
+            TestTuple testsWithOldAssertionsRemoved = dSpotState.getAssertionGenerator().removeAssertions(classTest, testMethods);
+            testsWithAssertions = dSpotState.getAssertionGenerator().assertionAmplification(
+                    testsWithOldAssertionsRemoved.testClassToBeAmplified,
+                    testsWithOldAssertionsRemoved.testMethodsToBeAmplified);
         } catch (Exception | java.lang.Error e) {
             GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
             return Collections.emptyList();

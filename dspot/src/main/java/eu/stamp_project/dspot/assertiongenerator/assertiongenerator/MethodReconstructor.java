@@ -111,7 +111,7 @@ public class MethodReconstructor {
      */
     @SuppressWarnings("unchecked")
     private CtMethod<?> buildTestWithAssert(CtMethod test, Map<String, Observation> observations) {
-        CtMethod testWithAssert = CloneHelper.cloneTestMethodForAmp(test, "_assert");
+        CtMethod testWithAssert = CloneHelper.cloneTestMethodForAmp(test, "_ass");
         Integer numberOfAddedAssertion = 0;
         List<CtStatement> statements = Query.getElements(testWithAssert, new TypeFilter(CtStatement.class));
 
@@ -165,7 +165,7 @@ public class MethodReconstructor {
             );
 
             for (CtStatement statement : assertStatements) {
-                CtMethod<?> testWithAssert = CloneHelper.cloneTestMethodForAmp(test, "_assertSeparate");
+                CtMethod<?> testWithAssert = CloneHelper.cloneTestMethodForAmp(test, "_assSep");
                 List<CtStatement> statements = Query.getElements(testWithAssert, new TypeFilter<CtStatement>(CtStatement.class));
 
                 int numberOfAddedAssertion = goThroughAssertionStatements(Collections.singletonList(statement), id, statements, 0);

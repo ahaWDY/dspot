@@ -1,5 +1,6 @@
 package eu.stamp_project.dspot.assertiongenerator;
 
+import eu.stamp_project.dspot.common.configuration.TestTuple;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationException;
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.AssertionRemover;
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.MethodReconstructor;
@@ -71,7 +72,6 @@ public class AssertionGenerator {
         }
         CtType cloneClass = testClass.clone();
         testClass.getPackage().addType(cloneClass);
-        List<CtMethod<?>> testsWithoutAssertions = removeAssertions(tests, cloneClass);
 
         // set up methodReconstructor for use in assertPassingAndFailingTests
         this.methodReconstructor = new MethodReconstructor(
@@ -83,13 +83,33 @@ public class AssertionGenerator {
                 this.lessAssertions
         );
         final List<CtMethod<?>> amplifiedTestsWithAssertions =
-                this.assertPassingAndFailingTests(cloneClass, testsWithoutAssertions);
+                this.assertPassingAndFailingTests(cloneClass, tests);
         decideLoggerOutput(amplifiedTestsWithAssertions);
         return amplifiedTestsWithAssertions;
     }
 
-    // remove existing assertions from cloned test methods
-    private List<CtMethod<?>> removeAssertions(List<CtMethod<?>> tests, CtType cloneClass){
+    /**
+     * Removes old assertions in multiple tests.
+     * @param testClass Test class
+     * @param tests     Test methods in which to remove assertions
+     * @return Test methods without assertions
+     */
+    public TestTuple removeAssertions(CtType<?> testClass, List<CtMethod<?>> tests) {
+        if (tests.isEmpty()) {
+            return new TestTuple(testClass, tests);
+        }
+        CtType<?> cloneClass = testClass.clone();
+        testClass.getPackage().addType(cloneClass);
+        return new TestTuple(cloneClass, removeAssertions(tests, cloneClass));
+    }
+
+    /**
+     * Uses {@link AssertionRemover#removeAssertion(CtMethod) to remove existing assertions from cloned test methods}
+     * @param tests
+     * @param cloneClass
+     * @return
+     */
+    private List<CtMethod<?>> removeAssertions(List<CtMethod<?>> tests, CtType<?> cloneClass){
         List<CtMethod<?>> testsWithoutAssertions = tests.stream()
                 .map(this.assertionRemover::removeAssertion)
                 .collect(Collectors.toList());
