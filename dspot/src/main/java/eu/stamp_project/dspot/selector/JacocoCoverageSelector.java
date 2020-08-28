@@ -17,6 +17,7 @@ import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.common.compilation.DSpotCompiler;
 
 import org.apache.commons.io.FileUtils;
+import spoon.reflect.code.CtComment;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtNamedElement;
 import spoon.reflect.declaration.CtType;
@@ -124,6 +125,20 @@ public class JacocoCoverageSelector extends TakeAllSelector {
         }
         final CoveragePerTestMethod coveragePerTestMethod = computeCoverageForGivenTestMethods(amplifiedTestToBeKept);
         final List<CtMethod<?>> methodsKept = amplifiedTestToBeKept.stream()
+                .peek(ctMethod -> {
+                    Coverage oldCoverage = this.selectedToBeAmplifiedCoverageResultsMap.get(getFirstParentThatHasBeenRun(ctMethod).getSimpleName());
+                    Coverage newCoverage = coveragePerTestMethod.getCoverageOf(ctMethod.getSimpleName());
+                    if (oldCoverage != null) {
+                        DSpotUtils.addComment(ctMethod, "JacocoCoverageSelector: Improves instruction coverage from "
+                                        + oldCoverage.getInstructionsCovered() + "/" + oldCoverage.getInstructionsTotal(),
+                                CtComment.CommentType.INLINE);
+                    }
+                    if (newCoverage != null) {
+                        DSpotUtils.addComment(ctMethod, "JacocoCoverageSelector: Improves instruction coverage to "
+                                        + newCoverage.getInstructionsCovered() + "/" + newCoverage.getInstructionsTotal(),
+                                CtComment.CommentType.INLINE);
+                    }
+                })
                 .filter(ctMethod -> {
                     final String simpleNameOfFirstParent = getFirstParentThatHasBeenRun(ctMethod).getSimpleName();
                     return this.selectedToBeAmplifiedCoverageResultsMap.get(simpleNameOfFirstParent) == null ||
@@ -138,7 +153,8 @@ public class JacocoCoverageSelector extends TakeAllSelector {
                         pathExecuted.add(pathByExecInstructions);
                         return true;
                     }
-                }).collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
 
         this.selectedToBeAmplifiedCoverageResultsMap.putAll(methodsKept.stream()
                 .map(CtNamedElement::getSimpleName)
@@ -165,7 +181,7 @@ public class JacocoCoverageSelector extends TakeAllSelector {
 
     @Override
     public TestSelectorElementReport report() {
-        if(currentClassTestToBeAmplified == null) {
+        if (currentClassTestToBeAmplified == null) {
             return lastReport;
         }
         // 1 textual report

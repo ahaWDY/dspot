@@ -152,7 +152,6 @@ public class DSpot {
             // amplify tests and shrink amplified set with inputAmplDistributor
             inputAmplifiedTests = dSpotState.getInputAmplDistributor().inputAmplify(selectedToBeAmplified, currentIteration);
 
-            // add assertions to input modified tests
             if (dSpotState.isOnlyInputAmplification()) {
                 currentTestList = dSpotState.getTestCompiler().compileRunAndDiscardUncompilableAndFailingTestMethods(
                         testClassToBeAmplified,
@@ -162,6 +161,7 @@ public class DSpot {
                 LOGGER.info("Amplification: {} test method(s) has been successfully amplified.",
                         currentTestList.size());
             } else {
+                // add assertions to input modified tests
                 currentTestList = this.assertionAmplification(testClassToBeAmplified, inputAmplifiedTests);
             }
 
