@@ -159,7 +159,7 @@ public class DSpot {
                         inputAmplifiedTests,
                         dSpotState.getCompiler()
                 );
-                LOGGER.info("Assertion amplification: {} test method(s) has been successfully amplified.",
+                LOGGER.info("Amplification: {} test method(s) has been successfully amplified.",
                         currentTestList.size());
             } else {
                 currentTestList = this.assertionAmplification(testClassToBeAmplified, inputAmplifiedTests);

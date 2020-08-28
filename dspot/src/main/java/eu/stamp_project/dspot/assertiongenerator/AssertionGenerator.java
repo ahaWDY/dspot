@@ -42,12 +42,19 @@ public class AssertionGenerator {
 
     private TestCompiler testCompiler;
 
+    private final boolean lessAssertions;
+
     public AssertionGenerator(double delta, DSpotCompiler compiler, TestCompiler testCompiler) {
+        this(delta,  compiler, testCompiler, false);
+    }
+
+    public AssertionGenerator(double delta, DSpotCompiler compiler, TestCompiler testCompiler, boolean lessAssertions) {
         this.delta = delta;
         this.compiler = compiler;
         this.assertionRemover = new AssertionRemover();
         this.tryCatchFailGenerator = new TryCatchFailGenerator();
         this.testCompiler = testCompiler;
+        this.lessAssertions = lessAssertions;
     }
 
     /**
@@ -72,7 +79,8 @@ public class AssertionGenerator {
                 testClass,
                 compiler,
                 this.assertionRemover.getVariableAssertedPerTestMethod(),
-                this.testCompiler
+                this.testCompiler,
+                this.lessAssertions
         );
         final List<CtMethod<?>> amplifiedTestsWithAssertions =
                 this.assertPassingAndFailingTests(cloneClass, testsWithoutAssertions);
