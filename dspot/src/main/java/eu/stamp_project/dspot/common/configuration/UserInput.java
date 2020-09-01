@@ -163,12 +163,12 @@ public class UserInput {
     private boolean onlyInputAmplification;
 
     @CommandLine.Option(
-            names = "--less-assertions",
+            names = "--dev-friendly",
             defaultValue = "false",
-            description = "Generates less assertions per test case."+
+            description = "Amplifies the test cases in a way that is easy for developers to read and understand."+
                     " Default value: ${DEFAULT-VALUE}"
     )
-    private boolean lessAssertions;
+    private boolean devFriendlyAmplification;
 
     /*
         advanced amplification process configuration
@@ -613,12 +613,12 @@ public class UserInput {
         return this;
     }
 
-    public boolean isLessAssertions() {
-        return lessAssertions;
+    public boolean isDevFriendlyAmplification() {
+        return devFriendlyAmplification;
     }
 
-    public UserInput setLessAssertions(boolean lessAssertions) {
-        this.lessAssertions = lessAssertions;
+    public UserInput setDevFriendlyAmplification(boolean devFriendlyAmplification) {
+        this.devFriendlyAmplification = devFriendlyAmplification;
         return this;
     }
 

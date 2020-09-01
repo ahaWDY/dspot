@@ -52,17 +52,22 @@ public class DSpot {
     public void run() {
         for (CtType<?> testClassToBeAmplified : dSpotState.getTestClassesToBeAmplified()) {
             TestTuple tuple = setup.preAmplification(testClassToBeAmplified, dSpotState.getTestMethodsToBeAmplifiedNames());
-            final List<CtMethod<?>> amplifiedTestMethods = devFriendlyAmplification(tuple.testClassToBeAmplified,
-                    tuple.testMethodsToBeAmplified);
-//            final List<CtMethod<?>> amplifiedTestMethods = amplification(tuple.testClassToBeAmplified,
-//                    tuple.testMethodsToBeAmplified);
+            final List<CtMethod<?>> amplifiedTestMethods;
+            if (dSpotState.isDevFriendlyAmplification()) {
+                amplifiedTestMethods = devFriendlyAmplification(tuple.testClassToBeAmplified,
+                        tuple.testMethodsToBeAmplified);
+            } else {
+                amplifiedTestMethods = amplification(tuple.testClassToBeAmplified,
+                        tuple.testMethodsToBeAmplified);
+            }
             setup.postAmplification(testClassToBeAmplified, amplifiedTestMethods);
             globalNumberOfSelectedAmplification = 0;
         }
         setup.report(setup.getAmplifiedTestClasses());
     }
 
-    private List<CtMethod<?>> amplification(CtType<?> testClassToBeAmplified, List<CtMethod<?>> testMethodsToBeAmplified) {
+    private List<CtMethod<?>> amplification(CtType<?> testClassToBeAmplified,
+                                            List<CtMethod<?>> testMethodsToBeAmplified) {
         List<CtMethod<?>> amplifiedTestMethodsToKeep = setupSelector(testClassToBeAmplified, testMethodsToBeAmplified);
 
         if (!dSpotState.isOnlyInputAmplification()) {
@@ -109,6 +114,7 @@ public class DSpot {
 
             // amplify tests and shrink amplified set with inputAmplDistributor
             inputAmplifiedTests = dSpotState.getInputAmplDistributor().inputAmplify(selectedToBeAmplified, 0);
+            
         } catch (AmplificationException e) {
             GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
             return Collections.emptyList();
