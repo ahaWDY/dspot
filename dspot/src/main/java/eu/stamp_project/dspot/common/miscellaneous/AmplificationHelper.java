@@ -162,15 +162,33 @@ public class AmplificationHelper {
         return new HashSet<>(types);
     }
 
-    @Deprecated
-    public static List<CtMethod<?>> getPassingTests(List<CtMethod<?>> newTests, TestResult result) {
-        final List<String> passingTests = result.getPassingTests();
-        return newTests.stream()
-                .filter(test -> {
-                    final Pattern pattern = Pattern.compile(test.getSimpleName() + "\\[\\d+\\]");
-                    return passingTests.contains(test.getSimpleName()) ||
-                            passingTests.stream().anyMatch(passingTest -> pattern.matcher(passingTest).matches());
-                }).collect(Collectors.toList());
+    public static List<CtMethod<?>> getPassingTests(List<CtMethod<?>> tests, TestResult result) {
+        final List<String> passingTestNames = result.getPassingTests();
+        if (!passingTestNames.isEmpty()) {
+            return tests.stream()
+                    .filter(ctMethod -> passingTestNames.stream()
+                            .anyMatch(passingTestName -> checkMethodName(ctMethod.getSimpleName(), passingTestName))
+                    ).collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    public static List<CtMethod<?>> getFailingTests(List<CtMethod<?>> tests, TestResult result) {
+        final List<String> failingTestsName = result.getFailingTests().stream().map(failure -> failure.testCaseName)
+                .collect(Collectors.toList());
+        if (!failingTestsName.isEmpty()) {
+            return tests.stream()
+                    .filter(ctMethod -> failingTestsName.stream()
+                    .anyMatch(failingTestName -> checkMethodName(ctMethod.getSimpleName(), failingTestName)))
+                    .collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    public static boolean checkMethodName(String patternMethodName, String methodNameToBeChecked) {
+        return Pattern.compile(patternMethodName + "(\\[\\d+\\])?").matcher(methodNameToBeChecked).matches();
     }
 
     public static CtMethod<?> addOriginInComment(CtMethod<?> amplifiedTest, CtMethod<?> topParent) {

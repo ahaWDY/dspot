@@ -5,6 +5,7 @@ import eu.stamp_project.dspot.common.miscellaneous.AmplificationException;
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.AssertionRemover;
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.MethodReconstructor;
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.TryCatchFailGenerator;
+import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import eu.stamp_project.testrunner.listener.TestResult;
 import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.common.compilation.DSpotCompiler;
@@ -70,8 +71,7 @@ public class AssertionGenerator {
         if (tests.isEmpty()) {
             return tests;
         }
-        CtType cloneClass = testClass.clone();
-        testClass.getPackage().addType(cloneClass);
+        CtType<?> cloneClass = CloneHelper.cloneTestClassAndAddGivenTest(testClass, tests);
 
         // set up methodReconstructor for use in assertPassingAndFailingTests
         this.methodReconstructor = new MethodReconstructor(
@@ -104,7 +104,7 @@ public class AssertionGenerator {
     }
 
     /**
-     * Uses {@link AssertionRemover#removeAssertion(CtMethod) to remove existing assertions from cloned test methods}
+     * Uses {@link AssertionRemover#removeAssertion(CtMethod)} to remove existing assertions from cloned test methods
      * @param tests
      * @param cloneClass
      * @return
@@ -159,12 +159,12 @@ public class AssertionGenerator {
             return Collections.emptyList();
         }
         final List<CtMethod<?>> generatedTestWithAssertion = new ArrayList<>();
-        generatedTestWithAssertion.addAll(addAssertionsOnPassingTests(testResult,tests,testClass));
-        generatedTestWithAssertion.addAll(addFailStatementOnFailingTests(testResult,tests));
+        generatedTestWithAssertion.addAll(addAssertionsOnPassingTests(testResult, tests, testClass));
+        generatedTestWithAssertion.addAll(addFailStatementOnFailingTests(testResult, tests, testClass));
         return generatedTestWithAssertion;
     }
 
-    private List<CtMethod<?>> addAssertionsOnPassingTests(TestResult testResult,List<CtMethod<?>> tests, CtType testClass){
+    private List<CtMethod<?>> addAssertionsOnPassingTests(TestResult testResult, List<CtMethod<?>> tests, CtType testClass){
         final List<CtMethod<?>> generatedTestWithAssertion = new ArrayList<>();
         final List<String> passingTestsName = testResult.getPassingTests();
         if (!passingTestsName.isEmpty()) {
@@ -172,7 +172,7 @@ public class AssertionGenerator {
             final List<CtMethod<?>> passingTestMethods = tests.stream()
                     .filter(ctMethod ->
                             passingTestsName.stream()
-                                    .anyMatch(passingTestName -> checkMethodName(ctMethod.getSimpleName(), passingTestName))
+                                    .anyMatch(passingTestName -> AmplificationHelper.checkMethodName(ctMethod.getSimpleName(), passingTestName))
                     ).collect(Collectors.toList());
             List<CtMethod<?>> passingTests = this.methodReconstructor.addAssertions(testClass, passingTestMethods)
                     .stream()
@@ -184,12 +184,8 @@ public class AssertionGenerator {
         return new ArrayList<>();
     }
 
-    private boolean checkMethodName(String patternMethodName, String methodNameToBeChecked) {
-        return Pattern.compile(patternMethodName + "(\\[\\d+\\])?").matcher(methodNameToBeChecked).matches();
-    }
-
     // add try/catch block with fail statement in failing tests
-    private List<CtMethod<?>> addFailStatementOnFailingTests(TestResult testResult, List<CtMethod<?>> tests){
+    private List<CtMethod<?>> addFailStatementOnFailingTests(TestResult testResult, List<CtMethod<?>> tests, CtType testClass){
         final List<String> failuresMethodName = testResult.getFailingTests()
                 .stream()
                 .map(failure -> failure.testCaseName)
