@@ -3,6 +3,7 @@ package eu.stamp_project.dspot;
 import eu.stamp_project.dspot.common.configuration.*;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationException;
 import eu.stamp_project.dspot.common.configuration.UserInput;
+import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.common.report.GlobalReport;
 import eu.stamp_project.dspot.common.report.error.Error;
@@ -51,10 +52,10 @@ public class DSpot {
     public void run() {
         for (CtType<?> testClassToBeAmplified : dSpotState.getTestClassesToBeAmplified()) {
             TestTuple tuple = setup.preAmplification(testClassToBeAmplified, dSpotState.getTestMethodsToBeAmplifiedNames());
-//            final List<CtMethod<?>> amplifiedTestMethods = devFriendlyAmplification(tuple.testClassToBeAmplified,
-//                    tuple.testMethodsToBeAmplified);
-            final List<CtMethod<?>> amplifiedTestMethods = amplification(tuple.testClassToBeAmplified,
+            final List<CtMethod<?>> amplifiedTestMethods = devFriendlyAmplification(tuple.testClassToBeAmplified,
                     tuple.testMethodsToBeAmplified);
+//            final List<CtMethod<?>> amplifiedTestMethods = amplification(tuple.testClassToBeAmplified,
+//                    tuple.testMethodsToBeAmplified);
             setup.postAmplification(testClassToBeAmplified, amplifiedTestMethods);
             globalNumberOfSelectedAmplification = 0;
         }
@@ -101,14 +102,13 @@ public class DSpot {
 
         // 2. Amplify input
         final List<CtMethod<?>> selectedToBeAmplified;
-        final List<CtMethod<?>> inputAmplifiedTests;
+        List<CtMethod<?>> inputAmplifiedTests;
         final List<CtMethod<?>> currentTestList;
         try {
             selectedToBeAmplified = setup.fullSelectorSetup(classWithTestMethods, testsWithoutAssertions);
 
             // amplify tests and shrink amplified set with inputAmplDistributor
             inputAmplifiedTests = dSpotState.getInputAmplDistributor().inputAmplify(selectedToBeAmplified, 0);
-
         } catch (AmplificationException e) {
             GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
             return Collections.emptyList();

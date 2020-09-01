@@ -150,7 +150,8 @@ public class MethodReconstructor {
      */
     private List<CtMethod<?>> buildTestsWithSeparateAsserts(CtMethod<?> test, Map<String, Observation> observations) {
         List<CtMethod<?>> testsToReturn = new ArrayList<>();
-        testsToReturn.add(CloneHelper.cloneTestMethodForAmp(test, ""));
+        test = CloneHelper.cloneTestMethodNoAmp(test);
+        testsToReturn.add(CloneHelper.cloneTestMethodForAmp(test, "_assSingle"));
 
         // for every observation, create a new test with a matching assertion
         for (String id : observations.keySet()) {
