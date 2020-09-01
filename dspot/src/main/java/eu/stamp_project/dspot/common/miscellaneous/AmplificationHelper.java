@@ -174,19 +174,6 @@ public class AmplificationHelper {
         }
     }
 
-    public static List<CtMethod<?>> getFailingTests(List<CtMethod<?>> tests, TestResult result) {
-        final List<String> failingTestsName = result.getFailingTests().stream().map(failure -> failure.testCaseName)
-                .collect(Collectors.toList());
-        if (!failingTestsName.isEmpty()) {
-            return tests.stream()
-                    .filter(ctMethod -> failingTestsName.stream()
-                    .anyMatch(failingTestName -> checkMethodName(ctMethod.getSimpleName(), failingTestName)))
-                    .collect(Collectors.toList());
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
     public static boolean checkMethodName(String patternMethodName, String methodNameToBeChecked) {
         return Pattern.compile(patternMethodName + "(\\[\\d+\\])?").matcher(methodNameToBeChecked).matches();
     }

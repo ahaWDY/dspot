@@ -1,7 +1,6 @@
 package eu.stamp_project.dspot.assertiongenerator.assertiongenerator;
 
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.methodreconstructor.observer.testwithloggenerator.objectlogsyntaxbuilder_constructs.objectlog.Observation;
-import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationException;
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.methodreconstructor.AssertionSyntaxBuilder;
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.methodreconstructor.Observer;
@@ -19,7 +18,6 @@ import spoon.reflect.code.CtComment;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLocalVariable;
 import spoon.reflect.code.CtStatement;
-import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.Factory;
@@ -44,14 +42,14 @@ public class MethodReconstructor {
 
     private double delta;
 
-    private final boolean lessAssertions;
+    private final boolean devFriendlyAmplification;
 
     public MethodReconstructor(double delta,
                                CtType originalClass,
                                DSpotCompiler compiler,
                                Map<CtMethod<?>, List<CtLocalVariable<?>>> variableReadsAsserted,
                                TestCompiler testCompiler,
-                               boolean lessAssertions) {
+                               boolean devFriendlyAmplification) {
         this.delta = delta;
         this.factory = compiler.getFactory();
         this.observer = new Observer(
@@ -60,7 +58,7 @@ public class MethodReconstructor {
                 variableReadsAsserted,
                 testCompiler
         );
-        this.lessAssertions = lessAssertions;
+        this.devFriendlyAmplification = devFriendlyAmplification;
     }
 
     /**
@@ -89,7 +87,7 @@ public class MethodReconstructor {
     // add assertions to each test with values retrieved from logs
     private List<CtMethod<?>> buildEachTest(List<CtMethod<?>> testCases,Map<String, Observation> observations) {
         LOGGER.info("Generating assertions...");
-        if (lessAssertions) {
+        if (devFriendlyAmplification) {
             return testCases.stream()
                     .map(ctMethod -> this.buildTestsWithSeparateAsserts(ctMethod, observations))
                     .flatMap(List::stream)

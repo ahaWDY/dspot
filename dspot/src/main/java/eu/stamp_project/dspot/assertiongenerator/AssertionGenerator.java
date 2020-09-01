@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -44,19 +43,19 @@ public class AssertionGenerator {
 
     private TestCompiler testCompiler;
 
-    private final boolean lessAssertions;
+    private final boolean devFriendlyAmplification;
 
     public AssertionGenerator(double delta, DSpotCompiler compiler, TestCompiler testCompiler) {
         this(delta,  compiler, testCompiler, false);
     }
 
-    public AssertionGenerator(double delta, DSpotCompiler compiler, TestCompiler testCompiler, boolean lessAssertions) {
+    public AssertionGenerator(double delta, DSpotCompiler compiler, TestCompiler testCompiler, boolean devFriendlyAmplification) {
         this.delta = delta;
         this.compiler = compiler;
         this.assertionRemover = new AssertionRemover();
         this.tryCatchFailGenerator = new TryCatchFailGenerator();
         this.testCompiler = testCompiler;
-        this.lessAssertions = lessAssertions;
+        this.devFriendlyAmplification = devFriendlyAmplification;
     }
 
     /**
@@ -80,7 +79,7 @@ public class AssertionGenerator {
                 compiler,
                 this.assertionRemover.getVariableAssertedPerTestMethod(),
                 this.testCompiler,
-                this.lessAssertions
+                this.devFriendlyAmplification
         );
         final List<CtMethod<?>> amplifiedTestsWithAssertions =
                 this.assertPassingAndFailingTests(cloneClass, tests);
@@ -160,7 +159,7 @@ public class AssertionGenerator {
         }
         final List<CtMethod<?>> generatedTestWithAssertion = new ArrayList<>();
         generatedTestWithAssertion.addAll(addAssertionsOnPassingTests(testResult, tests, testClass));
-        generatedTestWithAssertion.addAll(addFailStatementOnFailingTests(testResult, tests, testClass));
+        generatedTestWithAssertion.addAll(addFailStatementOnFailingTests(testResult, tests));
         return generatedTestWithAssertion;
     }
 
@@ -185,7 +184,7 @@ public class AssertionGenerator {
     }
 
     // add try/catch block with fail statement in failing tests
-    private List<CtMethod<?>> addFailStatementOnFailingTests(TestResult testResult, List<CtMethod<?>> tests, CtType testClass){
+    private List<CtMethod<?>> addFailStatementOnFailingTests(TestResult testResult, List<CtMethod<?>> tests){
         final List<String> failuresMethodName = testResult.getFailingTests()
                 .stream()
                 .map(failure -> failure.testCaseName)

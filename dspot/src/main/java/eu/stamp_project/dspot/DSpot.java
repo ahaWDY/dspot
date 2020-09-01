@@ -114,7 +114,7 @@ public class DSpot {
 
             // amplify tests and shrink amplified set with inputAmplDistributor
             inputAmplifiedTests = dSpotState.getInputAmplDistributor().inputAmplify(selectedToBeAmplified, 0);
-            
+
         } catch (AmplificationException e) {
             GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
             return Collections.emptyList();
