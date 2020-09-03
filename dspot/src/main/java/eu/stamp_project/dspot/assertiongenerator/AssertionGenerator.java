@@ -99,7 +99,11 @@ public class AssertionGenerator {
         }
         CtType<?> cloneClass = testClass.clone();
         testClass.getPackage().addType(cloneClass);
-        return new TestTuple(cloneClass, removeAssertions(tests, cloneClass));
+        if (devFriendlyAmplification) {
+            return new TestTuple(cloneClass, removeAssertionsAndTrailingInvocations(tests,cloneClass));
+        } else {
+            return new TestTuple(cloneClass, removeAssertions(tests, cloneClass));
+        }
     }
 
     /**
@@ -111,6 +115,21 @@ public class AssertionGenerator {
     private List<CtMethod<?>> removeAssertions(List<CtMethod<?>> tests, CtType<?> cloneClass){
         List<CtMethod<?>> testsWithoutAssertions = tests.stream()
                 .map(this.assertionRemover::removeAssertion)
+                .collect(Collectors.toList());
+        testsWithoutAssertions.forEach(cloneClass::addMethod);
+        return testsWithoutAssertions;
+    }
+
+    /**
+     * Uses {@link AssertionRemover#removeAssertion(CtMethod)} to remove existing assertions from cloned test methods
+     * @param tests
+     * @param cloneClass
+     * @return
+     */
+    private List<CtMethod<?>> removeAssertionsAndTrailingInvocations(List<CtMethod<?>> tests, CtType<?> cloneClass){
+        List<CtMethod<?>> testsWithoutAssertions = tests.stream()
+                .map(this.assertionRemover::removeAssertion)
+                .map(this.assertionRemover::removeArgumentsOfTrailingAssertions)
                 .collect(Collectors.toList());
         testsWithoutAssertions.forEach(cloneClass::addMethod);
         return testsWithoutAssertions;

@@ -3,8 +3,6 @@ package eu.stamp_project.dspot;
 import eu.stamp_project.dspot.common.configuration.*;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationException;
 import eu.stamp_project.dspot.common.configuration.UserInput;
-import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
-import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.common.report.GlobalReport;
 import eu.stamp_project.dspot.common.report.error.Error;
 import org.slf4j.Logger;
@@ -54,8 +52,9 @@ public class DSpot {
             TestTuple tuple = setup.preAmplification(testClassToBeAmplified, dSpotState.getTestMethodsToBeAmplifiedNames());
             final List<CtMethod<?>> amplifiedTestMethods;
             if (dSpotState.isDevFriendlyAmplification()) {
-                amplifiedTestMethods = devFriendlyAmplification(tuple.testClassToBeAmplified,
-                        tuple.testMethodsToBeAmplified);
+                amplifiedTestMethods =
+                        new DevFriendlyAmplification(this, dSpotState, setup, LOGGER, GLOBAL_REPORT)
+                                .devFriendlyAmplification(tuple.testClassToBeAmplified, tuple.testMethodsToBeAmplified);
             } else {
                 amplifiedTestMethods = amplification(tuple.testClassToBeAmplified,
                         tuple.testMethodsToBeAmplified);
@@ -80,76 +79,8 @@ public class DSpot {
         return amplifiedTestMethodsToKeep;
     }
 
-    /**
-     * Amplifies the test cases in a way suitable to present the results to developers.
-     *
-     * @param testClassToBeAmplified   Test class to be amplified
-     * @param testMethodsToBeAmplified Test methods to be amplified
-     * @return Amplified test methods
-     */
-    private List<CtMethod<?>> devFriendlyAmplification(CtType<?> testClassToBeAmplified, List<CtMethod<?>> testMethodsToBeAmplified) {
-
-        List<CtMethod<?>> amplifiedTestMethodsToKeep = setupSelector(testClassToBeAmplified, testMethodsToBeAmplified);
-
-
-        final List<CtMethod<?>> testsWithoutAssertions;
-        final CtType<?> classWithTestMethods;
-        // 1. Remove old assertions
-        try {
-            TestTuple testTuple;
-            testTuple = dSpotState.getAssertionGenerator().removeAssertions(testClassToBeAmplified, amplifiedTestMethodsToKeep);
-            classWithTestMethods = testTuple.testClassToBeAmplified;
-            testsWithoutAssertions = testTuple.testMethodsToBeAmplified;
-        } catch (Exception | java.lang.Error e) {
-            GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
-            return Collections.emptyList();
-        }
-
-        // 2. Amplify input
-        final List<CtMethod<?>> selectedToBeAmplified;
-        List<CtMethod<?>> inputAmplifiedTests;
-        final List<CtMethod<?>> currentTestList;
-        try {
-            selectedToBeAmplified = setup.fullSelectorSetup(classWithTestMethods, testsWithoutAssertions);
-
-            // amplify tests and shrink amplified set with inputAmplDistributor
-            inputAmplifiedTests = dSpotState.getInputAmplDistributor().inputAmplify(selectedToBeAmplified, 0);
-
-        } catch (AmplificationException e) {
-            GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
-            return Collections.emptyList();
-        } catch (Exception | java.lang.Error e) {
-            GLOBAL_REPORT.addError(new Error(ERROR_INPUT_AMPLIFICATION, e));
-            return Collections.emptyList();
-        }
-
-        // 3. Add new assertions
-        final List<CtMethod<?>> testsWithAssertions = dSpotState.getAssertionGenerator().assertionAmplification(classWithTestMethods, inputAmplifiedTests);
-        if (testsWithAssertions.isEmpty()) {
-            return testsWithAssertions;
-        }
-
-        final List<CtMethod<?>> amplifiedPassingTests =
-                dSpotState.getTestCompiler().compileRunAndDiscardUncompilableAndFailingTestMethods(
-                        classWithTestMethods,
-                        testsWithAssertions,
-                        dSpotState.getCompiler()
-                );
-
-        // 4. Keep tests that improve the test suite
-        final List<CtMethod<?>> improvingTests = new ArrayList<>();
-        try {
-            selectImprovingTestCases(amplifiedPassingTests, improvingTests);
-        } catch (AmplificationException e) {
-            GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
-            return Collections.emptyList();
-        }
-
-        LOGGER.info("Dev friendly amplification: {} test method(s) have been successfully amplified.", improvingTests.size());
-        return improvingTests;
-    }
-
-    private List<CtMethod<?>> setupSelector(CtType<?> testClassToBeAmplified, List<CtMethod<?>> testMethodsToBeAmplified) {
+    public List<CtMethod<?>> setupSelector(CtType<?> testClassToBeAmplified,
+                                          List<CtMethod<?>> testMethodsToBeAmplified) {
         final List<CtMethod<?>> selectedToBeAmplified;
         try {
             selectedToBeAmplified = setup.firstSelectorSetup(testClassToBeAmplified, testMethodsToBeAmplified);
@@ -296,7 +227,7 @@ public class DSpot {
      * @param amplifiedTests List that good test cases will be added to
      * @throws AmplificationException
      */
-    private void selectImprovingTestCases(List<CtMethod<?>> currentTestList, List<CtMethod<?>> amplifiedTests)
+    public void selectImprovingTestCases(List<CtMethod<?>> currentTestList, List<CtMethod<?>> amplifiedTests)
             throws AmplificationException  {
         final List<CtMethod<?>> amplifiedTestMethodsToKeep;
         try {
