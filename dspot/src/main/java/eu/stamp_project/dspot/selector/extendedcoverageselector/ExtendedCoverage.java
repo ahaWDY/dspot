@@ -74,7 +74,7 @@ public class ExtendedCoverage{
                 .filter(entry -> that.containsKey(entry.getKey()))
                 .forEach(entry -> {
                     List<Integer> instructionsCoveredByThat = that.get(entry.getKey());
-                    // calculate 'diff' of the coverage values, i.e. all the lines where this covered more than that
+                    // calculate 'diff' of the coverage values, i.e. all the lines where thiz covered more than that
                     List<Integer> betterAt = IntStream.range(0, entry.getValue().size())
                             .mapToObj(i -> entry.getValue().get(i) - instructionsCoveredByThat.get(i))
                             .collect(Collectors.toList());
@@ -86,8 +86,24 @@ public class ExtendedCoverage{
         return thizBetterDiff;
     }
 
-    // TODO Method that constructs a String to explain _what_ is better
-    public String explainImprovementOver(Coverage other) {
-        throw new NotImplementedException();
+    public String explainImprovementOver(ExtendedCoverage other) {
+
+        Map<String, List<Integer>> instructionDiff = improvementDiff(this.instructionsCoveredPerClass,
+                other.instructionsCoveredPerClass);
+        StringBuilder explanation = new StringBuilder("Coverage improved at");
+        instructionDiff.forEach((key, value) -> {
+            explanation.append("\n").append(key).append(": ");
+            int index = -1;
+            for (Integer instructionImprovement : value) {
+                index++;
+                if (instructionImprovement <= 0) {
+                    continue;
+                }
+                explanation.append("L. ").append(index).append(" +").append(instructionImprovement).append(" instr., ").append("\n");
+            }
+            explanation.replace(explanation.length() - 2, explanation.length(), "");
+        });
+
+        return explanation.toString();
     }
 }
