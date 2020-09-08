@@ -36,6 +36,10 @@ public class ExtendedCoverage {
         this.instructionsCoveredPerClass = cleanAllZeroValuesFromMap(this.instructionsCoveredPerClass);
     }
 
+    public Map<String, List<Integer>> getInstructionsCoveredPerClass() {
+        return instructionsCoveredPerClass;
+    }
+
     private Map<String, List<Integer>> cleanAllZeroValuesFromMap(Map<String, List<Integer>> map) {
         Map<String, List<Integer>> cleaned = new HashMap<>();
         map.forEach((k, v) -> {
@@ -131,5 +135,18 @@ public class ExtendedCoverage {
         });
 
         return explanation.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ExtendedCoverage that = (ExtendedCoverage) o;
+        return Objects.equals(instructionsCoveredPerClass, that.instructionsCoveredPerClass);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(instructionsCoveredPerClass);
     }
 }

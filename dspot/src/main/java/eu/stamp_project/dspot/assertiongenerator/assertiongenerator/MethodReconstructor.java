@@ -153,7 +153,6 @@ public class MethodReconstructor {
     private List<CtMethod<?>> buildTestsWithSeparateAsserts(CtMethod<?> test, Map<String, Observation> observations) {
         List<CtMethod<?>> testsToReturn = new ArrayList<>();
         CtMethod<?> clonedNoAmpTest = CloneHelper.cloneTestMethodNoAmp(test);
-        // testsToReturn.add(CloneHelper.cloneTestMethodForAmp(test, "_assSingle"));
 
         // for every observation, create a new test with a matching assertion
         for (String id : observations.keySet()) {
@@ -170,7 +169,6 @@ public class MethodReconstructor {
             CtMethod<?> parent = AmplificationHelper.getAmpTestParent(test);
             List<CtStatement> parentAssertStatements = Collections.emptyList();
             if (parent != null) {
-                System.out.println("***** PARENT WAS ******" + test.getSimpleName());
                 String parentKey = parent.getSimpleName() + "__" + id.split("__", 2)[1];
                 if (observations.containsKey(parentKey)) {
                     parentAssertStatements = AssertionSyntaxBuilder.buildAssert(parent,
@@ -187,7 +185,7 @@ public class MethodReconstructor {
             );
 
             for (CtStatement statement : assertStatements) {
-                // skip if same statement would also apply to parent test
+                // skip if same statement could also appear in parent test
                 if (!parentAssertStatements.isEmpty() && parentAssertStatements.contains(statement)) {
                     continue;
                 }
