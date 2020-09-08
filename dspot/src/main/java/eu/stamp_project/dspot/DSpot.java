@@ -104,6 +104,9 @@ public class DSpot {
             this.globalNumberOfSelectedAmplification += amplifiedTestMethodsToKeep.size();
             LOGGER.info("{} amplified test methods has been selected to be kept. (global: {})", amplifiedTestMethodsToKeep.size(),
                     this.globalNumberOfSelectedAmplification);
+        } catch (AmplificationException e) {
+            GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
+            return Collections.emptyList();
         } catch (Exception e) {
             return Collections.emptyList();
         }
