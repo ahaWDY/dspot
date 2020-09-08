@@ -119,11 +119,11 @@ public class MethodReconstructor {
 
         // for every observation, create an assertion
         for (String id : observations.keySet()) {
-            if (!id.split("__")[0].equals(testWithAssert.getSimpleName())) {
+            if (!id.split("__")[0].equals(test.getSimpleName())) {
                 continue;
             }
             final List<CtStatement> assertStatements = AssertionSyntaxBuilder.buildAssert(
-                    test,
+                    testWithAssert,
                     observations.get(id).getNotDeterministValues(),
                     observations.get(id).getObservationValues(),
                     this.delta

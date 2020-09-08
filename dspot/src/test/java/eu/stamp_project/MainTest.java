@@ -222,7 +222,7 @@ public class MainTest {
                 "--verbose",
                 "--absolute-path-to-project-root", new File("src/test/resources/test-projects/").getAbsolutePath() + "/",
                 "--amplifiers", "FastLiteralAmplifier",
-                "--test-criterion", "JacocoCoverageSelector",
+                "--test-criterion", "ExtendedCoverageSelector",
                 "--test", "example.TestSuiteExample2",
                 "--dev-friendly",
         });

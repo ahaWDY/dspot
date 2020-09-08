@@ -128,7 +128,7 @@ public class JacocoCoverageSelector extends TakeAllSelector {
                 .filter(ctMethod -> {
                     final String simpleNameOfFirstParent = getFirstParentThatHasBeenRun(ctMethod).getSimpleName();
                     return this.selectedToBeAmplifiedCoverageResultsMap.get(simpleNameOfFirstParent) == null ||
-                            coversNewPath(coveragePerTestMethod.getCoverageOf(ctMethod.getSimpleName()),
+                            coveragePerTestMethod.getCoverageOf(ctMethod.getSimpleName()).isBetterThan(
                                     this.selectedToBeAmplifiedCoverageResultsMap.get(simpleNameOfFirstParent));
                 })
                 .filter(ctMethod -> {
@@ -177,17 +177,6 @@ public class JacocoCoverageSelector extends TakeAllSelector {
             }
         }
         return currentParent;
-    }
-
-    private boolean coversNewPath(Coverage newCoverage, Coverage oldCoverage) {
-        if (oldCoverage == null) {
-            return true;
-        }
-        double percCoverageThis =
-                ((double) newCoverage.getInstructionsCovered() / (double) newCoverage.getInstructionsTotal());
-        double percCoverageThat = ((double) oldCoverage.getInstructionsCovered() / (double) oldCoverage.getInstructionsTotal());
-        // TODO actually we would need a contains relation here
-        return (!newCoverage.getExecutionPath().equals(oldCoverage.getExecutionPath())) || percCoverageThis >= percCoverageThat;
     }
 
     @Override

@@ -58,8 +58,15 @@ public class AssertionGenerator {
         this.devFriendlyAmplification = devFriendlyAmplification;
     }
 
+    public List<CtMethod<?>> removeAndAmplifyAssertions(CtType<?> testClass, List<CtMethod<?>> tests) {
+        TestTuple testsWithOldAssertionsRemoved = removeAssertions(testClass, tests);
+        return assertionAmplification(
+                testsWithOldAssertionsRemoved.testClassToBeAmplified,
+                testsWithOldAssertionsRemoved.testMethodsToBeAmplified);
+    }
+
     /**
-     * Removes old assertions and adds new assertions and fail statements in multiple tests.
+     * Adds new assertions and fail statements in multiple tests.
      * Details of the assertions generation in {@link #assertPassingAndFailingTests(CtType, List)}.
      *
      * @param testClass Test class
