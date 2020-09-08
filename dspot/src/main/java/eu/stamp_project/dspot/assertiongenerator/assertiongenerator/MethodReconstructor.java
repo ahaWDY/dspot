@@ -75,6 +75,10 @@ public class MethodReconstructor {
      */
     public List<CtMethod<?>> addAssertions(CtType<?> testClass, List<CtMethod<?>> testCases) {
         Map<String, Observation> observations;
+        if (devFriendlyAmplification) {
+            testCases.addAll(AmplificationHelper.getFirstParentsIfExist(testCases));
+        }
+
         try {
             observations = observer.getObservations(testClass, testCases);
         } catch (AmplificationException e) {
@@ -85,7 +89,7 @@ public class MethodReconstructor {
     }
 
     // add assertions to each test with values retrieved from logs
-    private List<CtMethod<?>> buildEachTest(List<CtMethod<?>> testCases,Map<String, Observation> observations) {
+    private List<CtMethod<?>> buildEachTest(List<CtMethod<?>> testCases, Map<String, Observation> observations) {
         LOGGER.info("Generating assertions...");
         if (devFriendlyAmplification) {
             return testCases.stream()
@@ -148,14 +152,33 @@ public class MethodReconstructor {
      */
     private List<CtMethod<?>> buildTestsWithSeparateAsserts(CtMethod<?> test, Map<String, Observation> observations) {
         List<CtMethod<?>> testsToReturn = new ArrayList<>();
-        test = CloneHelper.cloneTestMethodNoAmp(test);
-        testsToReturn.add(CloneHelper.cloneTestMethodForAmp(test, "_assSingle"));
+        CtMethod<?> clonedNoAmpTest = CloneHelper.cloneTestMethodNoAmp(test);
+        // testsToReturn.add(CloneHelper.cloneTestMethodForAmp(test, "_assSingle"));
 
         // for every observation, create a new test with a matching assertion
         for (String id : observations.keySet()) {
             if (!id.split("__")[0].equals(test.getSimpleName())) {
                 continue;
             }
+            // if there is a '__end' observation for the same method, skip this one and use that one
+            // (assertions should be at the end of the test case where possible)
+            if (observations.containsKey(id + "___end")) {
+                continue;
+            }
+
+            // check whether the observation exists in parent test case
+            CtMethod<?> parent = AmplificationHelper.getAmpTestParent(test);
+            List<CtStatement> parentAssertStatements = Collections.emptyList();
+            if (parent != null) {
+                System.out.println("***** PARENT WAS ******" + test.getSimpleName());
+                String parentKey = parent.getSimpleName() + "__" + id.split("__", 2)[1];
+                if (observations.containsKey(parentKey)) {
+                    parentAssertStatements = AssertionSyntaxBuilder.buildAssert(parent,
+                            observations.get(parentKey).getNotDeterministValues(),
+                            observations.get(parentKey).getObservationValues(),this.delta);
+                }
+            }
+
             final List<CtStatement> assertStatements = AssertionSyntaxBuilder.buildAssert(
                     test,
                     observations.get(id).getNotDeterministValues(),
@@ -164,7 +187,12 @@ public class MethodReconstructor {
             );
 
             for (CtStatement statement : assertStatements) {
-                CtMethod<?> testWithAssert = CloneHelper.cloneTestMethodForAmp(test, "_assSep");
+                // skip if same statement would also apply to parent test
+                if (!parentAssertStatements.isEmpty() && parentAssertStatements.contains(statement)) {
+                    continue;
+                }
+
+                CtMethod<?> testWithAssert = CloneHelper.cloneTestMethodForAmp(clonedNoAmpTest, "_assSep");
                 List<CtStatement> statements = Query.getElements(testWithAssert, new TypeFilter<CtStatement>(CtStatement.class));
 
                 int numberOfAddedAssertion = goThroughAssertionStatements(Collections.singletonList(statement), id, statements, 0);

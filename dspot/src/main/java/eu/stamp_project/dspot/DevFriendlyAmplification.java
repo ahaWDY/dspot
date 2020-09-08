@@ -50,18 +50,20 @@ public class DevFriendlyAmplification {
         final List<CtMethod<?>> amplifiedTestMethodsToKeep = new ArrayList<>();
         amplifiedTestMethodsToKeep.addAll(ampRemoveAssertionsAddNewOnes(testClassToBeAmplified,
                 selectedToBeAmplified));
+        amplifiedTestMethodsToKeep.addAll(inputAmplification(testClassToBeAmplified,selectedToBeAmplified));
         return amplifiedTestMethodsToKeep;
     }
 
     public List<CtMethod<?>> ampRemoveAssertionsAddNewOnes(CtType<?> testClassToBeAmplified,
-                                                      List<CtMethod<?>> testMethodsToBeAmplified) {
+                                                           List<CtMethod<?>> testMethodsToBeAmplified) {
         final List<CtMethod<?>> amplifiedTests;
         final CtType<?> classWithTestMethods;
         try {
             TestTuple testTuple;
-            // 1. Remove old assertions
+            // Remove old assertions
             testTuple = dSpotState.getAssertionGenerator().removeAssertions(testClassToBeAmplified, testMethodsToBeAmplified);
-            // 2. Add new assertions
+
+            // Add new assertions
             amplifiedTests = dSpotState.getAssertionGenerator().assertionAmplification(testTuple.testClassToBeAmplified, testTuple.testMethodsToBeAmplified);
             classWithTestMethods = testTuple.testClassToBeAmplified;
         } catch (Exception | java.lang.Error e) {
@@ -90,60 +92,41 @@ public class DevFriendlyAmplification {
         return improvingTests;
     }
 
-    /**
-     * TODO full process replicating the old one
-     *
-     * @param testClassToBeAmplified   Test class to be amplified
-     * @param testMethodsToBeAmplified Test methods to be amplified
-     * @return Amplified test methods
-     */
-    public List<CtMethod<?>> oldFullDevFriendlyAmp(CtType<?> testClassToBeAmplified,
-                                                      List<CtMethod<?>> testMethodsToBeAmplified) {
-
-        List<CtMethod<?>> amplifiedTestMethodsToKeep = dSpot.setupSelector(testClassToBeAmplified,
-                testMethodsToBeAmplified);
-
-
-        final List<CtMethod<?>> testsWithoutAssertions;
+    public List<CtMethod<?>> inputAmplification(CtType<?> testClassToBeAmplified,
+                                                List<CtMethod<?>> testMethodsToBeAmplified) {
+        final List<CtMethod<?>> amplifiedTests;
         final CtType<?> classWithTestMethods;
-        // 1. Remove old assertions
         try {
             TestTuple testTuple;
-            testTuple = dSpotState.getAssertionGenerator().removeAssertions(testClassToBeAmplified, amplifiedTestMethodsToKeep);
+            // Remove old assertions
+            testTuple = dSpotState.getAssertionGenerator().removeAssertions(testClassToBeAmplified, testMethodsToBeAmplified);
             classWithTestMethods = testTuple.testClassToBeAmplified;
-            testsWithoutAssertions = testTuple.testMethodsToBeAmplified;
-        } catch (Exception | java.lang.Error e) {
-            GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
-            return Collections.emptyList();
-        }
 
-        // 2. Amplify input
-        final List<CtMethod<?>> selectedToBeAmplified;
-        List<CtMethod<?>> inputAmplifiedTests;
-        try {
-            selectedToBeAmplified = setup.fullSelectorSetup(classWithTestMethods, testsWithoutAssertions);
+            // Amplify input
+            List<CtMethod<?>> selectedForInputAmplification = setup.fullSelectorSetup(classWithTestMethods,
+                    testTuple.testMethodsToBeAmplified);
 
             // amplify tests and shrink amplified set with inputAmplDistributor
-            inputAmplifiedTests = dSpotState.getInputAmplDistributor().inputAmplify(selectedToBeAmplified, 0);
+            List<CtMethod<?>> inputAmplifiedTests =
+                    dSpotState.getInputAmplDistributor().inputAmplify(selectedForInputAmplification, 0);
 
-        } catch (AmplificationException e) {
+            // Add new assertions
+            // TODO how can these assertions be related to the amplified input???
+            // TODO: keep 'parent' test case and also observe it's values: assert values that are different in parent
+            amplifiedTests = dSpotState.getAssertionGenerator().assertionAmplification(classWithTestMethods, inputAmplifiedTests);
+
+        } catch (Exception | java.lang.Error e) {
             GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
             return Collections.emptyList();
-        } catch (Exception | java.lang.Error e) {
-            GLOBAL_REPORT.addError(new Error(ERROR_INPUT_AMPLIFICATION, e));
+        }
+
+        if (amplifiedTests.isEmpty()) {
             return Collections.emptyList();
         }
-
-        // 3. Add new assertions
-        final List<CtMethod<?>> testsWithAssertions = dSpotState.getAssertionGenerator().assertionAmplification(classWithTestMethods, inputAmplifiedTests);
-        if (testsWithAssertions.isEmpty()) {
-            return testsWithAssertions;
-        }
-
         final List<CtMethod<?>> amplifiedPassingTests =
                 dSpotState.getTestCompiler().compileRunAndDiscardUncompilableAndFailingTestMethods(
                         classWithTestMethods,
-                        testsWithAssertions,
+                        amplifiedTests,
                         dSpotState.getCompiler()
                 );
 
@@ -156,7 +139,9 @@ public class DevFriendlyAmplification {
             return Collections.emptyList();
         }
 
-        LOGGER.info("Dev friendly amplification: {} test method(s) have been successfully amplified.", improvingTests.size());
+        LOGGER.info("Dev friendly amplification, path 1: {} test method(s) have been successfully amplified.",
+                improvingTests.size());
         return improvingTests;
     }
+
 }

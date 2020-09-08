@@ -9,28 +9,18 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import javax.swing.*;
 import java.io.FilenameFilter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class ExtendedCoverage{
-
-    private final Coverage internalCoverage;
+public class ExtendedCoverage {
 
     private Map<String, List<Integer>> instructionsCoveredPerClass;
 
-    //TODO
-    private Map<String, List<Integer>> totalInstructionsPerClass;
-
-    //TODO branch coverage
-    //private final Map<String, List<Integer>> branchesCoveredPerClass;
-    //private final Map<String, List<Integer>> totalBranchesPerClass;
-
     public ExtendedCoverage(Coverage coverage) {
-        this.internalCoverage = coverage;
-        this.totalInstructionsPerClass = Collections.emptyMap();
 
         this.instructionsCoveredPerClass =
-                Arrays.stream(internalCoverage.getExecutionPath().split(";"))
+                Arrays.stream(coverage.getExecutionPath().split(";"))
                         .collect(Collectors.toMap(
                                 s -> s.split(":")[0],
                                 s -> {
@@ -66,6 +56,42 @@ public class ExtendedCoverage{
         return !instructionDiff.keySet().isEmpty();
     }
 
+    public void accumulate(ExtendedCoverage toAdd) {
+        this.instructionsCoveredPerClass = accumulate(this.instructionsCoveredPerClass,
+                toAdd.instructionsCoveredPerClass);
+    }
+
+    /**
+     * @param base original coverage map
+     * @param toAdd coverage map to be accumulated on top
+     * @return accumulative coverage of base and toAdd
+     */
+    private static Map<String, List<Integer>> accumulate(Map<String, List<Integer>> base,
+                                                         Map<String, List<Integer>> toAdd) {
+        Set<String> mergedKeys = new HashSet<>();
+        mergedKeys.addAll(base.keySet());
+        mergedKeys.addAll(toAdd.keySet());
+
+        Map<String, List<Integer>> accumulated = new HashMap<>();
+        for (String mergedKey : mergedKeys) {
+            List<Integer> valuesBase = base.get(mergedKey);
+            List<Integer> valuesToAdd = toAdd.get(mergedKey);
+
+            if (valuesBase == null) {
+                accumulated.put(mergedKey, valuesToAdd);
+            }
+            else if (valuesToAdd == null) {
+                accumulated.put(mergedKey, valuesBase);
+            } else {
+                accumulated.put(mergedKey,
+                        IntStream.range(0, valuesToAdd.size())
+                                .mapToObj(i -> Math.max(valuesBase.get(i), valuesToAdd.get(i)))
+                                .collect(Collectors.toList()));
+            }
+        }
+        return accumulated;
+    }
+
     private static Map<String, List<Integer>> improvementDiff(Map<String, List<Integer>> thiz,
                                                         Map<String, List<Integer>> that) {
 
@@ -92,14 +118,14 @@ public class ExtendedCoverage{
                 other.instructionsCoveredPerClass);
         StringBuilder explanation = new StringBuilder("Coverage improved at");
         instructionDiff.forEach((key, value) -> {
-            explanation.append("\n").append(key).append(": ");
+            explanation.append("\n").append(key).append(":\n");
             int index = -1;
             for (Integer instructionImprovement : value) {
                 index++;
                 if (instructionImprovement <= 0) {
                     continue;
                 }
-                explanation.append("L. ").append(index).append(" +").append(instructionImprovement).append(" instr., ").append("\n");
+                explanation.append("L. ").append(index).append(" +").append(instructionImprovement).append(" instr.").append("\n");
             }
             explanation.replace(explanation.length() - 2, explanation.length(), "");
         });

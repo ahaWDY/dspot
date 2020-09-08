@@ -15,14 +15,9 @@ import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.Query;
 import spoon.reflect.visitor.filter.TypeFilter;
 
+import javax.swing.event.ListDataEvent;
 import java.text.DecimalFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -187,4 +182,20 @@ public class AmplificationHelper {
         return amplifiedTest;
     }
 
+    /**
+     * For each method in `methods` that has a parent, this (direct) parent will be in the returned list.
+     * @param methods list of methods of which to determine the parents
+     * @return list containing all available first parents
+     */
+    public static List<CtMethod<?>> getFirstParentsIfExist(List<CtMethod<?>> methods) {
+        List<CtMethod<?>> parents = new ArrayList<>();
+
+        for (CtMethod<?> method : methods) {
+            CtMethod<?> parent = getAmpTestParent(method);
+            if (parent != null) {
+                parents.add(parent);
+            }
+        }
+        return parents;
+    }
 }

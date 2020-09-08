@@ -37,6 +37,8 @@ public class ExtendedCoverageSelector extends TakeAllSelector {
 
     ExtendedCoverage initialCoverage;
 
+    ExtendedCoverage cumulativeAmplifiedCoverage;
+
     public ExtendedCoverageSelector(AutomaticBuilder automaticBuilder, UserInput configuration) {
         super(automaticBuilder, configuration);
     }
@@ -54,23 +56,28 @@ public class ExtendedCoverageSelector extends TakeAllSelector {
         } catch (TimeoutException e) {
             throw new RuntimeException(e);
         }
+        this.cumulativeAmplifiedCoverage = this.initialCoverage;
         return testsToBeAmplified;
     }
 
     @Override
     public List<CtMethod<?>> selectToKeep(List<CtMethod<?>> amplifiedTestToBeKept) {
         CoveragePerTestMethod coveragePerTestMethod = computeCoverageForGivenTestMethods(amplifiedTestToBeKept);
+
         final List<CtMethod<?>> methodsKept = new ArrayList<>();
         for (CtMethod<?> ctMethod : amplifiedTestToBeKept) {
             ExtendedCoverage newCoverage =
                     new ExtendedCoverage(coveragePerTestMethod.getCoverageOf(ctMethod.getSimpleName()));
-            if (newCoverage.isBetterThan(initialCoverage)) {
+            if (newCoverage.isBetterThan(cumulativeAmplifiedCoverage)) {
+                //note: we still explain the improvement to the coverage before amplification. Maybe we should change?
                 DSpotUtils.addComment(ctMethod, newCoverage.explainImprovementOver(initialCoverage),
                         CtComment.CommentType.BLOCK);
                 methodsKept.add(ctMethod);
+                cumulativeAmplifiedCoverage.accumulate(newCoverage);
             }
         }
         this.selectedAmplifiedTest.addAll(methodsKept);
+
         return methodsKept;
     }
 
@@ -91,6 +98,8 @@ public class ExtendedCoverageSelector extends TakeAllSelector {
     @Override
     public TestSelectorElementReport report() {
         final String report = "Amplification results with " + this.selectedAmplifiedTest.size() + " new tests.";
+
+        // todo: json could report on initial vs. cumulative coverage
 
 //        // compute the new coverage obtained by the amplification
 //        final CtType<?> clone = this.currentClassTestToBeAmplified.clone();
