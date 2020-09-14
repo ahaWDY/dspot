@@ -5,6 +5,7 @@ import eu.stamp_project.dspot.AbstractTestOnSample;
 import eu.stamp_project.dspot.amplifier.amplifiers.value.ValueCreator;
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.AssertionRemover;
 import eu.stamp_project.dspot.common.configuration.UserInput;
+import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
@@ -66,7 +67,7 @@ public class AssertionGeneratorTest extends AbstractTestOnSample {
         AutomaticBuilder builder = AutomaticBuilderEnum.Maven.getAutomaticBuilder(configuration);
         initializeDSpot = new InitializeDSpot();
         dependencies = initializeDSpot.completeDependencies(configuration, builder);
-        DSpotUtils.init(false, "target/dspot/",
+        DSpotUtils.init(CommentEnum.None, "target/dspot/",
                 configuration.getFullClassPathWithExtraDependencies(),
                 "src/test/resources/sample/"
         );

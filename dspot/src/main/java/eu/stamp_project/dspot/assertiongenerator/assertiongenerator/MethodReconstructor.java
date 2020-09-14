@@ -1,6 +1,7 @@
 package eu.stamp_project.dspot.assertiongenerator.assertiongenerator;
 
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.methodreconstructor.observer.testwithloggenerator.objectlogsyntaxbuilder_constructs.objectlog.Observation;
+import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationException;
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.methodreconstructor.AssertionSyntaxBuilder;
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.methodreconstructor.Observer;
@@ -208,7 +209,8 @@ public class MethodReconstructor {
         for (CtStatement assertStatement : assertStatements) {
             DSpotUtils.addComment(assertStatement,
                     "AssertionGenerator: add assertion",
-                    CtComment.CommentType.INLINE);
+                    CtComment.CommentType.INLINE,
+                    CommentEnum.Amplifier);
             try {
                 CtStatement statementToBeAsserted = statements.get(line);
                 if (lastStmt == null) {
@@ -265,7 +267,8 @@ public class MethodReconstructor {
 
         DSpotUtils.addComment(localVariable,
                 "AssertionGenerator: create local variable with return value of invocation",
-                CtComment.CommentType.INLINE);
+                CtComment.CommentType.INLINE,
+                CommentEnum.Amplifier);
         localVariable.setParent(statementToBeAsserted.getParent());
         addAtCorrectPlace(id, localVariable, assertStatement, statementToBeAsserted);
         statements.remove(line);

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import eu.stamp_project.dspot.common.automaticbuilder.AutomaticBuilder;
 import eu.stamp_project.dspot.common.configuration.UserInput;
+import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.report.output.selector.TestSelectorElementReport;
 import eu.stamp_project.dspot.common.report.output.selector.TestSelectorElementReportImpl;
 import eu.stamp_project.dspot.common.report.output.selector.coverage.json.TestCaseJSON;
@@ -146,12 +147,12 @@ public class JacocoCoverageSelector extends TakeAllSelector {
                     if (oldCoverage != null) {
                         DSpotUtils.addComment(ctMethod, "JacocoCoverageSelector: Improves instruction coverage from "
                                         + oldCoverage.getInstructionsCovered() + "/" + oldCoverage.getInstructionsTotal(),
-                                CtComment.CommentType.INLINE);
+                                CtComment.CommentType.INLINE, CommentEnum.Coverage);
                     }
                     if (newCoverage != null) {
                         DSpotUtils.addComment(ctMethod, "JacocoCoverageSelector: Improves instruction coverage to "
                                         + newCoverage.getInstructionsCovered() + "/" + newCoverage.getInstructionsTotal(),
-                                CtComment.CommentType.INLINE);
+                                CtComment.CommentType.INLINE, CommentEnum.Coverage);
                     }
                 })
                 .collect(Collectors.toList());

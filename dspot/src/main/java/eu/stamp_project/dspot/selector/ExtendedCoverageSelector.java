@@ -2,6 +2,7 @@ package eu.stamp_project.dspot.selector;
 
 import eu.stamp_project.dspot.common.automaticbuilder.AutomaticBuilder;
 import eu.stamp_project.dspot.common.configuration.UserInput;
+import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import eu.stamp_project.dspot.common.miscellaneous.Counter;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
@@ -62,7 +63,7 @@ public class ExtendedCoverageSelector extends TakeAllSelector {
             if (newCoverage.isBetterThan(this.cumulativeAmplifiedCoverage)) {
                 //note: we still explain the improvement to the coverage before amplification. Maybe we should change?
                 CoverageImprovement coverageImprovement = newCoverage.coverageImprovementOver(this.initialCoverage);
-                DSpotUtils.addComment(ctMethod, coverageImprovement.toString(), CtComment.CommentType.BLOCK);
+                DSpotUtils.addComment(ctMethod, coverageImprovement.toString(), CtComment.CommentType.BLOCK, CommentEnum.Coverage);
                 methodsKept.add(ctMethod);
                 this.coveragePerAmplifiedMethod.put(ctMethod, coverageImprovement);
                 this.cumulativeAmplifiedCoverage.accumulate(newCoverage);

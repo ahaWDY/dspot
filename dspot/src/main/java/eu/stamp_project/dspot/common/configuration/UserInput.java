@@ -428,11 +428,12 @@ public class UserInput {
 
     @CommandLine.Option(
             names = {"--with-comment"},
-            defaultValue = "false",
-            description = "Enable comment on amplified test: details steps of the Amplification." +
+            defaultValue = "None",
+            description = "Enable comment on amplified test: details steps of the amplification." +
+                    " Valid values: ${COMPLETION-CANDIDATES}." +
                     " Default value: ${DEFAULT-VALUE}"
     )
-    private boolean withComment;
+    private CommentEnum withComment;
 
     @CommandLine.Option(
             names = {"--allow-path-in-assertions"},
@@ -936,7 +937,7 @@ public class UserInput {
         return this;
     }
 
-    public boolean withComment() {
+    public CommentEnum withComment() {
         return withComment;
     }
 

@@ -1,5 +1,6 @@
 package eu.stamp_project.dspot.common.miscellaneous;
 
+import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import eu.stamp_project.testrunner.listener.TestResult;
 
@@ -178,7 +179,8 @@ public class AmplificationHelper {
                 "amplification of " +
                         (topParent.getDeclaringType() != null ?
                                 topParent.getDeclaringType().getQualifiedName() + "#" : "") + topParent.getSimpleName(),
-                CtComment.CommentType.BLOCK);
+                CtComment.CommentType.BLOCK,
+                CommentEnum.Amplifier);
         return amplifiedTest;
     }
 
