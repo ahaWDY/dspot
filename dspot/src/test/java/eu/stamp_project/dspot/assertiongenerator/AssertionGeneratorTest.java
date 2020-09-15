@@ -67,10 +67,6 @@ public class AssertionGeneratorTest extends AbstractTestOnSample {
         AutomaticBuilder builder = AutomaticBuilderEnum.Maven.getAutomaticBuilder(configuration);
         initializeDSpot = new InitializeDSpot();
         dependencies = initializeDSpot.completeDependencies(configuration, builder);
-        DSpotUtils.init(CommentEnum.None, "target/dspot/",
-                configuration.getFullClassPathWithExtraDependencies(),
-                "src/test/resources/sample/"
-        );
     }
 
     @Before
@@ -93,6 +89,10 @@ public class AssertionGeneratorTest extends AbstractTestOnSample {
                 false
         );
         this.assertionGenerator = new AssertionGenerator(0.1D, compiler, testCompiler, false);
+        DSpotUtils.init(CommentEnum.None, "target/dspot/",
+                configuration.getFullClassPathWithExtraDependencies(),
+                "src/test/resources/sample/"
+        );
         super.setUp();
     }
 

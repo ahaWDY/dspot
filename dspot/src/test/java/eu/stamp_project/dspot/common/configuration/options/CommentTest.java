@@ -1,7 +1,6 @@
 package eu.stamp_project.dspot.common.configuration.options;
 
 import eu.stamp_project.Main;
-import eu.stamp_project.MainTest;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -21,7 +20,7 @@ public class CommentTest {
     private static final String PATH_OUTPUT_TEST_CLASS = "target/dspot/output/example/TestSuiteExample2.java";
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         try {
             FileUtils.deleteDirectory(new File("target/trash"));
             FileUtils.deleteDirectory(new File("src/test/resources/test-projects/target"));
@@ -31,7 +30,7 @@ public class CommentTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         try {
             FileUtils.deleteDirectory(new File("target/trash"));
             FileUtils.deleteDirectory(new File("src/test/resources/test-projects/target"));
@@ -40,12 +39,21 @@ public class CommentTest {
         }
     }
 
-    private void assertFileStartsWith(String path, String expectedStart) throws Exception{
-        final File amplifiedTestClass = new File(path);
+    private void assertFileStartsWith(String expectedStart) throws Exception{
+        final File amplifiedTestClass = new File(CommentTest.PATH_OUTPUT_TEST_CLASS);
 
         try (BufferedReader reader = new BufferedReader(new FileReader(amplifiedTestClass))) {
             String content = reader.lines().collect(Collectors.joining(AmplificationHelper.LINE_SEPARATOR));
             assertTrue(content.startsWith(expectedStart));
+        }
+    }
+
+    private void assertFileContains(String expected) throws Exception{
+        final File amplifiedTestClass = new File(CommentTest.PATH_OUTPUT_TEST_CLASS);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(amplifiedTestClass))) {
+            String content = reader.lines().collect(Collectors.joining(AmplificationHelper.LINE_SEPARATOR));
+            assertTrue(content.contains(expected));
         }
     }
 
@@ -73,7 +81,7 @@ public class CommentTest {
                 "        try {";
 
         assertTrue(new File(PATH_OUTPUT_TEST_CLASS).exists());
-        assertFileStartsWith(PATH_OUTPUT_TEST_CLASS, expectedAmplifiedTestClassBegin);
+        assertFileStartsWith(expectedAmplifiedTestClassBegin);
     }
 
     @Test
@@ -88,29 +96,16 @@ public class CommentTest {
                 "--with-comment=All",
                 "--dev-friendly",
         });
-        String expectedAmplifiedTestClassBegin = "package example;" + AmplificationHelper.LINE_SEPARATOR +
-                "import org.junit.Assert;" + AmplificationHelper.LINE_SEPARATOR +
-                "import org" +
-                ".junit.Test;" + AmplificationHelper.LINE_SEPARATOR +
-                "public class TestSuiteExample2 {" + AmplificationHelper.LINE_SEPARATOR +
-                "    private static int integer = TestResources.integer;" + AmplificationHelper.LINE_SEPARATOR +
-                "" + AmplificationHelper.LINE_SEPARATOR +
+        String classComment =
                 "    /* Coverage improved at" + AmplificationHelper.LINE_SEPARATOR +
                 "    example/Example:" + AmplificationHelper.LINE_SEPARATOR +
                 "    L. 6 +7 instr" + AmplificationHelper.LINE_SEPARATOR +
-                "     */" + AmplificationHelper.LINE_SEPARATOR +
-                "    @Test(timeout = 10000)" + AmplificationHelper.LINE_SEPARATOR +
-                "    public void test3_literalMutationNumber41_assSep92() throws Exception {" + AmplificationHelper.LINE_SEPARATOR +
-                "        Example ex = new Example();" + AmplificationHelper.LINE_SEPARATOR +
-                "        String s = \"abcd\";" + AmplificationHelper.LINE_SEPARATOR +
-                "        // FastLiteralAmplifier: change number from '1' to '0.0'" + AmplificationHelper.LINE_SEPARATOR +
-                "        // AssertionGenerator: create local variable with return value of invocation" + AmplificationHelper.LINE_SEPARATOR +
-                "        char o_test3_literalMutationNumber41__4 = ex.charAt(s, s.length() - 0);" + AmplificationHelper.LINE_SEPARATOR +
-                "        // AssertionGenerator: add assertion" + AmplificationHelper.LINE_SEPARATOR +
-                "        Assert.assertEquals('d', ((char) (o_test3_literalMutationNumber41__4)));" + AmplificationHelper.LINE_SEPARATOR +
-                "    }";
+                "     */";
+        String amplifierComment =
+                "        // AssertionGenerator: add assertion";
         assertTrue(new File(PATH_OUTPUT_TEST_CLASS).exists());
-        assertFileStartsWith(PATH_OUTPUT_TEST_CLASS,expectedAmplifiedTestClassBegin);
+        assertFileContains(classComment);
+        assertFileContains(amplifierComment);
     }
 
     @Test
@@ -125,21 +120,12 @@ public class CommentTest {
                 "--with-comment=Amplifier",
                 "--dev-friendly",
         });
-        String expectedAmplifiedTestClassBegin = "package example;" + AmplificationHelper.LINE_SEPARATOR +
-                "import org.junit.Assert;" + AmplificationHelper.LINE_SEPARATOR +
-                "import org.junit.Test;" + AmplificationHelper.LINE_SEPARATOR +
-                "public class TestSuiteExample2 {" + AmplificationHelper.LINE_SEPARATOR +
-                "    private static int integer = TestResources.integer;" + AmplificationHelper.LINE_SEPARATOR +
-                "" + AmplificationHelper.LINE_SEPARATOR +
-                "    @Test(timeout = 10000)" + AmplificationHelper.LINE_SEPARATOR +
-                "    public void test3_literalMutationNumber41_assSep92() throws Exception {" + AmplificationHelper.LINE_SEPARATOR +
-                "        Example ex = new Example();" + AmplificationHelper.LINE_SEPARATOR +
-                "        String s = \"abcd\";" + AmplificationHelper.LINE_SEPARATOR +
+        String commentAndExpression =
                 "        // FastLiteralAmplifier: change number from '1' to '0.0'" + AmplificationHelper.LINE_SEPARATOR +
                 "        // AssertionGenerator: create local variable with return value of invocation" + AmplificationHelper.LINE_SEPARATOR +
                 "        char o_test3_literalMutationNumber41__4 = ex.charAt(s, s.length() - 0);";
         assertTrue(new File(PATH_OUTPUT_TEST_CLASS).exists());
-        assertFileStartsWith(PATH_OUTPUT_TEST_CLASS,expectedAmplifiedTestClassBegin);
+        assertFileContains(commentAndExpression);
     }
 
     @Test
@@ -172,6 +158,6 @@ public class CommentTest {
                 "        }" + AmplificationHelper.LINE_SEPARATOR +
                 "    }";
         assertTrue(new File(PATH_OUTPUT_TEST_CLASS).exists());
-        assertFileStartsWith(PATH_OUTPUT_TEST_CLASS,expectedAmplifiedTestClassBegin);
+        assertFileStartsWith(expectedAmplifiedTestClassBegin);
     }
 }
