@@ -13,7 +13,7 @@ public class ExtendedCoverage {
     public ExtendedCoverage(Coverage coverage) {
 
         this.instructionsProjectCoverageMap = new ProjectCoverageMap();
-        String[] classes = coverage.getExecutionPath().split(";");
+        String[] classes = coverage.getExecutionPath().split("-");
         for (String aClass : classes) {
             String[] split = aClass.split(":");
             if (split.length >= 2) {
@@ -35,9 +35,10 @@ public class ExtendedCoverage {
         for (String s : perMethod) {
             String[] split = s.split("\\+");
             String methodName = split[0];
+            String methodDescriptor = split[1];
             List<Integer> coveredLines =
-                    Arrays.stream(split[1].split(",")).map(Integer::parseInt).collect(Collectors.toList());
-            MethodCoverage methodCoverage = new MethodCoverage(coveredLines);
+                    Arrays.stream(split[2].split(",")).map(Integer::parseInt).collect(Collectors.toList());
+            MethodCoverage methodCoverage = new MethodCoverage(coveredLines, methodDescriptor);
             classCoverageMap.addMethodCoverage(methodName, methodCoverage);
         }
         return classCoverageMap;

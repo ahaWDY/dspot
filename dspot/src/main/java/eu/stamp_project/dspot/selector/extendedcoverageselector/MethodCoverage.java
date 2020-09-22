@@ -12,9 +12,11 @@ import java.util.stream.IntStream;
 public class MethodCoverage {
 
     public List<Integer> lineCoverage;
+    public String methodDescriptor;
 
-    public MethodCoverage(List<Integer> lineCoverage) {
+    public MethodCoverage(List<Integer> lineCoverage, String methodDescriptor) {
         this.lineCoverage = lineCoverage;
+        this.methodDescriptor = methodDescriptor;
     }
 
     /**
@@ -28,7 +30,7 @@ public class MethodCoverage {
         List<Integer> betterAt = IntStream.range(0, lineCoverage.size())
                 .mapToObj(i -> lineCoverage.get(i) - that.lineCoverage.get(i))
                 .collect(Collectors.toList());
-        return new MethodCoverage(betterAt);
+        return new MethodCoverage(betterAt, this.methodDescriptor);
     }
 
     /**
@@ -37,7 +39,7 @@ public class MethodCoverage {
     public MethodCoverage accumulate(MethodCoverage toAdd) {
         return new MethodCoverage(IntStream.range(0, this.lineCoverage.size())
                 .mapToObj(i -> Math.max(this.lineCoverage.get(i), toAdd.lineCoverage.get(i)))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()), this.methodDescriptor);
     }
 
     public Map<Integer, Integer> coveragePerLine() {
@@ -58,11 +60,12 @@ public class MethodCoverage {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MethodCoverage that = (MethodCoverage) o;
-        return Objects.equals(lineCoverage, that.lineCoverage);
+        return Objects.equals(lineCoverage, that.lineCoverage) && Objects
+                .equals(methodDescriptor, that.methodDescriptor);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(lineCoverage);
+        return Objects.hash(lineCoverage, methodDescriptor);
     }
 }

@@ -12,9 +12,12 @@ import java.util.Map;
 
 public class ExtendedCoverageTest {
 
-    String EXECUTION_PATH_1 = "package/package/class:method1+1,0,3,0|method2+0,4";
-    String EXECUTION_PATH_2 = "package/package/class:method1+1,0,3,5|method2+0,1";
-    String EXECUTION_PATH_3 = "package/package/class:method1+1,0,3,5|method2+0,4";
+    String EXECUTION_PATH_1 = "package.package.class:method1+()V+1,0,3,0|method2+(LCallback;)V+0,4" +
+            "-package.package.class2:method1+()V+4,3,0";
+    String EXECUTION_PATH_2 = "package.package.class:method1+()V+1,0,3,5|method2+(LCallback;)V+0,1" +
+            "-package.package.class2:method1+()V+4,3,0";
+    String EXECUTION_PATH_3 = "package.package.class:method1+()V+1,0,3,5|method2+(LCallback;)V+0,4" +
+            "-package.package.class2:method1+()V+4,3,0";
 
     private ExtendedCoverage genExtendedCoverageWithPath(String executionPath) {
         Coverage coverage = new CoverageImpl(8, 10);
@@ -29,9 +32,13 @@ public class ExtendedCoverageTest {
 
         ProjectCoverageMap instructionsCoveredPerClass = new ProjectCoverageMap();
         ClassCoverageMap instructionsCoveredPerMethod = new ClassCoverageMap();
-        instructionsCoveredPerMethod.addMethodCoverage("method1", new MethodCoverage(Arrays.asList(1, 0, 3, 0)));
-        instructionsCoveredPerMethod.addMethodCoverage("method2", new MethodCoverage(Arrays.asList(0, 4)));
-        instructionsCoveredPerClass.addClassCoverage("package/package/class", instructionsCoveredPerMethod);
+        instructionsCoveredPerMethod.addMethodCoverage("method1", new MethodCoverage(Arrays.asList(1, 0, 3, 0), "()V"));
+        instructionsCoveredPerMethod.addMethodCoverage("method2", new MethodCoverage(Arrays.asList(0, 4), "(LCallback;)V"));
+        instructionsCoveredPerClass.addClassCoverage("package.package.class", instructionsCoveredPerMethod);
+        ClassCoverageMap instructionsCoveredPerMethod2 = new ClassCoverageMap();
+        instructionsCoveredPerMethod2.addMethodCoverage("method1", new MethodCoverage(Arrays.asList(4, 3, 0),
+                "()V"));
+        instructionsCoveredPerClass.addClassCoverage("package.package.class2", instructionsCoveredPerMethod2);
 
         Assert.assertEquals(extendedCoverage.getInstructionsProjectCoverageMap(), instructionsCoveredPerClass);
     }
@@ -43,7 +50,7 @@ public class ExtendedCoverageTest {
 
         extendedCoverage.accumulate(extendedCoverage2);
 
-        Assert.assertEquals(extendedCoverage,genExtendedCoverageWithPath(EXECUTION_PATH_3));
+        Assert.assertEquals(extendedCoverage, genExtendedCoverageWithPath(EXECUTION_PATH_3));
     }
 
 }

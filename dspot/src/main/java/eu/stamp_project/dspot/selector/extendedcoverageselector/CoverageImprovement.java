@@ -43,8 +43,8 @@ public class CoverageImprovement {
                             .append(" instr.").append("\n");
                 }
             });
-            explanation.replace(explanation.length() - 1, explanation.length(), "");
         });
+        explanation.replace(explanation.length() - 1, explanation.length(), "");
         return explanation.toString();
     }
 }
