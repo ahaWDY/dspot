@@ -12,9 +12,9 @@ import java.util.Map;
 
 public class ExtendedCoverageTest {
 
-    String EXECUTION_PATH_1 = "package/package/class:1,0,3,0,0,4";
-    String EXECUTION_PATH_2 = "package/package/class:1,0,3,5,0,1";
-    String EXECUTION_PATH_3 = "package/package/class:1,0,3,5,0,4";
+    String EXECUTION_PATH_1 = "package/package/class:method1+1,0,3,0|method2+0,4";
+    String EXECUTION_PATH_2 = "package/package/class:method1+1,0,3,5|method2+0,1";
+    String EXECUTION_PATH_3 = "package/package/class:method1+1,0,3,5|method2+0,4";
 
     private ExtendedCoverage genExtendedCoverageWithPath(String executionPath) {
         Coverage coverage = new CoverageImpl(8, 10);
@@ -27,10 +27,13 @@ public class ExtendedCoverageTest {
     public void constructExtendedCoverageFromCoverage() {
         ExtendedCoverage extendedCoverage = genExtendedCoverageWithPath(EXECUTION_PATH_1);
 
-        Map<String, List<Integer>> instructionsCoveredPerClass = new HashMap<>();
-        instructionsCoveredPerClass.put("package/package/class", Arrays.asList(1, 0, 3, 0, 0, 4));
+        ProjectCoverageMap instructionsCoveredPerClass = new ProjectCoverageMap();
+        ClassCoverageMap instructionsCoveredPerMethod = new ClassCoverageMap();
+        instructionsCoveredPerMethod.addMethodCoverage("method1", new MethodCoverage(Arrays.asList(1, 0, 3, 0)));
+        instructionsCoveredPerMethod.addMethodCoverage("method2", new MethodCoverage(Arrays.asList(0, 4)));
+        instructionsCoveredPerClass.addClassCoverage("package/package/class", instructionsCoveredPerMethod);
 
-        Assert.assertEquals(extendedCoverage.getInstructionsCoveredPerClass(),instructionsCoveredPerClass);
+        Assert.assertEquals(extendedCoverage.getInstructionsProjectCoverageMap(), instructionsCoveredPerClass);
     }
 
     @Test
