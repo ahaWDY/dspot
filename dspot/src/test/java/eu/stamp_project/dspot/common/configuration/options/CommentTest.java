@@ -97,11 +97,11 @@ public class CommentTest {
                 "--dev-friendly",
         });
         String classComment =
-                "    /* Coverage improved at" + AmplificationHelper.LINE_SEPARATOR +
-                "    example/Example:" + AmplificationHelper.LINE_SEPARATOR +
-                "    charAt" + AmplificationHelper.LINE_SEPARATOR +
-                "    L. 7 +7 instr." + AmplificationHelper.LINE_SEPARATOR +
-                "     */";
+                "/* Coverage improved at" + AmplificationHelper.LINE_SEPARATOR +
+                        "    example.Example:" + AmplificationHelper.LINE_SEPARATOR +
+                        "    charAt" + AmplificationHelper.LINE_SEPARATOR  +
+                        "    L. 7 +7 instr." + AmplificationHelper.LINE_SEPARATOR +
+                        "     */";
         String amplifierComment =
                 "        // AssertionGenerator: add assertion";
         assertTrue(new File(PATH_OUTPUT_TEST_CLASS).exists());
