@@ -14,6 +14,6 @@ public class ExtendedCoverageSelectorTest extends AbstractSelectorRemoveOverlapT
 
     @Override
     protected String getContentReportFile() {
-        return "Amplification results with 1 new tests.";
+        return "Amplification results with 2 new tests.";
     }
 }
