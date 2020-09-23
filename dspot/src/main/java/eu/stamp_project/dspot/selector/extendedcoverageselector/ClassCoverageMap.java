@@ -20,15 +20,18 @@ public class ClassCoverageMap {
 
     public ClassCoverageMap improvementDiffOver(ClassCoverageMap that) {
         ClassCoverageMap thizBetterDiff = new ClassCoverageMap();
-        this.methodCoverageMap.entrySet().stream()
-                .filter(entry -> that.methodCoverageMap.containsKey(entry.getKey()))
-                .forEach(entry -> {
-                    MethodCoverage betterAt =
-                            entry.getValue().improvementDiffOver(that.methodCoverageMap.get(entry.getKey()));
-                    if (betterAt.lineCoverage.parallelStream().anyMatch(i -> i > 0)) {
-                        thizBetterDiff.addMethodCoverage(entry.getKey(), betterAt);
-                    }
-                });
+        for (Map.Entry<String, MethodCoverage> entry : this.methodCoverageMap.entrySet()) {
+            MethodCoverage coverageThat = that.getCoverageForMethod(entry.getKey());
+            if (coverageThat == null) {
+                thizBetterDiff.addMethodCoverage(entry.getKey(), entry.getValue());
+            } else {
+                MethodCoverage improvementDiff = entry.getValue().improvementDiffOver(coverageThat);
+                if (improvementDiff.lineCoverage.parallelStream().anyMatch(i -> i > 0)) {
+                    thizBetterDiff.addMethodCoverage(entry.getKey(), improvementDiff);
+                }
+            }
+
+        }
         return thizBetterDiff;
     }
 

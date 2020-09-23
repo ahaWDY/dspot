@@ -71,7 +71,7 @@ public class ExtendedCoverage {
         ProjectCoverageMap instructionDiff = this.instructionsProjectCoverageMap.improvementDiffOver(
                 that.instructionsProjectCoverageMap);
 
-        return !instructionDiff.classCoverageMaps.keySet().isEmpty();
+        return !instructionDiff.classCoverageMaps.isEmpty();
     }
 
     public void accumulate(ExtendedCoverage toAdd) {
@@ -100,5 +100,10 @@ public class ExtendedCoverage {
 
     public ExtendedCoverage clone() {
         return new ExtendedCoverage(this.instructionsProjectCoverageMap);
+    }
+
+    @Override
+    public String toString() {
+        return "ExtendedCoverage{" + "instructionsProjectCoverageMap=" + instructionsProjectCoverageMap + '}';
     }
 }

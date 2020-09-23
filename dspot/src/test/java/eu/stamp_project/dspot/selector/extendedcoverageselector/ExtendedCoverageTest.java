@@ -53,4 +53,20 @@ public class ExtendedCoverageTest {
         Assert.assertEquals(extendedCoverage, genExtendedCoverageWithPath(EXECUTION_PATH_3));
     }
 
+    @Test
+    public void testBetterThan() {
+        ExtendedCoverage extendedCoverage = genExtendedCoverageWithPath(EXECUTION_PATH_1);
+        ExtendedCoverage extendedCoverage2 = genExtendedCoverageWithPath(EXECUTION_PATH_2);
+
+        Assert.assertTrue(extendedCoverage.isBetterThan(extendedCoverage2));
+        Assert.assertTrue(extendedCoverage2.isBetterThan(extendedCoverage));
+    }
+
+    @Test
+    public void testBetterThanNotReflexive() {
+        ExtendedCoverage extendedCoverage = genExtendedCoverageWithPath(EXECUTION_PATH_1);
+
+        Assert.assertFalse(extendedCoverage.isBetterThan(extendedCoverage));
+    }
+
 }

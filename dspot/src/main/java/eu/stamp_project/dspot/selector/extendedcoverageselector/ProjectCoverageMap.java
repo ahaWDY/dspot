@@ -21,15 +21,17 @@ public class ProjectCoverageMap {
     public ProjectCoverageMap improvementDiffOver(ProjectCoverageMap that) {
 
         ProjectCoverageMap thizBetterDiff = new ProjectCoverageMap();
-        this.classCoverageMaps.entrySet().stream()
-                .filter(entry -> that.classCoverageMaps.containsKey(entry.getKey()))
-                .forEach(entry -> {
-                    ClassCoverageMap coverageThat = that.getCoverageForClass(entry.getKey());
-                    ClassCoverageMap improvementDiff = entry.getValue().improvementDiffOver(coverageThat);
-                    if (!improvementDiff.methodCoverageMap.isEmpty()) {
-                        thizBetterDiff.addClassCoverage(entry.getKey(), improvementDiff);
-                    }
-                });
+        for (Map.Entry<String, ClassCoverageMap> entry : this.classCoverageMaps.entrySet()) {
+            ClassCoverageMap coverageThat = that.getCoverageForClass(entry.getKey());
+            if (coverageThat == null) {
+                thizBetterDiff.addClassCoverage(entry.getKey(), entry.getValue());
+            } else {
+                ClassCoverageMap improvementDiff = entry.getValue().improvementDiffOver(coverageThat);
+                if (!improvementDiff.methodCoverageMap.isEmpty()) {
+                    thizBetterDiff.addClassCoverage(entry.getKey(), improvementDiff);
+                }
+            }
+        }
         return thizBetterDiff;
     }
 
@@ -69,5 +71,25 @@ public class ProjectCoverageMap {
     @Override
     public int hashCode() {
         return Objects.hash(classCoverageMaps);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder explanation = new StringBuilder("Project coverage map\n");
+        classCoverageMaps.forEach((className, classCoverageMap) -> {
+            explanation.append(className).append(":\n");
+            classCoverageMap.methodCoverageMap.forEach((methodName, methodCoverage) -> {
+                explanation.append(methodName).append("\n");
+                int index = -1;
+                for (Integer instructionImprovement : methodCoverage.lineCoverage) {
+                    index++;
+                    explanation.append("L. ").append(index + 1)
+                               .append(" ").append(instructionImprovement)
+                               .append(" instr.").append("\n");
+                }
+            });
+        });
+        explanation.replace(explanation.length() - 1, explanation.length(), "");
+        return explanation.toString();
     }
 }
