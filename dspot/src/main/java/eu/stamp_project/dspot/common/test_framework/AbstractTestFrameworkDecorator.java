@@ -52,8 +52,9 @@ public abstract class AbstractTestFrameworkDecorator extends AbstractTestFramewo
     }
 
     @Override
-    public CtMethod<?> generateExpectedExceptionsBlock(CtMethod<?> test, Failure failure, int numberOfFail) {
-        return this.innerTestFramework.generateExpectedExceptionsBlock(test, failure, numberOfFail);
+    public CtMethod<?> generateExpectedExceptionsBlock(CtMethod<?> test, Failure failure, int numberOfFail,
+                                                       int statementInTestToSurroundIndex) {
+        return this.innerTestFramework.generateExpectedExceptionsBlock(test, failure, numberOfFail, statementInTestToSurroundIndex);
     }
 
     @Override

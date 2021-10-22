@@ -1,10 +1,11 @@
 package eu.stamp_project.dspot.common.test_framework.implementations.junit;
 
+import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
+import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.testrunner.runner.Failure;
-import spoon.reflect.code.CtBlock;
-import spoon.reflect.code.CtFieldRead;
-import spoon.reflect.code.CtInvocation;
-import spoon.reflect.code.CtLambda;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtExecutableReference;
@@ -12,6 +13,8 @@ import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtTypeReference;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * created by Benjamin DANGLOT
@@ -19,6 +22,8 @@ import java.util.Arrays;
  * on 07/11/18
  */
 public class JUnit5Support extends JUnitSupport {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JUnit5Support.class);
 
     public JUnit5Support() {
         super("org.junit.jupiter.api.Assertions");
@@ -40,11 +45,11 @@ public class JUnit5Support extends JUnitSupport {
     }
 
     @Override
-    public CtMethod<?> generateExpectedExceptionsBlock(CtMethod<?> test, Failure failure, int numberOfFail) {
+    public CtMethod<?> generateExpectedExceptionsBlock(CtMethod<?> test, Failure failure, int numberOfFail,
+                                                       int statementInTestToSurroundIndex) {
         final Factory factory = test.getFactory();
 
         final CtLambda lambda = factory.createLambda();
-        lambda.setBody(test.getBody());
 
         // invocation to assertThrows
         final CtInvocation invocation = factory.createInvocation();
@@ -70,10 +75,24 @@ public class JUnit5Support extends JUnitSupport {
                         lambda
                 )
         );
-        CtBlock body = factory.Core().createBlock();
-        body.addStatement(invocation);
 
-        test.setBody(body);
+        CtBlock<?> finalTestBody = factory.Core().createBlock();
+
+        if (statementInTestToSurroundIndex == -1) {
+            lambda.setBody(test.getBody());
+            finalTestBody.addStatement(invocation);
+            test.setBody(finalTestBody);
+        } else {
+            CtStatement throwingStatement = test.getBody().getStatement(statementInTestToSurroundIndex);
+            invocation.insertAfter(throwingStatement);
+            test.getBody().removeStatement(throwingStatement);
+            lambda.setBody(invocation);
+        }
+        DSpotUtils.addComment(invocation,
+                "AssertionGenerator generate try/catch block with fail statement",
+                CtComment.CommentType.INLINE,
+                CommentEnum.Amplifier);
+
         test.setSimpleName(test.getSimpleName() + "_failAssert" + (numberOfFail));
 
         return test;

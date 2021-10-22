@@ -92,7 +92,8 @@ public class TestFrameworkTest extends AbstractTestOnSample {
         final CtMethod<?> actualJUnit3 = TestFramework.get().generateExpectedExceptionsBlock(
                 testJUnit3,
                 new Failure("", "", new RuntimeException()),
-                0
+                0,
+                -1
         );
         assertEquals(actualJUnit3.toString(), JUnit3WithExceptionThrown, actualJUnit3.toString());
 
@@ -100,7 +101,8 @@ public class TestFrameworkTest extends AbstractTestOnSample {
         final CtMethod<?> actualJUnit4 = TestFramework.get().generateExpectedExceptionsBlock(
                 testJUnit4,
                 new Failure("", "", new RuntimeException()),
-                0
+                0,
+                -1
         );
         assertEquals(actualJUnit4.toString(), JUnit4WithExceptionThrown, actualJUnit4.toString());
 
@@ -108,7 +110,8 @@ public class TestFrameworkTest extends AbstractTestOnSample {
         final CtMethod<?> actualJUnit5 = TestFramework.get().generateExpectedExceptionsBlock(
                 testJUnit5,
                 new Failure("", "", new RuntimeException()),
-                0
+                0,
+                -1
         );
         assertEquals(actualJUnit5.toString(), JUnit5WithExceptingThrown, actualJUnit5.toString());
     }

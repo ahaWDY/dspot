@@ -38,7 +38,8 @@ public class AssertJTestFramework extends AbstractTestFramework {
     }
 
     @Override
-    public CtMethod<?> generateExpectedExceptionsBlock(CtMethod<?> test, Failure failure, int numberOfFail) {
+    public CtMethod<?> generateExpectedExceptionsBlock(CtMethod<?> test, Failure failure, int numberOfFail,
+                                                       int statementInTestToSurroundIndex) {
         return test;
     }
 

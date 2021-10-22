@@ -259,8 +259,9 @@ public class TestFramework implements TestFrameworkSupport {
     }
 
     @Override
-    public CtMethod<?> generateExpectedExceptionsBlock(CtMethod<?> test, Failure failure, int numberOfFail) {
-        return this.getTestFramework(test).generateExpectedExceptionsBlock(test, failure, numberOfFail);
+    public CtMethod<?> generateExpectedExceptionsBlock(CtMethod<?> test, Failure failure, int numberOfFail,
+                                                       int statementInTestToSurroundIndex) {
+        return this.getTestFramework(test).generateExpectedExceptionsBlock(test, failure, numberOfFail, statementInTestToSurroundIndex);
     }
 
     @Override

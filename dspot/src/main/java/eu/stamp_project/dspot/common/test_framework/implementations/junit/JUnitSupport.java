@@ -4,9 +4,12 @@ import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.methodrecons
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.AssertionGeneratorUtils;
 import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.test_framework.AbstractTestFramework;
+import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import eu.stamp_project.dspot.common.test_framework.assertions.AssertEnum;
 import eu.stamp_project.testrunner.runner.Failure;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.*;
 import spoon.reflect.factory.Factory;
@@ -16,6 +19,9 @@ import spoon.reflect.reference.CtTypeReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * created by Benjamin DANGLOT
@@ -25,6 +31,8 @@ import java.util.List;
  * This abstract class is used for JUnit4 and JUnit5 support
  */
 public abstract class JUnitSupport extends AbstractTestFramework {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JUnitSupport.class);
 
     protected abstract String getFullQualifiedNameOfAnnotationTest();
 
@@ -125,14 +133,26 @@ public abstract class JUnitSupport extends AbstractTestFramework {
     public static final String ASSERT_ARRAY_EQUALS = "assertArrayEquals";
 
     @Override
-    public CtMethod<?> generateExpectedExceptionsBlock(CtMethod<?> test, Failure failure, int numberOfFail) {
+    public CtMethod<?> generateExpectedExceptionsBlock(CtMethod<?> test, Failure failure, int numberOfFail,
+                                                       int statementInTestToSurroundIndex) {
         final Factory factory = test.getFactory();
 
         final String[] split = failure.fullQualifiedNameOfException.split("\\.");
         final String simpleNameOfException = split[split.length - 1];
 
+        CtBlock<?> finalTestBody = factory.Core().createBlock();
         CtTry tryBlock = factory.Core().createTry();
-        tryBlock.setBody(test.getBody());
+
+        if (statementInTestToSurroundIndex == -1) {
+            tryBlock.setBody(test.getBody());
+            finalTestBody.addStatement(tryBlock);
+            test.setBody(finalTestBody);
+        } else {
+            CtStatement throwingStatement = test.getBody().getStatement(statementInTestToSurroundIndex);
+            throwingStatement.insertAfter(tryBlock);
+            test.getBody().removeStatement(throwingStatement);
+            tryBlock.setBody(throwingStatement);
+        }
 
         CtType<?> assertClass = factory.createReference(this.qualifiedNameOfAssertClass).getTypeDeclaration();
         CtStatement failStatement;
@@ -168,10 +188,6 @@ public abstract class JUnitSupport extends AbstractTestFramework {
         addAssertionOnException(test, ctCatch, failure);
         tryBlock.setCatchers(catchers);
 
-        CtBlock body = factory.Core().createBlock();
-        body.addStatement(tryBlock);
-
-        test.setBody(body);
         test.setSimpleName(test.getSimpleName() + "_failAssert" + (numberOfFail));
 
         return test;

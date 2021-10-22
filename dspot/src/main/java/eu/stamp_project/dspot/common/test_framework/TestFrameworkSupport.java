@@ -82,7 +82,7 @@ public interface TestFrameworkSupport {
      * @param numberOfFail the number of amplified test methods that expect a exception to be thrown. This int is used to identify uniquely the test.
      * @return the test method expected the exception to be thrown by the program
      */
-    public CtMethod<?> generateExpectedExceptionsBlock(CtMethod<?> test, Failure failure, int numberOfFail);
+    public CtMethod<?> generateExpectedExceptionsBlock(CtMethod<?> test, Failure failure, int numberOfFail, int statementInTestToSurroundIndex);
 
     /**
      * This method is responsible to add to the test class that will be run a method that will call {@link ObjectLog#save()}.
