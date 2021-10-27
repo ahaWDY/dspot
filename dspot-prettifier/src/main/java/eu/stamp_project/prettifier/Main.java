@@ -19,6 +19,7 @@ import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.InitializeDSpot;
 import eu.stamp_project.dspot.common.configuration.check.Checker;
 import eu.stamp_project.dspot.common.configuration.check.InputErrorException;
+import eu.stamp_project.prettifier.variablenaming.SimpleVariableNamePrettifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -116,23 +117,23 @@ public class Main {
         final List<CtMethod<?>> minimizedAmplifiedTestMethods;
 
         // 1 minimize amplified test methods
-        if (configuration.isApplyAllPrettifiers() ||  configuration.isApplyGeneralMinimizer() || configuration.isApplyPitMinimizer()) {
-            minimizedAmplifiedTestMethods = applyMinimization(
-                    testMethods,
-                    amplifiedTestClass,
-                    configuration
-            );
-        } else {
+//        if (configuration.isApplyAllPrettifiers() ||  configuration.isApplyGeneralMinimizer() || configuration.isApplyPitMinimizer()) {
+//            minimizedAmplifiedTestMethods = applyMinimization(
+//                    testMethods,
+//                    amplifiedTestClass,
+//                    configuration
+//            );
+//        } else {
             minimizedAmplifiedTestMethods = testMethods;
-        }
+//        }
         // 2 rename test methods
         if (configuration.isApplyAllPrettifiers() || configuration.isRenameTestMethods()) {
-            applyCode2Vec(minimizedAmplifiedTestMethods, configuration);
+            //applyCode2Vec(minimizedAmplifiedTestMethods, configuration);
         }
         // 3 rename local variables TODO train one better model
         final List<CtMethod<?>> prettifiedTestMethods;
         if (configuration.isApplyAllPrettifiers() || configuration.isRenameLocalVariables()) {
-            prettifiedTestMethods = applyContext2Name(minimizedAmplifiedTestMethods);
+            prettifiedTestMethods = applyVariableRenaming(minimizedAmplifiedTestMethods);
         } else {
             prettifiedTestMethods = minimizedAmplifiedTestMethods;
         }
@@ -188,6 +189,11 @@ public class Main {
                 .collect(Collectors.toList());
         minimizer.updateReport(Main.report);
         return minimizedAmplifiedTestMethods;
+    }
+
+    public static List<CtMethod<?>> applyVariableRenaming(List<CtMethod<?>> testMethods) {
+        SimpleVariableNamePrettifier prettifier = new SimpleVariableNamePrettifier();
+        return prettifier.prettify(testMethods);
     }
 
     public static void applyCode2Vec(List<CtMethod<?>> amplifiedTestMethodsToBeRenamed,
@@ -250,8 +256,7 @@ public class Main {
         new PrettifiedTestMethods(configuration.getOutputDirectory())
                 .output(amplifiedTestClass, prettifiedAmplifiedTestMethods);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        final String pathname = configuration.getOutputDirectory() +
-                "/" + amplifiedTestClass.getSimpleName() + "report.json";
+        final String pathname = configuration.getOutputDirectory() + amplifiedTestClass.getSimpleName() + "report.json";
         LOGGER.info("Output a report in {}", pathname);
         final File file = new File(pathname);
         try (FileWriter writer = new FileWriter(file, false)) {
