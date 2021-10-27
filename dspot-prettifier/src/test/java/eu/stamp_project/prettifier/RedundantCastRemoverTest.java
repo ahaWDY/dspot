@@ -2,6 +2,8 @@ package eu.stamp_project.prettifier;
 
 import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spoon.Launcher;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.factory.Factory;
@@ -15,6 +17,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class RedundantCastRemoverTest {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedundantCastRemoverTest.class);
+
     @Test
     public void test() {
 
@@ -24,6 +28,7 @@ public class RedundantCastRemoverTest {
             The last statement should keeps its cast
          */
 
+        LOGGER.info("TEST TEST TEST");
         Launcher launcher = new Launcher();
         launcher.addInputResource("src/test/java/eu/stamp_project/resources/AmplifiedTest.java");
         launcher.buildModel();

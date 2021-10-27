@@ -26,8 +26,8 @@ public class MainTest {
     @After
     public void tearDown() throws Exception {
         try {
-            FileUtils.deleteDirectory(new File("target/dspot/output/"));
-            FileUtils.deleteDirectory(new File("src/test/resources/sample/target"));
+            //FileUtils.deleteDirectory(new File("target/dspot/output/"));
+            //FileUtils.deleteDirectory(new File("src/test/resources/sample/target"));
         } catch (Exception ignored) {
 
         }
@@ -82,6 +82,17 @@ public class MainTest {
                 "--path-to-amplified-test-class", "src/test/resources/sample/src/test/java/fr/inria/amplified/AmplifiedTest.java",
                 "--path-to-code2vec", "src/test/resources/code2vec/code2vec",
                 "--path-to-code2vec-model", "../model",
+                "--rename-local-variables"
+        });
+        assertTrue(new File("target/dspot/output/fr/inria/amplified/AmplifiedTest.java").exists());
+    }
+
+
+    @Test
+    public void testSimpleVariableName() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--path-to-amplified-test-class", "src/test/resources/sample/src/test/java/fr/inria/amplified/AmplifiedTest.java",
                 "--rename-local-variables"
         });
         assertTrue(new File("target/dspot/output/fr/inria/amplified/AmplifiedTest.java").exists());
