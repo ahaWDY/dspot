@@ -62,6 +62,16 @@ public class MainTest {
         assertTrue(new File("target/dspot/output/fr/inria/amplified/AmplifiedTest.java").exists());
     }
 
+    @Test
+    public void testImprovedCoverageTestNames() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--path-to-amplified-test-class", "src/test/resources/sample/src/test/java/fr/inria/amplified/AmplifiedTest.java",
+                "--rename-test-methods=ImprovedCoverageTestRenamer"
+        });
+        assertTrue(new File("target/dspot/output/fr/inria/amplified/AmplifiedTest.java").exists());
+    }
+
     @Ignore // DOES NOT WORK ON TRAVIS, CANNOT FIND python3 cmd
     @Test
     public void testRenameTestMethods() throws Exception {
@@ -70,7 +80,17 @@ public class MainTest {
                 "--path-to-amplified-test-class", "src/test/resources/sample/src/test/java/fr/inria/amplified/AmplifiedTest.java",
                 "--path-to-code2vec", "src/test/resources/code2vec/code2vec",
                 "--path-to-code2vec-model", "../model",
-                "--rename-test-methods"
+                "--rename-test-methods=Code2VecTestRenamer"
+        });
+        assertTrue(new File("target/dspot/output/fr/inria/amplified/AmplifiedTest.java").exists());
+    }
+
+    @Test
+    public void testSimpleVariableNames() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--path-to-amplified-test-class", "src/test/resources/sample/src/test/java/fr/inria/amplified/AmplifiedTest.java",
+                "--rename-local-variables=SimpleVariableRenamer"
         });
         assertTrue(new File("target/dspot/output/fr/inria/amplified/AmplifiedTest.java").exists());
     }
@@ -82,19 +102,9 @@ public class MainTest {
                 "--path-to-amplified-test-class", "src/test/resources/sample/src/test/java/fr/inria/amplified/AmplifiedTest.java",
                 "--path-to-code2vec", "src/test/resources/code2vec/code2vec",
                 "--path-to-code2vec-model", "../model",
-                "--rename-local-variables"
+                "--rename-local-variables=Context2NameVariableRenamer"
         });
         assertTrue(new File("target/dspot/output/fr/inria/amplified/AmplifiedTest.java").exists());
     }
 
-
-    @Test
-    public void testSimpleVariableName() throws Exception {
-        Main.main(new String[]{
-                "--absolute-path-to-project-root", "src/test/resources/sample/",
-                "--path-to-amplified-test-class", "src/test/resources/sample/src/test/java/fr/inria/amplified/AmplifiedTest.java",
-                "--rename-local-variables"
-        });
-        assertTrue(new File("target/dspot/output/fr/inria/amplified/AmplifiedTest.java").exists());
-    }
 }
