@@ -17,7 +17,7 @@ import spoon.reflect.visitor.filter.TypeFilter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SimpleVariableNamePrettifier implements Prettifier {
+public class SimpleVariableRenamer implements Prettifier {
 
     @Override
     public List<CtMethod<?>> prettify(List<CtMethod<?>> amplifiedTestsToBePrettified) {

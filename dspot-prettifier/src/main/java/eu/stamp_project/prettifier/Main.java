@@ -4,15 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import eu.stamp_project.dspot.common.automaticbuilder.AutomaticBuilder;
 import eu.stamp_project.prettifier.testnaming.Code2VecTestRenamer;
-import eu.stamp_project.prettifier.testnaming.code2vec.Code2VecExecutor;
-import eu.stamp_project.prettifier.testnaming.code2vec.Code2VecParser;
-import eu.stamp_project.prettifier.testnaming.code2vec.Code2VecWriter;
 import eu.stamp_project.prettifier.variablenaming.Context2NameVariableRenamer;
-import eu.stamp_project.prettifier.variablenaming.context2name.Context2Name;
 import eu.stamp_project.prettifier.minimization.GeneralMinimizer;
 import eu.stamp_project.prettifier.minimization.Minimizer;
 import eu.stamp_project.prettifier.minimization.PitMutantMinimizer;
-import eu.stamp_project.prettifier.options.UserInput;
+import eu.stamp_project.prettifier.configuration.UserInput;
 import eu.stamp_project.prettifier.output.PrettifiedTestMethods;
 import eu.stamp_project.prettifier.output.report.ReportJSON;
 import eu.stamp_project.dspot.common.test_framework.TestFramework;
@@ -21,14 +17,13 @@ import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.InitializeDSpot;
 import eu.stamp_project.dspot.common.configuration.check.Checker;
 import eu.stamp_project.dspot.common.configuration.check.InputErrorException;
-import eu.stamp_project.prettifier.testnaming.ImprovedCoverageTestNamePrettifier;
-import eu.stamp_project.prettifier.variablenaming.SimpleVariableNamePrettifier;
+import eu.stamp_project.prettifier.testnaming.ImprovedCoverageTestRenamer;
+import eu.stamp_project.prettifier.variablenaming.SimpleVariableRenamer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import spoon.Launcher;
 import spoon.reflect.code.CtStatement;
-import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.visitor.filter.TypeFilter;
@@ -195,7 +190,7 @@ public class Main {
     private static List<CtMethod<?>> applyTestRenaming(List<CtMethod<?>> testMethods, UserInput configuration) {
         List<CtMethod<?>> prettifiedTestMethods = testMethods;
         if (configuration.isApplyAllPrettifiers() || configuration.isRenameTestMethods()) {
-            prettifiedTestMethods = new ImprovedCoverageTestNamePrettifier().prettify(prettifiedTestMethods);
+            prettifiedTestMethods = new ImprovedCoverageTestRenamer().prettify(prettifiedTestMethods);
         }
         // TODO make separate options!!
         if (configuration.isApplyAllPrettifiers() || configuration.isRenameTestMethods()) {
@@ -207,7 +202,7 @@ public class Main {
     private static List<CtMethod<?>> applyVariableRenaming(List<CtMethod<?>> testMethods, UserInput configuration) {
         List<CtMethod<?>> prettifiedTestMethods = testMethods;
         if (configuration.isApplyAllPrettifiers() || configuration.isRenameLocalVariables()) {
-            prettifiedTestMethods = new SimpleVariableNamePrettifier().prettify(prettifiedTestMethods);
+            prettifiedTestMethods = new SimpleVariableRenamer().prettify(prettifiedTestMethods);
         }
         // TODO make separate options!!
         if (configuration.isApplyAllPrettifiers() || configuration.isRenameLocalVariables()) {

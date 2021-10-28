@@ -1,6 +1,5 @@
 package eu.stamp_project.prettifier;
 
-import eu.stamp_project.prettifier.options.UserInput;
 import spoon.reflect.declaration.CtMethod;
 
 import java.util.List;

@@ -1,12 +1,11 @@
 package eu.stamp_project.prettifier.testnaming;
 
 import eu.stamp_project.prettifier.Prettifier;
-import eu.stamp_project.prettifier.options.UserInput;
 import spoon.reflect.declaration.CtMethod;
 
 import java.util.List;
 
-public class ImprovedCoverageTestNamePrettifier implements Prettifier {
+public class ImprovedCoverageTestRenamer implements Prettifier {
 
     @Override
     public List<CtMethod<?>> prettify(List<CtMethod<?>> amplifiedTestsToBePrettified) {

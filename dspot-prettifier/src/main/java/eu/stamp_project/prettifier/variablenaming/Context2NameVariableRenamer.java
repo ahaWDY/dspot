@@ -1,7 +1,6 @@
 package eu.stamp_project.prettifier.variablenaming;
 
 import eu.stamp_project.prettifier.Prettifier;
-import eu.stamp_project.prettifier.options.UserInput;
 import eu.stamp_project.prettifier.variablenaming.context2name.Context2Name;
 import spoon.Launcher;
 import spoon.reflect.declaration.CtClass;
