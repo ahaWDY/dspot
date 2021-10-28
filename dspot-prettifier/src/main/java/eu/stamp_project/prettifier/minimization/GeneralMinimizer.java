@@ -119,19 +119,6 @@ public class GeneralMinimizer implements Minimizer {
                 .collect(Collectors.toList());
     }
 
-    private static final class LOCAL_VARIABLE_READ_FILTER extends TypeFilter<CtVariableRead> {
-        private CtLocalVariableReference localVariableReference;
-
-        LOCAL_VARIABLE_READ_FILTER(CtLocalVariable localVariable) {
-            super(CtVariableRead.class);
-            this.localVariableReference = localVariable.getReference();
-        }
-
-        @Override
-        public boolean matches(CtVariableRead element) {
-            return localVariableReference.equals(element.getVariable());
-        }
-    }
 
     private List<Integer> numbersOfLocalVariablesBefore = new ArrayList<>();
 
@@ -145,7 +132,7 @@ public class GeneralMinimizer implements Minimizer {
                 amplifiedTestToBeMinimized.getElements(new TypeFilter<>(CtLocalVariable.class));
         final int nbLocalVariables = localVariables.size();
 
-        final List<CtVariableRead> variableReads = localVariables.stream().map(LOCAL_VARIABLE_READ_FILTER::new)
+        final List<CtVariableRead> variableReads = localVariables.stream().map(Util.LOCAL_VARIABLE_READ_FILTER::new)
                 .flatMap(filter -> amplifiedTestToBeMinimized.getElements(filter).stream())
                 .collect(Collectors.toList());
 

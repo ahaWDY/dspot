@@ -1,4 +1,4 @@
-package eu.stamp_project.prettifier.context2name;
+package eu.stamp_project.prettifier.variablenaming.context2name;
 
 import eu.stamp_project.prettifier.Main;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;

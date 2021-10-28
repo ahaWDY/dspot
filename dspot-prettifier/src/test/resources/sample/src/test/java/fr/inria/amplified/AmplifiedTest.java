@@ -31,4 +31,10 @@ public class AmplifiedTest {
         assertEquals(5, __DSPOT_1.intValue());
         assertEquals(5, __DSPOT_1.intValue());
     }
+
+    @Test
+    public void amplifiedTestWithOldVariable() throws Exception {
+        int testingAnInt = 5;
+        assertEquals(5, testingAnInt);
+    }
 }
