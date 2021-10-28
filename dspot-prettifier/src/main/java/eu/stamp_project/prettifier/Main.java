@@ -3,6 +3,8 @@ package eu.stamp_project.prettifier;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import eu.stamp_project.dspot.common.automaticbuilder.AutomaticBuilder;
+import eu.stamp_project.prettifier.configuration.TestRenamerEnum;
+import eu.stamp_project.prettifier.configuration.VariableRenamerEnum;
 import eu.stamp_project.prettifier.testnaming.Code2VecTestRenamer;
 import eu.stamp_project.prettifier.variablenaming.Context2NameVariableRenamer;
 import eu.stamp_project.prettifier.minimization.GeneralMinimizer;
@@ -126,11 +128,11 @@ public class Main {
         }
         List<CtMethod<?>> prettifiedTestMethods = minimizedAmplifiedTestMethods;
         // 2 rename test methods
-        if (configuration.isApplyAllPrettifiers() || configuration.isRenameTestMethods()) {
+        if (configuration.isApplyAllPrettifiers() || configuration.getTestRenamer() != TestRenamerEnum.None) {
             prettifiedTestMethods = applyTestRenaming(minimizedAmplifiedTestMethods, configuration);
         }
         // 3 rename local variables TODO train one better model
-        if (configuration.isApplyAllPrettifiers() || configuration.isRenameLocalVariables()) {
+        if (configuration.isApplyAllPrettifiers() || configuration.getVariableRenamer() != VariableRenamerEnum.None) {
             prettifiedTestMethods = applyVariableRenaming(minimizedAmplifiedTestMethods, configuration);
         }
         return prettifiedTestMethods;
@@ -189,11 +191,11 @@ public class Main {
 
     private static List<CtMethod<?>> applyTestRenaming(List<CtMethod<?>> testMethods, UserInput configuration) {
         List<CtMethod<?>> prettifiedTestMethods = testMethods;
-        if (configuration.isApplyAllPrettifiers() || configuration.isRenameTestMethods()) {
-            prettifiedTestMethods = new ImprovedCoverageTestRenamer().prettify(prettifiedTestMethods);
+        if (configuration.isApplyAllPrettifiers() || configuration.getTestRenamer() == TestRenamerEnum.ImprovedCoverageTestRenamer) {
+            prettifiedTestMethods = new ImprovedCoverageTestRenamer(configuration).prettify(prettifiedTestMethods);
         }
         // TODO make separate options!!
-        if (configuration.isApplyAllPrettifiers() || configuration.isRenameTestMethods()) {
+        if (configuration.isApplyAllPrettifiers() || configuration.getTestRenamer() == TestRenamerEnum.Code2VecTestRenamer) {
             prettifiedTestMethods = new Code2VecTestRenamer(configuration).prettify(prettifiedTestMethods);
         }
         return prettifiedTestMethods;
@@ -201,11 +203,11 @@ public class Main {
 
     private static List<CtMethod<?>> applyVariableRenaming(List<CtMethod<?>> testMethods, UserInput configuration) {
         List<CtMethod<?>> prettifiedTestMethods = testMethods;
-        if (configuration.isApplyAllPrettifiers() || configuration.isRenameLocalVariables()) {
+        if (configuration.isApplyAllPrettifiers() || configuration.getVariableRenamer() == VariableRenamerEnum.SimpleVariableRenamer) {
             prettifiedTestMethods = new SimpleVariableRenamer().prettify(prettifiedTestMethods);
         }
         // TODO make separate options!!
-        if (configuration.isApplyAllPrettifiers() || configuration.isRenameLocalVariables()) {
+        if (configuration.isApplyAllPrettifiers() || configuration.getVariableRenamer() == VariableRenamerEnum.Context2NameVariableRenamer) {
             prettifiedTestMethods = new Context2NameVariableRenamer().prettify(prettifiedTestMethods);
         }
         return prettifiedTestMethods;

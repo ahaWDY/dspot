@@ -91,35 +91,37 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
 
     @CommandLine.Option(
             names = "--rename-test-methods",
-            description = "Apply Code2Vec to give the test methods more expressive names." +
+            description = "Choose a TestRenamer to give the tests new names." +
+                    " Valid values: ${COMPLETION-CANDIDATES}" +
                     " Default value: ${DEFAULT-VALUE}",
-            defaultValue = "false"
+            defaultValue = "None"
     )
-    private boolean renameTestMethods;
+    private TestRenamerEnum testRenamer;
 
-    public boolean isRenameTestMethods() {
-        return renameTestMethods;
+    public TestRenamerEnum getTestRenamer() {
+        return testRenamer;
     }
 
-    public UserInput setRenameTestMethods(boolean renameTestMethods) {
-        this.renameTestMethods = renameTestMethods;
+    public UserInput setTestRenamer(TestRenamerEnum testRenamer) {
+        this.testRenamer = testRenamer;
         return this;
     }
 
     @CommandLine.Option(
             names = "--rename-local-variables",
-            description = "Apply Context2Vec to give the local variables more expressive names." +
+            description = "Choose a VariableRenamer to give local variables new names." +
+                    " Valid values: ${COMPLETION-CANDIDATES}" +
                     " Default value: ${DEFAULT-VALUE}",
-            defaultValue = "false"
+            defaultValue = "None"
     )
-    private boolean renameLocalVariables;
+    private VariableRenamerEnum variableRenamer;
 
-    public boolean isRenameLocalVariables() {
-        return renameLocalVariables;
+    public VariableRenamerEnum getVariableRenamer() {
+        return variableRenamer;
     }
 
-    public UserInput setRenameLocalVariables(boolean renameLocalVariables) {
-        this.renameLocalVariables = renameLocalVariables;
+    public UserInput setVariableRenamer(VariableRenamerEnum variableRenamer) {
+        this.variableRenamer = variableRenamer;
         return this;
     }
 

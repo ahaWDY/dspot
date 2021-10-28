@@ -2,6 +2,7 @@ package eu.stamp_project.prettifier.variablenaming.context2name;
 
 import eu.stamp_project.prettifier.Main;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
+import eu.stamp_project.prettifier.variablenaming.Context2NameVariableRenamer;
 import org.junit.Ignore;
 import org.junit.Test;
 import spoon.Launcher;
@@ -76,7 +77,7 @@ public class Context2NameTest {
         methodListBeforeC2N.addAll(ctClass.getMethodsByName("main"));
         assertThat(methodListBeforeC2N.size(), is(4));
         // then we have corresponding prettified methods
-        List<CtMethod<?>> methodListAfterC2N = Main.applyContext2Name(methodListBeforeC2N);
+        List<CtMethod<?>> methodListAfterC2N = new Context2NameVariableRenamer().prettify(methodListBeforeC2N);
         assertThat(methodListAfterC2N.size(), is(4));
 
         // the first method AKA "mess"
