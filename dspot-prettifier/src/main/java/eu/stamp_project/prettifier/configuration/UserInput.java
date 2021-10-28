@@ -1,4 +1,4 @@
-package eu.stamp_project.prettifier.options;
+package eu.stamp_project.prettifier.configuration;
 
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.common.configuration.check.InputErrorException;

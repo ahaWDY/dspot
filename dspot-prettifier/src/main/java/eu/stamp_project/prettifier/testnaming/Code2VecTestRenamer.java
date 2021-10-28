@@ -1,8 +1,7 @@
 package eu.stamp_project.prettifier.testnaming;
 
-import eu.stamp_project.prettifier.Main;
 import eu.stamp_project.prettifier.Prettifier;
-import eu.stamp_project.prettifier.options.UserInput;
+import eu.stamp_project.prettifier.configuration.UserInput;
 import eu.stamp_project.prettifier.testnaming.code2vec.Code2VecExecutor;
 import eu.stamp_project.prettifier.testnaming.code2vec.Code2VecParser;
 import eu.stamp_project.prettifier.testnaming.code2vec.Code2VecWriter;
