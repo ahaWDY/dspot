@@ -3,6 +3,7 @@ package eu.stamp_project.prettifier.variablenaming;
 import eu.stamp_project.dspot.amplifier.amplifiers.utils.AmplificationChecker;
 import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import eu.stamp_project.prettifier.Prettifier;
+import eu.stamp_project.prettifier.Util;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLocalVariable;
@@ -30,19 +31,16 @@ public class SimpleVariableNamePrettifier implements Prettifier {
         int counter = 1;
         for (CtLocalVariable<?> localVariable : localVariables) {
             if (variableNamedByDSpot(localVariable.getSimpleName())) {
-                // find assignment
-                localVariable.setSimpleName(localVariable.getType().getSimpleName() + counter);
+                String newName = localVariable.getType().getSimpleName() + counter;
                 counter++;
 
-                // TODO rename all occurences of variable!!!
+                // rename usages of variable
+                List<CtVariableRead<?>> variableReads =
+                        prettifiedTest.getElements(new Util.LOCAL_VARIABLE_READ_FILTER(localVariable));
+                variableReads.forEach(ctVariableRead -> ctVariableRead.getVariable().setSimpleName(newName));
 
-                System.out.println(localVariable);
-//                prettifiedTest.getElements(new TypeFilter<>(CtExpression.class) {
-//                    @Override
-//                    public boolean matches(CtExpression<?> expression) {
-//                        return expression
-//                    }
-//                });
+                // rename at assignment
+                localVariable.setSimpleName(newName);
             }
         }
 

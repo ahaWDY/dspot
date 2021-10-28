@@ -3,10 +3,12 @@ package eu.stamp_project.prettifier;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import eu.stamp_project.dspot.common.automaticbuilder.AutomaticBuilder;
-import eu.stamp_project.prettifier.code2vec.Code2VecExecutor;
-import eu.stamp_project.prettifier.code2vec.Code2VecParser;
-import eu.stamp_project.prettifier.code2vec.Code2VecWriter;
-import eu.stamp_project.prettifier.context2name.Context2Name;
+import eu.stamp_project.prettifier.testnaming.Code2VecTestRenamer;
+import eu.stamp_project.prettifier.testnaming.code2vec.Code2VecExecutor;
+import eu.stamp_project.prettifier.testnaming.code2vec.Code2VecParser;
+import eu.stamp_project.prettifier.testnaming.code2vec.Code2VecWriter;
+import eu.stamp_project.prettifier.variablenaming.Context2NameVariableRenamer;
+import eu.stamp_project.prettifier.variablenaming.context2name.Context2Name;
 import eu.stamp_project.prettifier.minimization.GeneralMinimizer;
 import eu.stamp_project.prettifier.minimization.Minimizer;
 import eu.stamp_project.prettifier.minimization.PitMutantMinimizer;
@@ -19,6 +21,7 @@ import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.InitializeDSpot;
 import eu.stamp_project.dspot.common.configuration.check.Checker;
 import eu.stamp_project.dspot.common.configuration.check.InputErrorException;
+import eu.stamp_project.prettifier.testnaming.ImprovedCoverageTestNamePrettifier;
 import eu.stamp_project.prettifier.variablenaming.SimpleVariableNamePrettifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,25 +120,23 @@ public class Main {
         final List<CtMethod<?>> minimizedAmplifiedTestMethods;
 
         // 1 minimize amplified test methods
-//        if (configuration.isApplyAllPrettifiers() ||  configuration.isApplyGeneralMinimizer() || configuration.isApplyPitMinimizer()) {
-//            minimizedAmplifiedTestMethods = applyMinimization(
-//                    testMethods,
-//                    amplifiedTestClass,
-//                    configuration
-//            );
-//        } else {
+        if (configuration.isApplyAllPrettifiers() ||  configuration.isApplyGeneralMinimizer() || configuration.isApplyPitMinimizer()) {
+            minimizedAmplifiedTestMethods = applyMinimization(
+                    testMethods,
+                    amplifiedTestClass,
+                    configuration
+            );
+        } else {
             minimizedAmplifiedTestMethods = testMethods;
-//        }
+        }
+        List<CtMethod<?>> prettifiedTestMethods = minimizedAmplifiedTestMethods;
         // 2 rename test methods
         if (configuration.isApplyAllPrettifiers() || configuration.isRenameTestMethods()) {
-            //applyCode2Vec(minimizedAmplifiedTestMethods, configuration);
+            prettifiedTestMethods = applyTestRenaming(minimizedAmplifiedTestMethods, configuration);
         }
         // 3 rename local variables TODO train one better model
-        final List<CtMethod<?>> prettifiedTestMethods;
         if (configuration.isApplyAllPrettifiers() || configuration.isRenameLocalVariables()) {
-            prettifiedTestMethods = applyVariableRenaming(minimizedAmplifiedTestMethods);
-        } else {
-            prettifiedTestMethods = minimizedAmplifiedTestMethods;
+            prettifiedTestMethods = applyVariableRenaming(minimizedAmplifiedTestMethods, configuration);
         }
         return prettifiedTestMethods;
     }
@@ -191,56 +192,28 @@ public class Main {
         return minimizedAmplifiedTestMethods;
     }
 
-    public static List<CtMethod<?>> applyVariableRenaming(List<CtMethod<?>> testMethods) {
-        SimpleVariableNamePrettifier prettifier = new SimpleVariableNamePrettifier();
-        return prettifier.prettify(testMethods);
+    private static List<CtMethod<?>> applyTestRenaming(List<CtMethod<?>> testMethods, UserInput configuration) {
+        List<CtMethod<?>> prettifiedTestMethods = testMethods;
+        if (configuration.isApplyAllPrettifiers() || configuration.isRenameTestMethods()) {
+            prettifiedTestMethods = new ImprovedCoverageTestNamePrettifier().prettify(prettifiedTestMethods);
+        }
+        // TODO make separate options!!
+        if (configuration.isApplyAllPrettifiers() || configuration.isRenameTestMethods()) {
+            prettifiedTestMethods = new Code2VecTestRenamer(configuration).prettify(prettifiedTestMethods);
+        }
+        return prettifiedTestMethods;
     }
 
-    public static void applyCode2Vec(List<CtMethod<?>> amplifiedTestMethodsToBeRenamed,
-                                     UserInput configuration) {
-        Code2VecWriter writer = new Code2VecWriter(configuration.getPathToRootOfCode2Vec());
-        Code2VecParser parser = new Code2VecParser();
-        Code2VecExecutor code2VecExecutor = null;
-        try {
-            code2VecExecutor = new Code2VecExecutor(
-                    configuration.getPathToRootOfCode2Vec(),
-                    configuration.getRelativePathToModelForCode2Vec(),
-                    configuration.getTimeToWaitForCode2vecInMillis()
-            );
-            for (CtMethod<?> amplifiedTestMethodToBeRenamed : amplifiedTestMethodsToBeRenamed) {
-                writer.writeCtMethodToInputFile(amplifiedTestMethodToBeRenamed);
-                code2VecExecutor.run();
-                final String code2vecOutput = code2VecExecutor.getOutput();
-                final String predictedSimpleName = parser.parse(code2vecOutput);
-                LOGGER.info("Code2Vec predicted {} for {} as new name", predictedSimpleName, amplifiedTestMethodToBeRenamed.getSimpleName());
-                amplifiedTestMethodToBeRenamed.setSimpleName(predictedSimpleName);
-            }
-        } finally {
-            if (code2VecExecutor != null) {
-                code2VecExecutor.stop();
-            }
+    private static List<CtMethod<?>> applyVariableRenaming(List<CtMethod<?>> testMethods, UserInput configuration) {
+        List<CtMethod<?>> prettifiedTestMethods = testMethods;
+        if (configuration.isApplyAllPrettifiers() || configuration.isRenameLocalVariables()) {
+            prettifiedTestMethods = new SimpleVariableNamePrettifier().prettify(prettifiedTestMethods);
         }
-    }
-
-    public static List<CtMethod<?>> applyContext2Name(List<CtMethod<?>> amplifiedTestMethods) {
-        Context2Name context2name = new Context2Name();
-        CtClass tmpClass = Launcher.parseClass("class Tmp {}");
-        // remember the order
-        List<String> methodNameList = new ArrayList<>();
-        for (CtMethod<?> amplifiedTestMethod : amplifiedTestMethods) {
-            methodNameList.add(amplifiedTestMethod.getSimpleName());
+        // TODO make separate options!!
+        if (configuration.isApplyAllPrettifiers() || configuration.isRenameLocalVariables()) {
+            prettifiedTestMethods = new Context2NameVariableRenamer().prettify(prettifiedTestMethods);
         }
-        // apply Context2Name
-        tmpClass.setMethods(new HashSet<>(amplifiedTestMethods));
-        String strTmpClass = tmpClass.toString();
-        String strProcessedClass = context2name.process(strTmpClass);
-        CtClass processedClass = Launcher.parseClass(strProcessedClass);
-        // restore the order
-        List<CtMethod<?>> prettifiedMethodList = new ArrayList<>();
-        methodNameList.forEach(methodName -> {
-            prettifiedMethodList.addAll(processedClass.getMethodsByName(methodName));
-        });
-        return prettifiedMethodList;
+        return prettifiedTestMethods;
     }
 
     public static <T extends Number & Comparable<T>> Double getMedian(List<T> list) {

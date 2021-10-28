@@ -1,4 +1,4 @@
-package eu.stamp_project.prettifier.code2vec;
+package eu.stamp_project.prettifier.testnaming.code2vec;
 
 import java.io.PrintStream;
 

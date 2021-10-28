@@ -1,4 +1,4 @@
-package eu.stamp_project.prettifier.context2name;
+package eu.stamp_project.prettifier.variablenaming.context2name;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
