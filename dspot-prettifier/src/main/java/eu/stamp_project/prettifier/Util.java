@@ -31,7 +31,7 @@ public class Util {
     public static TestClassJSON getExtendedCoverageResultJSON(UserInput configuration) {
         Gson gson = new Gson();
         try {
-            return gson.fromJson(new FileReader(configuration.getOutputDirectory()+ File.separator
+            return gson.fromJson(new FileReader(configuration.getPathToDSpotReports()+ File.separator
                                                 + configuration.getTestClasses().get(0) + "_report.json"),
                     TestClassJSON.class);
         } catch (FileNotFoundException e) {

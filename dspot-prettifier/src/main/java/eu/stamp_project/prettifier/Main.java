@@ -83,6 +83,8 @@ public class Main {
     }
 
     public static void run(UserInput configuration) {
+        // TODO technically this is no longer needed if the test class is set via --test
+
         final CtType<?> amplifiedTestClass = loadAmplifiedTestClass(configuration);
         final List<CtMethod<?>> prettifiedAmplifiedTestMethods =
                 run(
@@ -226,7 +228,8 @@ public class Main {
                 .output(amplifiedTestClass, prettifiedAmplifiedTestMethods);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         final String pathname =
-                configuration.getOutputDirectory() + File.separator + amplifiedTestClass.getSimpleName() + "report.json";
+                configuration.getOutputDirectory() + File.separator + amplifiedTestClass.getQualifiedName() +
+                "_prettifier_report.json";
         LOGGER.info("Output a report in {}", pathname);
         final File file = new File(pathname);
         try (FileWriter writer = new FileWriter(file, false)) {
