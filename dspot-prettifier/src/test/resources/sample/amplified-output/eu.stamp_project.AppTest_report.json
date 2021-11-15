@@ -1,0 +1,186 @@
+{
+  "testCases": [
+    {
+      "name": "test1_mg12_assSep41",
+      "nbAssertionAdded": 1,
+      "nbInputAdded": 1,
+      "coverageImprovement": {
+        "instructionImprovement": {
+          "classCoverageMaps": {
+            "eu.stamp_project.App": {
+              "methodCoverageMap": {
+                "compute": {
+                  "lineCoverage": [
+                    8,
+                    1
+                  ],
+                  "methodDescriptor": "(I)V"
+                }
+              }
+            }
+          }
+        }
+      },
+      "fullCoverage": {
+        "instructionsProjectCoverageMap": {
+          "classCoverageMaps": {
+            "eu.stamp_project.App": {
+              "methodCoverageMap": {
+                "compute": {
+                  "lineCoverage": [
+                    8,
+                    1
+                  ],
+                  "methodDescriptor": "(I)V"
+                },
+                "getInt": {
+                  "lineCoverage": [
+                    3
+                  ],
+                  "methodDescriptor": "()I"
+                },
+                "\u003cinit\u003e": {
+                  "lineCoverage": [
+                    2,
+                    3,
+                    1
+                  ],
+                  "methodDescriptor": "(I)V"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "test1_mg13_failAssert0",
+      "nbAssertionAdded": 1,
+      "nbInputAdded": 1,
+      "coverageImprovement": {
+        "instructionImprovement": {
+          "classCoverageMaps": {
+            "eu.stamp_project.App": {
+              "methodCoverageMap": {
+                "throwException": {
+                  "lineCoverage": [
+                    5
+                  ],
+                  "methodDescriptor": "()V"
+                }
+              }
+            }
+          }
+        }
+      },
+      "fullCoverage": {
+        "instructionsProjectCoverageMap": {
+          "classCoverageMaps": {
+            "eu.stamp_project.App": {
+              "methodCoverageMap": {
+                "\u003cinit\u003e": {
+                  "lineCoverage": [
+                    2,
+                    3,
+                    1
+                  ],
+                  "methodDescriptor": "(I)V"
+                },
+                "throwException": {
+                  "lineCoverage": [
+                    5
+                  ],
+                  "methodDescriptor": "()V"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "initialCoverage": {
+    "instructionsProjectCoverageMap": {
+      "classCoverageMaps": {
+        "eu.stamp_project.App": {
+          "methodCoverageMap": {
+            "getInt": {
+              "lineCoverage": [
+                3
+              ],
+              "methodDescriptor": "()I"
+            },
+            "\u003cinit\u003e": {
+              "lineCoverage": [
+                2,
+                3,
+                1
+              ],
+              "methodDescriptor": "(I)V"
+            }
+          }
+        }
+      }
+    }
+  },
+  "amplifiedCoverage": {
+    "instructionImprovement": {
+      "classCoverageMaps": {
+        "eu.stamp_project.App": {
+          "methodCoverageMap": {
+            "compute": {
+              "lineCoverage": [
+                8,
+                1
+              ],
+              "methodDescriptor": "(I)V"
+            },
+            "throwException": {
+              "lineCoverage": [
+                5
+              ],
+              "methodDescriptor": "()V"
+            }
+          }
+        }
+      }
+    }
+  },
+  "fullCoverageAfterAmplification": {
+    "instructionsProjectCoverageMap": {
+      "classCoverageMaps": {
+        "eu.stamp_project.App": {
+          "methodCoverageMap": {
+            "compute": {
+              "lineCoverage": [
+                8,
+                1
+              ],
+              "methodDescriptor": "(I)V"
+            },
+            "getInt": {
+              "lineCoverage": [
+                3
+              ],
+              "methodDescriptor": "()I"
+            },
+            "\u003cinit\u003e": {
+              "lineCoverage": [
+                2,
+                3,
+                1
+              ],
+              "methodDescriptor": "(I)V"
+            },
+            "throwException": {
+              "lineCoverage": [
+                5
+              ],
+              "methodDescriptor": "()V"
+            }
+          }
+        }
+      }
+    }
+  }
+}
