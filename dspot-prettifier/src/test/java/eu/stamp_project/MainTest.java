@@ -67,7 +67,10 @@ public class MainTest {
         Main.main(new String[]{
                 "--absolute-path-to-project-root", "src/test/resources/sample/",
                 "--path-to-amplified-test-class", "src/test/resources/sample/src/test/java/fr/inria/amplified/AmplifiedTest.java",
-                "--rename-test-methods=ImprovedCoverageTestRenamer"
+                "--rename-test-methods=ImprovedCoverageTestRenamer",
+                "--output-path", "src/test/resources/sample/amplified-output",
+                "--test", "eu.stamp_project.AppTest",
+                "--test-cases", "test1_mg12_assSep41,test1_mg13_failAssert0"
         });
         assertTrue(new File("target/dspot/output/fr/inria/amplified/AmplifiedTest.java").exists());
     }

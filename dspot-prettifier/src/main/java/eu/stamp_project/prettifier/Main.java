@@ -47,6 +47,7 @@ public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static ReportJSON report = new ReportJSON();
+    private static DSpotState dSpotState;
 
     public static void main(String[] args) {
         UserInput inputConfiguration = new UserInput();
@@ -103,16 +104,14 @@ public class Main {
     public static List<CtMethod<?>> run(CtType<?> amplifiedTestClass,
                                         UserInput configuration) {
         InitializeDSpot initializeDSpot = new InitializeDSpot();
-        final AutomaticBuilder automaticBuilder = configuration.getBuilderEnum().getAutomaticBuilder(configuration);
-        final String dependencies = initializeDSpot.completeDependencies(configuration, automaticBuilder);
-        final DSpotCompiler compiler = DSpotCompiler.createDSpotCompiler(
-                configuration,
-                dependencies
-        );
-        configuration.setFactory(compiler.getLauncher().getFactory());
-        initializeDSpot.initHelpers(configuration);
+        initializeDSpot.init(configuration);
+        dSpotState = initializeDSpot.getDSpotState();
 
-        final List<CtMethod<?>> testMethods = TestFramework.getAllTest(amplifiedTestClass);
+        // TODO throw error if more than one test class passed
+
+        final List<CtMethod<?>> testMethods =
+                dSpotState.getTestFinder().findTestMethods(dSpotState.getTestClassesToBeAmplified().get(0),
+                        dSpotState.getTestMethodsToBeAmplifiedNames());
         Main.report.nbTestMethods = testMethods.size();
         final List<CtMethod<?>> minimizedAmplifiedTestMethods;
 
@@ -226,7 +225,8 @@ public class Main {
         new PrettifiedTestMethods(configuration.getOutputDirectory())
                 .output(amplifiedTestClass, prettifiedAmplifiedTestMethods);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        final String pathname = configuration.getOutputDirectory() + amplifiedTestClass.getSimpleName() + "report.json";
+        final String pathname =
+                configuration.getOutputDirectory() + File.separator + amplifiedTestClass.getSimpleName() + "report.json";
         LOGGER.info("Output a report in {}", pathname);
         final File file = new File(pathname);
         try (FileWriter writer = new FileWriter(file, false)) {

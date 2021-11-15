@@ -32,23 +32,11 @@ public class Util {
         Gson gson = new Gson();
         try {
             return gson.fromJson(new FileReader(configuration.getOutputDirectory()+ File.separator
-                                                + getAmplifiedTestClassName(configuration) + "_report.json"),
+                                                + configuration.getTestClasses().get(0) + "_report.json"),
                     TestClassJSON.class);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    /**
-     * uses the configured path to the amplified test class to determine the class' name
-     * @param configuration
-     * @return the simple name of the class
-     */
-    public static String getAmplifiedTestClassName(UserInput configuration) {
-
-        // TODO: this actually requires a fully qualified class name :/
-        String[] pathComponents = configuration.getPathToAmplifiedTestClass().split("/");
-        return pathComponents[pathComponents.length - 1].replace(".java", "");
     }
 }
