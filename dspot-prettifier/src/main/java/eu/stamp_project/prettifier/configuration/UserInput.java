@@ -4,6 +4,8 @@ import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.common.configuration.check.InputErrorException;
 import picocli.CommandLine;
 
+import java.io.File;
+
 /**
  * created by Benjamin DANGLOT
  * benjamin.danglot@inria.fr
@@ -33,6 +35,23 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
             throw new InputErrorException();
         }
         this.pathToAmplifiedTestClass = pathToAmplifiedTestClass;
+        return this;
+    }
+
+    @CommandLine.Option(
+            names = "--path-to-dspot-reports",
+            description = "Specify the path to the reporting jsons provided by DSpot." +
+                          " Default value: ${DEFAULT-VALUE}",
+            defaultValue = "target/dspot/output"
+    )
+    private String pathToDSpotReports = "target" + File.separator + "dspot" + File.separator + "output";
+
+    public String getPathToDSpotReports() {
+        return this.pathToDSpotReports;
+    }
+
+    public UserInput setPathToDSpotReports(String pathToDSpotReports) {
+        this.pathToDSpotReports = pathToDSpotReports;
         return this;
     }
 
