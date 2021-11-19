@@ -8,9 +8,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
@@ -18,7 +16,8 @@ import static org.junit.Assert.assertTrue;
 public class MainTest {
 
     public static String PATH_INPUT_TEST_CLASS = "src/test/resources/sample/src/test/java/fr/inria/amplified/AmplifiedTest.java";
-    public static String PATH_OUTPUT_TEST_CLASS = "target/dspot/output/fr/inria/amplified/AmplifiedTest.java";
+    public static String OUTPUT_PATH_AMPLIFIED_TEST = "target/dspot/output/fr/inria/amplified/AmplifiedTest.java";
+    public static String OUTPUT_PATH_APP_TEST = "target/dspot/output/eu/stamp_project/AppTest.java";
 
     @Before
     public void setUp() throws Exception {
@@ -47,7 +46,7 @@ public class MainTest {
                 "--path-to-amplified-test-class", PATH_INPUT_TEST_CLASS,
                 "--test", "fr.inria.amplified.AmplifiedTest",
         });
-        assertTrue(new File(PATH_OUTPUT_TEST_CLASS).exists());
+        assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
     }
 
     @Test
@@ -58,7 +57,7 @@ public class MainTest {
                 "--test", "fr.inria.amplified.AmplifiedTest",
                 "--apply-general-minimizer"
         });
-        assertTrue(new File(PATH_OUTPUT_TEST_CLASS).exists());
+        assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
     }
 
     @Test
@@ -69,7 +68,7 @@ public class MainTest {
                 "--test", "fr.inria.amplified.AmplifiedTest",
                 "--apply-pit-minimizer"
         });
-        assertTrue(new File(PATH_OUTPUT_TEST_CLASS).exists());
+        assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
     }
 
     @Test
@@ -83,9 +82,19 @@ public class MainTest {
                 "--test", "eu.stamp_project.AppTest",
                 "--test-cases", "test1_mg12_assSep41,test1_mg13_failAssert0"
         });
-        assertTrue(new File(PATH_OUTPUT_TEST_CLASS).exists());
-        assertOutputClassContains("testCompute");
-        assertOutputClassContains("testThrowException");
+        assertTrue(new File(OUTPUT_PATH_APP_TEST).exists());
+        assertFileContains("Name changed to covered methods in test", "testCompute", OUTPUT_PATH_APP_TEST);
+        assertFileContains("Name changed to covered methods in test", "testThrowException", OUTPUT_PATH_APP_TEST);
+        assertFileContains("New name included in json report", "testCompute",
+                "src/test/resources/sample/amplified-output/eu.stamp_project.AppTest_report.json");
+
+        // cleanup: replace names back in report json
+        replaceInFile("\"testCompute\"",
+                "\"test1_mg12_assSep41\"",
+                "src/test/resources/sample/amplified-output/eu.stamp_project.AppTest_report.json");
+        replaceInFile("\"testThrowException\"",
+                "\"test1_mg13_failAssert0\"",
+                "src/test/resources/sample/amplified-output/eu.stamp_project.AppTest_report.json");
     }
 
     @Ignore // DOES NOT WORK ON TRAVIS, CANNOT FIND python3 cmd
@@ -99,7 +108,7 @@ public class MainTest {
                 "--path-to-code2vec-model", "../model",
                 "--rename-test-methods=Code2VecTestRenamer"
         });
-        assertTrue(new File(PATH_OUTPUT_TEST_CLASS).exists());
+        assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
     }
 
     @Test
@@ -110,7 +119,7 @@ public class MainTest {
                 "--test", "fr.inria.amplified.AmplifiedTest",
                 "--rename-local-variables=SimpleVariableRenamer"
         });
-        assertTrue(new File(PATH_OUTPUT_TEST_CLASS).exists());
+        assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
         assertOutputClassContains("int1");
         assertOutputClassContains("Integer1");
         assertOutputClassContains("Non-DSpot named variables are not modified","testingAnInt");
@@ -126,7 +135,7 @@ public class MainTest {
                 "--path-to-code2vec-model", "../model",
                 "--rename-local-variables=Context2NameVariableRenamer"
         });
-        assertTrue(new File(PATH_OUTPUT_TEST_CLASS).exists());
+        assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
     }
 
     private void assertOutputClassContains(String expected) throws Exception{
@@ -134,11 +143,32 @@ public class MainTest {
     }
 
     private void assertOutputClassContains(String message, String expected) throws Exception{
-        final File amplifiedTestClass = new File(PATH_OUTPUT_TEST_CLASS);
+        final File amplifiedTestClass = new File(OUTPUT_PATH_AMPLIFIED_TEST);
 
         try (BufferedReader reader = new BufferedReader(new FileReader(amplifiedTestClass))) {
             String content = reader.lines().collect(Collectors.joining(AmplificationHelper.LINE_SEPARATOR));
             assertTrue(message, content.contains(expected));
+        }
+    }
+
+    private void assertFileContains(String message, String expected, String path) throws Exception{
+        final File amplifiedTestClass = new File(path);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(amplifiedTestClass))) {
+            String content = reader.lines().collect(Collectors.joining(AmplificationHelper.LINE_SEPARATOR));
+            assertTrue(message, content.contains(expected));
+        }
+    }
+
+    private void replaceInFile(String target, String replacement, String path) throws Exception{
+        final File amplifiedTestClass = new File(path);
+        String content;
+        try (BufferedReader reader = new BufferedReader(new FileReader(amplifiedTestClass))) {
+            content = reader.lines().collect(Collectors.joining(AmplificationHelper.LINE_SEPARATOR));
+        }
+        content = content.replace(target,replacement);
+        try (FileWriter writer = new FileWriter(path, false)) {
+            writer.write(content);
         }
     }
 }
