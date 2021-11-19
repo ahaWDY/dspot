@@ -18,6 +18,7 @@ public class MainTest {
     public static String PATH_INPUT_TEST_CLASS = "src/test/resources/sample/src/test/java/fr/inria/amplified/AmplifiedTest.java";
     public static String OUTPUT_PATH_AMPLIFIED_TEST = "target/dspot/output/fr/inria/amplified/AmplifiedTest.java";
     public static String OUTPUT_PATH_APP_TEST = "target/dspot/output/eu/stamp_project/AppTest.java";
+    public static String REPORT_PATH_APP_TEST = "target/dspot/output/eu.stamp_project.AppTest_prettifier_report.json";
 
     @Before
     public void setUp() throws Exception {
@@ -85,16 +86,7 @@ public class MainTest {
         assertTrue(new File(OUTPUT_PATH_APP_TEST).exists());
         assertFileContains("Name changed to covered methods in test", "testCompute", OUTPUT_PATH_APP_TEST);
         assertFileContains("Name changed to covered methods in test", "testThrowException", OUTPUT_PATH_APP_TEST);
-        assertFileContains("New name included in json report", "testCompute",
-                "src/test/resources/sample/amplified-output/eu.stamp_project.AppTest_report.json");
-
-        // cleanup: replace names back in report json
-        replaceInFile("\"testCompute\"",
-                "\"test1_mg12_assSep41\"",
-                "src/test/resources/sample/amplified-output/eu.stamp_project.AppTest_report.json");
-        replaceInFile("\"testThrowException\"",
-                "\"test1_mg13_failAssert0\"",
-                "src/test/resources/sample/amplified-output/eu.stamp_project.AppTest_report.json");
+        assertFileContains("New name included in json report", "testThrowException", REPORT_PATH_APP_TEST);
     }
 
     @Ignore // DOES NOT WORK ON TRAVIS, CANNOT FIND python3 cmd
@@ -138,6 +130,33 @@ public class MainTest {
         assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
     }
 
+    @Test
+    public void testTestDescriptions() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--path-to-amplified-test-class",
+                "src/test/resources/sample/src/test/java/eu/stamp_project/AppTest.java",
+                "--generate-descriptions",
+                "--with-comment", "All",
+                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
+                "--test", "eu.stamp_project.AppTest",
+                "--test-cases", "test1_mg12_assSep41,test1_mg13_failAssert0"
+        });
+        assertTrue(new File(OUTPUT_PATH_APP_TEST).exists());
+//        assertFileContains("Name changed to covered methods in test", "testCompute", OUTPUT_PATH_APP_TEST);
+//        assertFileContains("Name changed to covered methods in test", "testThrowException", OUTPUT_PATH_APP_TEST);
+//        assertFileContains("New name included in json report", "testCompute",
+//                "src/test/resources/sample/amplified-output/eu.stamp_project.AppTest_report.json");
+//
+//        // cleanup: replace names back in report json
+//        replaceInFile("\"testCompute\"",
+//                "\"test1_mg12_assSep41\"",
+//                "src/test/resources/sample/amplified-output/eu.stamp_project.AppTest_report.json");
+//        replaceInFile("\"testThrowException\"",
+//                "\"test1_mg13_failAssert0\"",
+//                "src/test/resources/sample/amplified-output/eu.stamp_project.AppTest_report.json");
+    }
+
     private void assertOutputClassContains(String expected) throws Exception{
         assertOutputClassContains(null,expected);
     }
@@ -157,18 +176,6 @@ public class MainTest {
         try (BufferedReader reader = new BufferedReader(new FileReader(amplifiedTestClass))) {
             String content = reader.lines().collect(Collectors.joining(AmplificationHelper.LINE_SEPARATOR));
             assertTrue(message, content.contains(expected));
-        }
-    }
-
-    private void replaceInFile(String target, String replacement, String path) throws Exception{
-        final File amplifiedTestClass = new File(path);
-        String content;
-        try (BufferedReader reader = new BufferedReader(new FileReader(amplifiedTestClass))) {
-            content = reader.lines().collect(Collectors.joining(AmplificationHelper.LINE_SEPARATOR));
-        }
-        content = content.replace(target,replacement);
-        try (FileWriter writer = new FileWriter(path, false)) {
-            writer.write(content);
         }
     }
 }

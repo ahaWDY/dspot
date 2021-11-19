@@ -5,6 +5,7 @@ import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.jso
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestClassJSON;
 import eu.stamp_project.dspot.selector.extendedcoverageselector.CoverageImprovement;
 import eu.stamp_project.dspot.selector.extendedcoverageselector.MethodCoverage;
+import eu.stamp_project.prettifier.Main;
 import eu.stamp_project.prettifier.Prettifier;
 import eu.stamp_project.prettifier.Util;
 import eu.stamp_project.prettifier.configuration.UserInput;
@@ -33,18 +34,24 @@ public class ImprovedCoverageTestRenamer implements Prettifier {
     @Override
     public List<CtMethod<?>> prettify(List<CtMethod<?>> amplifiedTestsToBePrettified) {
         List<CtMethod<?>> prettifiedTests = new ArrayList<>();
-        // read JSON with extended coverage for the amplified test cases
-        TestClassJSON resultJson = Util.readExtendedCoverageResultJSON(configuration);
-        if (resultJson == null) {
-            LOGGER.error("No result json found under configured DSpot output path!");
+
+        TestClassJSON amplificationReport;
+        try {
+            amplificationReport = (TestClassJSON) Main.report.amplificationReport;
+        } catch (ClassCastException e) {
+            LOGGER.error("No DSpot output is not from ExtendedCoverageSelector! ImprovedCoverageTestRenamer not " +
+                         "applied");
             return amplifiedTestsToBePrettified;
         }
-        Map<String, TestCaseJSON> mapTestNameToResult =
-                resultJson.getTestCases().stream().collect(Collectors.toMap(TestCaseJSON::getName,
-                        Function.identity()));
+        if (amplificationReport == null) {
+            LOGGER.error("No json found under configured DSpot output path! ImprovedCoverageTestRenamer not " +
+                         "applied");
+            return amplifiedTestsToBePrettified;
+        }
+
+        Map<String, TestCaseJSON> mapTestNameToResult = amplificationReport.mapTestNameToResult();
         Map<CtMethod<?>, String> testToNames =
                 buildNameMapForTests(mapTestNameToResult, amplifiedTestsToBePrettified);
-
 
         for (CtMethod<?> test : amplifiedTestsToBePrettified) {
             TestCaseJSON testCaseJSON = mapTestNameToResult.get(test.getSimpleName());
@@ -53,15 +60,10 @@ public class ImprovedCoverageTestRenamer implements Prettifier {
             CtMethod<?> renamedTest = test.clone();
             renamedTest.setSimpleName(newTestName);
 
-            resultJson.getTestCases().remove(testCaseJSON);
-            TestCaseJSON renamedTestCaseJSON = new TestCaseJSON(newTestName, testCaseJSON);
-            resultJson.addTestCase(renamedTestCaseJSON);
+            amplificationReport.updateTestCase(testCaseJSON,testCaseJSON.copyAndUpdateName(newTestName));
 
             prettifiedTests.add(renamedTest);
         }
-
-        // update JSON with new names
-        Util.writeExtendedCoverageResultJSON(configuration, resultJson);
 
         return prettifiedTests;
     }
@@ -82,7 +84,7 @@ public class ImprovedCoverageTestRenamer implements Prettifier {
 
         for (CtMethod<?> test : amplifiedTestsToBePrettified) {
             TestCaseJSON testCaseJSON = mapTestNameToResult.get(test.getSimpleName());
-            testToCoveredMethods.put(test, getCoveredMethods(testCaseJSON.getCoverageImprovement()));
+            testToCoveredMethods.put(test, Util.getCoveredMethods(testCaseJSON.getCoverageImprovement()));
         }
 
         Map<CtMethod<?>, List<String>> testToUniqueCoveredMethods = findUniqueCoveredMethods(testToCoveredMethods);
@@ -93,30 +95,6 @@ public class ImprovedCoverageTestRenamer implements Prettifier {
         fixAmbiguousTestNames(testToNewNames);
 
         return testToNewNames;
-    }
-
-
-    /**
-     * @param coverageImprovement of the test case
-     * @return a list of all method names where this test case improves coverage
-     */
-    private List<String> getCoveredMethods(CoverageImprovement coverageImprovement) {
-        List<String> methodNames = new ArrayList<>();
-        coverageImprovement.getInstructionImprovement().classCoverageMaps.forEach((className, classCoverageMap) -> {
-            List<Map.Entry<String, MethodCoverage>> methodNamesAndMethodCoverages =
-                    new ArrayList<>(classCoverageMap.methodCoverageMap.entrySet());
-
-            // put the methods with most additional coverage first (to be first in the name later)
-            methodNamesAndMethodCoverages.sort((e1, e2) ->
-                Integer.compare(e1.getValue().totalAdditionallyCoveredInstructions(),
-                        e2.getValue().totalAdditionallyCoveredInstructions())
-            );
-
-            methodNamesAndMethodCoverages.forEach((entry) -> {
-                methodNames.add(entry.getKey());
-            });
-        });
-        return methodNames;
     }
 
     /**
@@ -145,19 +123,26 @@ public class ImprovedCoverageTestRenamer implements Prettifier {
 
         // Start off with only the top goals and then iteratively add more goals
         for(Map.Entry<CtMethod<?>, List<String>> testAndUniqueCoveredMethods : testToUniqueCoveredMethods.entrySet()) {
+            CtMethod<?> test = testAndUniqueCoveredMethods.getKey();
 
             List<String> goalsToUse;
             if (testAndUniqueCoveredMethods.getValue().isEmpty()) {
                 // make a name with max two covered methods to keep name easily readable
-                goalsToUse = testToCoveredMethods.get(testAndUniqueCoveredMethods.getKey());
+                goalsToUse = testToCoveredMethods.get(test);
             } else {
                 goalsToUse = testAndUniqueCoveredMethods.getValue();
             }
             String testName;
             int topIndex = Math.min(goalsToUse.size(), 2);
+
+            if (topIndex == 0) {
+                LOGGER.error("No additionally covered methods to generate name for " + test.getSimpleName());
+                testToNewNames.put(test, test.getSimpleName());
+            }
+
             testName = getTestName(goalsToUse.subList(0, topIndex));
 
-            testToNewNames.put(testAndUniqueCoveredMethods.getKey(),testName);
+            testToNewNames.put(test,testName);
         }
         return testToNewNames;
     }

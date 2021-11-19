@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import eu.stamp_project.dspot.common.automaticbuilder.AutomaticBuilder;
 import eu.stamp_project.prettifier.configuration.TestRenamerEnum;
 import eu.stamp_project.prettifier.configuration.VariableRenamerEnum;
+import eu.stamp_project.prettifier.description.TestDescriptionGenerator;
 import eu.stamp_project.prettifier.testnaming.Code2VecTestRenamer;
 import eu.stamp_project.prettifier.variablenaming.Context2NameVariableRenamer;
 import eu.stamp_project.prettifier.minimization.GeneralMinimizer;
@@ -14,7 +15,6 @@ import eu.stamp_project.prettifier.configuration.UserInput;
 import eu.stamp_project.prettifier.output.PrettifiedTestMethods;
 import eu.stamp_project.prettifier.output.report.ReportJSON;
 import eu.stamp_project.dspot.common.test_framework.TestFramework;
-import eu.stamp_project.dspot.common.compilation.DSpotCompiler;
 import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.InitializeDSpot;
 import eu.stamp_project.dspot.common.configuration.check.Checker;
@@ -46,7 +46,7 @@ public class Main {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-    public static ReportJSON report = new ReportJSON();
+    public static ReportJSON report;
     private static DSpotState dSpotState;
 
     public static void main(String[] args) {
@@ -78,20 +78,35 @@ public class Main {
             commandLine.usage(System.err);
             return;
         }
-        DSpotState.verbose = inputConfiguration.isVerbose();
-        run(inputConfiguration);
+
+        InitializeDSpot initializeDSpot = new InitializeDSpot();
+        initializeDSpot.init(inputConfiguration);
+        dSpotState = initializeDSpot.getDSpotState();
+
+        report = new ReportJSON(inputConfiguration);
+
+        runPrettifier(inputConfiguration);
     }
 
-    public static void run(UserInput configuration) {
-        // TODO technically this is no longer needed if the test class is set via --test
+    public static void runPrettifier(UserInput configuration) {
 
+        // TODO throw error if more than one test class passed
+
+        final List<CtMethod<?>> testMethods =
+                dSpotState.getTestFinder().findTestMethods(dSpotState.getTestClassesToBeAmplified().get(0),
+                        dSpotState.getTestMethodsToBeAmplifiedNames());
+        Main.report.nbTestMethods = testMethods.size();
+
+        // TODO technically this is no longer needed if the test class is set via --test
         final CtType<?> amplifiedTestClass = loadAmplifiedTestClass(configuration);
+
         final List<CtMethod<?>> prettifiedAmplifiedTestMethods =
-                run(
+                prettify(
                         amplifiedTestClass,
+                        testMethods,
                         configuration
                 );
-        // output now
+
         output(amplifiedTestClass, prettifiedAmplifiedTestMethods, configuration);
     }
 
@@ -103,18 +118,8 @@ public class Main {
         return launcher.getFactory().Class().getAll().get(0);
     }
 
-    public static List<CtMethod<?>> run(CtType<?> amplifiedTestClass,
-                                        UserInput configuration) {
-        InitializeDSpot initializeDSpot = new InitializeDSpot();
-        initializeDSpot.init(configuration);
-        dSpotState = initializeDSpot.getDSpotState();
-
-        // TODO throw error if more than one test class passed
-
-        final List<CtMethod<?>> testMethods =
-                dSpotState.getTestFinder().findTestMethods(dSpotState.getTestClassesToBeAmplified().get(0),
-                        dSpotState.getTestMethodsToBeAmplifiedNames());
-        Main.report.nbTestMethods = testMethods.size();
+    public static List<CtMethod<?>> prettify(CtType<?> amplifiedTestClass, List<CtMethod<?>> testMethods,
+                                             UserInput configuration) {
         final List<CtMethod<?>> minimizedAmplifiedTestMethods;
 
         // 1 minimize amplified test methods
@@ -130,11 +135,15 @@ public class Main {
         List<CtMethod<?>> prettifiedTestMethods = minimizedAmplifiedTestMethods;
         // 2 rename test methods
         if (configuration.isApplyAllPrettifiers() || configuration.getTestRenamer() != TestRenamerEnum.None) {
-            prettifiedTestMethods = applyTestRenaming(minimizedAmplifiedTestMethods, configuration);
+            prettifiedTestMethods = applyTestRenaming(prettifiedTestMethods, configuration);
         }
-        // 3 rename local variables TODO train one better model
+        // 3 rename local variables
         if (configuration.isApplyAllPrettifiers() || configuration.getVariableRenamer() != VariableRenamerEnum.None) {
-            prettifiedTestMethods = applyVariableRenaming(minimizedAmplifiedTestMethods, configuration);
+            prettifiedTestMethods = applyVariableRenaming(prettifiedTestMethods, configuration);
+        }
+        // 4 generate test descriptions
+        if (configuration.isApplyAllPrettifiers() || configuration.isGenerateTestDescriptions()) {
+            prettifiedTestMethods = new TestDescriptionGenerator(configuration).prettify(prettifiedTestMethods);
         }
         return prettifiedTestMethods;
     }
@@ -195,7 +204,6 @@ public class Main {
         if (configuration.isApplyAllPrettifiers() || configuration.getTestRenamer() == TestRenamerEnum.ImprovedCoverageTestRenamer) {
             prettifiedTestMethods = new ImprovedCoverageTestRenamer(configuration).prettify(prettifiedTestMethods);
         }
-        // TODO make separate options!!
         if (configuration.isApplyAllPrettifiers() || configuration.getTestRenamer() == TestRenamerEnum.Code2VecTestRenamer) {
             prettifiedTestMethods = new Code2VecTestRenamer(configuration).prettify(prettifiedTestMethods);
         }
@@ -207,7 +215,7 @@ public class Main {
         if (configuration.isApplyAllPrettifiers() || configuration.getVariableRenamer() == VariableRenamerEnum.SimpleVariableRenamer) {
             prettifiedTestMethods = new SimpleVariableRenamer().prettify(prettifiedTestMethods);
         }
-        // TODO make separate options!!
+        // TODO train one better model
         if (configuration.isApplyAllPrettifiers() || configuration.getVariableRenamer() == VariableRenamerEnum.Context2NameVariableRenamer) {
             prettifiedTestMethods = new Context2NameVariableRenamer().prettify(prettifiedTestMethods);
         }
