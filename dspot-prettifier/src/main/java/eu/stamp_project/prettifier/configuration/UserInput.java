@@ -144,6 +144,23 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
         return this;
     }
 
+    @CommandLine.Option(
+            names = "--generate-descriptions",
+            description = "Generate textual descriptions of the test case's contributions." +
+                          " Default value: ${DEFAULT-VALUE}",
+            defaultValue = "false"
+    )
+    private boolean generateTestDescriptions;
+
+    public boolean isGenerateTestDescriptions() {
+        return generateTestDescriptions;
+    }
+
+    public UserInput setGenerateTestDescriptions(boolean generateTestDescriptions) {
+        this.generateTestDescriptions = generateTestDescriptions;
+        return this;
+    }
+
     // Code2Vec
 
     @CommandLine.Option(

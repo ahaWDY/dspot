@@ -10,6 +10,7 @@ public class TestCaseJSON {
     private final int nbInputAdded;
     private final CoverageImprovement coverageImprovement;
     private final ExtendedCoverage fullCoverage;
+    private final String description;
 
     public TestCaseJSON(String name, int nbAssertionAdded, int nbInputAdded, CoverageImprovement coverageImprovement,
                         ExtendedCoverage fullCoverage) {
@@ -18,14 +19,25 @@ public class TestCaseJSON {
         this.nbInputAdded = nbInputAdded;
         this.coverageImprovement = coverageImprovement;
         this.fullCoverage = fullCoverage;
+        this.description = "";
     }
 
-    public TestCaseJSON(String name, TestCaseJSON oldTestCaseJSON) {
+    public TestCaseJSON(String name, int nbAssertionAdded, int nbInputAdded, CoverageImprovement coverageImprovement,
+                        ExtendedCoverage fullCoverage, String description) {
         this.name = name;
-        this.nbAssertionAdded = oldTestCaseJSON.nbAssertionAdded;
-        this.nbInputAdded = oldTestCaseJSON.nbInputAdded;
-        this.coverageImprovement = oldTestCaseJSON.coverageImprovement;
-        this.fullCoverage = oldTestCaseJSON.fullCoverage;
+        this.nbAssertionAdded = nbAssertionAdded;
+        this.nbInputAdded = nbInputAdded;
+        this.coverageImprovement = coverageImprovement;
+        this.fullCoverage = fullCoverage;
+        this.description = description;
+    }
+
+    public TestCaseJSON copyAndUpdateName(String name) {
+        return new TestCaseJSON(name, this.nbAssertionAdded, this.nbInputAdded, this.coverageImprovement, this.fullCoverage, this.description);
+    }
+
+    public TestCaseJSON copyAndUpdateDescription(String description) {
+        return new TestCaseJSON(this.name, this.nbAssertionAdded, this.nbInputAdded, this.coverageImprovement, this.fullCoverage, description);
     }
 
     public String getName() {
