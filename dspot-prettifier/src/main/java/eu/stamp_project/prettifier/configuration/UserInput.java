@@ -1,10 +1,15 @@
 package eu.stamp_project.prettifier.configuration;
 
+import eu.stamp_project.Main;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.common.configuration.check.InputErrorException;
+import eu.stamp_project.dspot.common.report.error.Error;
+import eu.stamp_project.dspot.common.report.error.ErrorEnum;
 import picocli.CommandLine;
 
 import java.io.File;
+
+import static eu.stamp_project.dspot.common.configuration.DSpotState.GLOBAL_REPORT;
 
 /**
  * created by Benjamin DANGLOT
@@ -20,10 +25,10 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
 
     @CommandLine.Option(
             names = "--path-to-amplified-test-class",
-            description = "[mandatory] Specify the path to the java test class that has been amplified " +
+            description = "Specify the path to the java test class that has been amplified " +
                     "and that contains some amplified test methods to be \"prettified\"."
     )
-    private String pathToAmplifiedTestClass;
+    private String pathToAmplifiedTestClass = "";
 
     public String getPathToAmplifiedTestClass() {
         return this.pathToAmplifiedTestClass;
@@ -31,8 +36,8 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
 
     public UserInput setPathToAmplifiedTestClass(String pathToAmplifiedTestClass) {
         if (!pathToAmplifiedTestClass.endsWith(".java")) {
-            // TODO must add this error to the global report
-            throw new InputErrorException();
+            GLOBAL_REPORT.addInputError(new Error(ErrorEnum.ERROR_PATH_TO_AMPLIFIED_TEST_FILE));
+            return this;
         }
         this.pathToAmplifiedTestClass = pathToAmplifiedTestClass;
         return this;
