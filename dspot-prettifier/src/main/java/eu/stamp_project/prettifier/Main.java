@@ -90,15 +90,27 @@ public class Main {
 
     public static void runPrettifier(UserInput configuration) {
 
-        // TODO throw error if more than one test class passed
+        if (dSpotState.getTestClassesToBeAmplified().size() > 1) {
+            LOGGER.error("More than one test class passed! The prettifier can only process one amplified test class " +
+                         "at a time.");
+            return;
+        }
+        if (dSpotState.getTestClassesToBeAmplified().size() < 1 && configuration.getPathToAmplifiedTestClass().isEmpty()) {
+            LOGGER.error("No test class passed! Please pass the class to be prettified with --test or --path-to" +
+                         "-amplified-test-class");
+            return;
+        }
+        CtType<?> amplifiedTestClass;
+        if (!configuration.getPathToAmplifiedTestClass().isEmpty()) {
+            amplifiedTestClass = loadAmplifiedTestClassFromFile(configuration);
+        } else {
+            amplifiedTestClass = dSpotState.getTestClassesToBeAmplified().get(0);
+        }
 
         final List<CtMethod<?>> testMethods =
                 dSpotState.getTestFinder().findTestMethods(dSpotState.getTestClassesToBeAmplified().get(0),
                         dSpotState.getTestMethodsToBeAmplifiedNames());
         Main.report.nbTestMethods = testMethods.size();
-
-        // TODO technically this is no longer needed if the test class is set via --test
-        final CtType<?> amplifiedTestClass = loadAmplifiedTestClass(configuration);
 
         final List<CtMethod<?>> prettifiedAmplifiedTestMethods =
                 prettify(
@@ -110,7 +122,7 @@ public class Main {
         output(amplifiedTestClass, prettifiedAmplifiedTestMethods, configuration);
     }
 
-    public static CtType<?> loadAmplifiedTestClass(UserInput configuration) {
+    public static CtType<?> loadAmplifiedTestClassFromFile(UserInput configuration) {
         Launcher launcher = new Launcher();
         launcher.getEnvironment().setNoClasspath(true);
         launcher.addInputResource(configuration.getPathToAmplifiedTestClass());

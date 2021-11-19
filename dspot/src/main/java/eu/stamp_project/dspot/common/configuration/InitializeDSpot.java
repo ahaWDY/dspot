@@ -106,7 +106,6 @@ public class InitializeDSpot {
         DSpotState.setCollectData(true);
         DSpotState.setDelta(userInput.getDelta());
         DSpotState.setNbIteration(userInput.getNbIteration());
-        DSpotState.verbose = userInput.isVerbose();
     }
 
     public void initHelpers(UserInput configuration) {

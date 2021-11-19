@@ -76,8 +76,6 @@ public class MainTest {
     public void testImprovedCoverageTestNames() throws Exception {
         Main.main(new String[]{
                 "--absolute-path-to-project-root", "src/test/resources/sample/",
-                "--path-to-amplified-test-class",
-                "src/test/resources/sample/src/test/java/eu/stamp_project/AppTest.java",
                 "--rename-test-methods=ImprovedCoverageTestRenamer",
                 "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
                 "--test", "eu.stamp_project.AppTest",
@@ -134,8 +132,6 @@ public class MainTest {
     public void testTestDescriptions() throws Exception {
         Main.main(new String[]{
                 "--absolute-path-to-project-root", "src/test/resources/sample/",
-                "--path-to-amplified-test-class",
-                "src/test/resources/sample/src/test/java/eu/stamp_project/AppTest.java",
                 "--generate-descriptions",
                 "--with-comment", "All",
                 "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
@@ -143,18 +139,9 @@ public class MainTest {
                 "--test-cases", "test1_mg12_assSep41,test1_mg13_failAssert0"
         });
         assertTrue(new File(OUTPUT_PATH_APP_TEST).exists());
-//        assertFileContains("Name changed to covered methods in test", "testCompute", OUTPUT_PATH_APP_TEST);
-//        assertFileContains("Name changed to covered methods in test", "testThrowException", OUTPUT_PATH_APP_TEST);
-//        assertFileContains("New name included in json report", "testCompute",
-//                "src/test/resources/sample/amplified-output/eu.stamp_project.AppTest_report.json");
-//
-//        // cleanup: replace names back in report json
-//        replaceInFile("\"testCompute\"",
-//                "\"test1_mg12_assSep41\"",
-//                "src/test/resources/sample/amplified-output/eu.stamp_project.AppTest_report.json");
-//        replaceInFile("\"testThrowException\"",
-//                "\"test1_mg13_failAssert0\"",
-//                "src/test/resources/sample/amplified-output/eu.stamp_project.AppTest_report.json");
+        assertFileContains("Added description to method", "* Checks compute.", OUTPUT_PATH_APP_TEST);
+        assertFileContains("Added description to method", "* Checks throwException.", OUTPUT_PATH_APP_TEST);
+        assertFileContains("Description included in json report", "Checks throwException.", REPORT_PATH_APP_TEST);
     }
 
     private void assertOutputClassContains(String expected) throws Exception{
