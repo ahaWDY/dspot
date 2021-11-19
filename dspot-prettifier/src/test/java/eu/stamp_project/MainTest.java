@@ -33,8 +33,8 @@ public class MainTest {
     @After
     public void tearDown() throws Exception {
         try {
-            //FileUtils.deleteDirectory(new File("target/dspot/output/"));
-            //FileUtils.deleteDirectory(new File("src/test/resources/sample/target"));
+            FileUtils.deleteDirectory(new File("target/dspot/output/"));
+            FileUtils.deleteDirectory(new File("src/test/resources/sample/target"));
         } catch (Exception ignored) {
 
         }
