@@ -53,6 +53,10 @@ public class MethodCoverage {
         return map;
     }
 
+    public int totalAdditionallyCoveredInstructions() {
+        return lineCoverage.stream().mapToInt(Integer::intValue).sum();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -20,6 +20,14 @@ public class TestCaseJSON {
         this.fullCoverage = fullCoverage;
     }
 
+    public TestCaseJSON(String name, TestCaseJSON oldTestCaseJSON) {
+        this.name = name;
+        this.nbAssertionAdded = oldTestCaseJSON.nbAssertionAdded;
+        this.nbInputAdded = oldTestCaseJSON.nbInputAdded;
+        this.coverageImprovement = oldTestCaseJSON.coverageImprovement;
+        this.fullCoverage = oldTestCaseJSON.fullCoverage;
+    }
+
     public String getName() {
         return name;
     }
