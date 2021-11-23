@@ -32,6 +32,7 @@ public class PrettifiedTestMethods {
                 .filter(TestFramework.get()::isTest)
                 .forEach(testClass::removeMethod);
         prettifiedAmplifiedTestMethods.forEach(testClass::addMethod);
+        LOGGER.info(testClass.toString());
         DSpotUtils.printCtTypeToGivenDirectory(testClass, new File(outputDirectory), true);
         LOGGER.info("Print {} in {}", testClass.getQualifiedName(), outputDirectory);
     }

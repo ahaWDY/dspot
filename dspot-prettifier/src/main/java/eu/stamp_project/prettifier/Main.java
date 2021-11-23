@@ -105,14 +105,9 @@ public class Main {
         if (!configuration.getPathToAmplifiedTestClass().isEmpty()) {
             amplifiedTestClass = loadAmplifiedTestClassFromFile(configuration);
         } else {
-            LOGGER.info(dSpotState.getTestClassesToBeAmplified().toString());
-            LOGGER.info(String.valueOf(dSpotState.getTestClassesToBeAmplified().size()));
-            LOGGER.info(dSpotState.getTestClassesToBeAmplified().stream().map(CtTypeInformation::getQualifiedName).reduce("",
-                    (a,  b) -> a + ", " + b));
             amplifiedTestClass = dSpotState.getTestClassesToBeAmplified().get(0);
         }
 
-        LOGGER.info(amplifiedTestClass.toString());
         final List<CtMethod<?>> testMethods =
                 dSpotState.getTestFinder().findTestMethods(amplifiedTestClass,
                         dSpotState.getTestMethodsToBeAmplifiedNames());
@@ -252,17 +247,7 @@ public class Main {
                               UserInput configuration) {
         new PrettifiedTestMethods(configuration.getOutputDirectory())
                 .output(amplifiedTestClass, prettifiedAmplifiedTestMethods);
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        final String pathname =
-                configuration.getOutputDirectory() + File.separator + amplifiedTestClass.getQualifiedName() +
-                "_prettifier_report.json";
-        LOGGER.info("Output a report in {}", pathname);
-        final File file = new File(pathname);
-        try (FileWriter writer = new FileWriter(file, false)) {
-            writer.write(gson.toJson(Main.report));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Main.report.output(configuration, amplifiedTestClass);
     }
 
 }
