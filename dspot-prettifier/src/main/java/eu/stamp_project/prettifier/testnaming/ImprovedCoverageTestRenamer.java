@@ -54,8 +54,13 @@ public class ImprovedCoverageTestRenamer implements Prettifier {
                 buildNameMapForTests(mapTestNameToResult, amplifiedTestsToBePrettified);
 
         for (CtMethod<?> test : amplifiedTestsToBePrettified) {
-            TestCaseJSON testCaseJSON = mapTestNameToResult.get(test.getSimpleName());
             String newTestName = testToNames.get(test);
+            if (newTestName == null) {
+                LOGGER.info("No new name generated for " + test.getSimpleName());
+                continue;
+            }
+
+            TestCaseJSON testCaseJSON = mapTestNameToResult.get(test.getSimpleName());
 
             CtMethod<?> renamedTest = test.clone();
             renamedTest.setSimpleName(newTestName);
@@ -75,7 +80,7 @@ public class ImprovedCoverageTestRenamer implements Prettifier {
      *
      * @param mapTestNameToResult map of the old test name to its JSON coverage report
      * @param amplifiedTestsToBePrettified list of all methods to be considered
-     * @return map of the amplifed test cases to their new name
+     * @return map of the amplified test cases to their new name
      */
     private Map<CtMethod<?>, String> buildNameMapForTests(Map<String, TestCaseJSON> mapTestNameToResult,
                                                           List<CtMethod<?>> amplifiedTestsToBePrettified) {
@@ -83,7 +88,13 @@ public class ImprovedCoverageTestRenamer implements Prettifier {
         Map<CtMethod<?>, List<String>> testToCoveredMethods = new HashMap<>();
 
         for (CtMethod<?> test : amplifiedTestsToBePrettified) {
+
             TestCaseJSON testCaseJSON = mapTestNameToResult.get(test.getSimpleName());
+            if (testCaseJSON == null) {
+                LOGGER.info("No coverage results found for " + test.getSimpleName() + ". Skipped renaming.");
+                continue;
+            }
+            LOGGER.info(testCaseJSON.toString());
             testToCoveredMethods.put(test, Util.getCoveredMethods(testCaseJSON.getCoverageImprovement()));
         }
 

@@ -28,6 +28,7 @@ import spoon.Launcher;
 import spoon.reflect.code.CtStatement;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
+import spoon.reflect.declaration.CtTypeInformation;
 import spoon.reflect.visitor.filter.TypeFilter;
 
 import java.io.File;
@@ -104,11 +105,16 @@ public class Main {
         if (!configuration.getPathToAmplifiedTestClass().isEmpty()) {
             amplifiedTestClass = loadAmplifiedTestClassFromFile(configuration);
         } else {
+            LOGGER.info(dSpotState.getTestClassesToBeAmplified().toString());
+            LOGGER.info(String.valueOf(dSpotState.getTestClassesToBeAmplified().size()));
+            LOGGER.info(dSpotState.getTestClassesToBeAmplified().stream().map(CtTypeInformation::getQualifiedName).reduce("",
+                    (a,  b) -> a + ", " + b));
             amplifiedTestClass = dSpotState.getTestClassesToBeAmplified().get(0);
         }
 
+        LOGGER.info(amplifiedTestClass.toString());
         final List<CtMethod<?>> testMethods =
-                dSpotState.getTestFinder().findTestMethods(dSpotState.getTestClassesToBeAmplified().get(0),
+                dSpotState.getTestFinder().findTestMethods(amplifiedTestClass,
                         dSpotState.getTestMethodsToBeAmplifiedNames());
         Main.report.nbTestMethods = testMethods.size();
 
