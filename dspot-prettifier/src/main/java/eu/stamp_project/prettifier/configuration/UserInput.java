@@ -26,7 +26,9 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
     @CommandLine.Option(
             names = "--path-to-amplified-test-class",
             description = "Specify the path to the java test class that has been amplified " +
-                    "and that contains some amplified test methods to be \"prettified\"."
+                    "and that contains some amplified test methods to be \"prettified\"." +
+                          "If the test class is not in the package with the standard test classes, you need to set " +
+                          "this parameter!"
     )
     private String pathToAmplifiedTestClass = "";
 
