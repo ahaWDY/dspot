@@ -44,9 +44,9 @@ public class DevFriendlyAmplification {
     public List<CtMethod<?>> devFriendlyAmplification(CtType<?> testClassToBeAmplified,
                                                       List<CtMethod<?>> testMethodsToBeAmplified) {
 
+        // first we setup the selector so it can compute the complete coverage of the whole existing test suite
         final List<CtMethod<?>> selectedToBeAmplified = dSpot
-                .setupSelector(testClassToBeAmplified,
-                        dSpotState.getTestFinder().findTestMethods(testClassToBeAmplified,Collections.emptyList()));
+                .setupSelector(testClassToBeAmplified, testMethodsToBeAmplified);
 
         // selectedToBeAmplified with all test class methods -> keep only ones matching testMethodsToBeAmplified
         final List<CtMethod<?>> methodsToAmplify =
@@ -106,11 +106,8 @@ public class DevFriendlyAmplification {
             classWithTestMethods = testTuple.testClassToBeAmplified;
 
             // Amplify input
-            List<CtMethod<?>> selectedForInputAmplification = setup
-                    .fullSelectorSetup(classWithTestMethods, testTuple.testMethodsToBeAmplified);
-
             List<CtMethod<?>> inputAmplifiedTests = dSpotState.getInputAmplDistributor()
-                    .inputAmplify(selectedForInputAmplification, 0);
+                    .inputAmplify(testTuple.testMethodsToBeAmplified, 0);
 
             // Add new assertions
             amplifiedTests = dSpotState.getAssertionGenerator()
