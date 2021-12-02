@@ -20,6 +20,10 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Generates a textual description of the contribution that the passed test cases make.
+ * The description is added as a javadoc comment and saved in the report.
+ */
 public class TestDescriptionGenerator implements Prettifier {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestDescriptionGenerator.class);

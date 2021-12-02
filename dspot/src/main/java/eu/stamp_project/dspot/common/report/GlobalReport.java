@@ -2,7 +2,9 @@ package eu.stamp_project.dspot.common.report;
 
 import eu.stamp_project.dspot.common.report.error.Error;
 import eu.stamp_project.dspot.common.report.error.ErrorReport;
+import eu.stamp_project.dspot.common.report.output.ModificationReport;
 import eu.stamp_project.dspot.common.report.output.OutputReport;
+import eu.stamp_project.dspot.common.report.output.assertiongenerator.AssertionGeneratorReport;
 import eu.stamp_project.dspot.common.report.output.selector.TestSelectorElementReport;
 import eu.stamp_project.dspot.common.report.output.selector.TestSelectorReport;
 import spoon.reflect.declaration.CtType;
@@ -22,10 +24,14 @@ public class GlobalReport implements Report, ErrorReport, OutputReport, TestSele
 
     private TestSelectorReport testSelectorReport;
 
-    public GlobalReport(OutputReport outputReport, ErrorReport errorReport, TestSelectorReport testSelectorReport) {
+    private ModificationReport modificationReport;
+
+    public GlobalReport(OutputReport outputReport, ErrorReport errorReport, TestSelectorReport testSelectorReport,
+                        ModificationReport modificationReport) {
         this.outputReport = outputReport;
         this.errorReport = errorReport;
         this.testSelectorReport = testSelectorReport;
+        this.modificationReport = modificationReport;
     }
 
     /* REPORT METHODS */
@@ -35,6 +41,7 @@ public class GlobalReport implements Report, ErrorReport, OutputReport, TestSele
         this.testSelectorReport.output(outputDirectory);
         this.errorReport.output(outputDirectory);
         this.outputReport.output(outputDirectory);
+        this.modificationReport.output(outputDirectory);
     }
 
     @Override
@@ -42,6 +49,7 @@ public class GlobalReport implements Report, ErrorReport, OutputReport, TestSele
         this.testSelectorReport.reset();
         this.errorReport.reset();
         this.outputReport.reset();
+        this.modificationReport.reset();
     }
 
     /* ERROR REPORT METHODS */
@@ -83,5 +91,9 @@ public class GlobalReport implements Report, ErrorReport, OutputReport, TestSele
     @Override
     public void addPrintedTestClasses(String line) {
         this.outputReport.addPrintedTestClasses(line);
+    }
+
+    public void reportModification(CtType<?> testClass, String testName, AssertionGeneratorReport report) {
+        this.modificationReport.reportModification(testClass, testName, report);
     }
 }

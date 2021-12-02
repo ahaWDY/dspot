@@ -40,8 +40,8 @@ public class MainTest {
     @After
     public void tearDown() throws Exception {
         try {
-            FileUtils.deleteDirectory(new File("target/trash"));
-            FileUtils.deleteDirectory(new File("src/test/resources/test-projects/target"));
+//            FileUtils.deleteDirectory(new File("target/trash"));
+//            FileUtils.deleteDirectory(new File("src/test/resources/test-projects/target"));
         } catch (Exception ignored) {
 
         }

@@ -1,6 +1,7 @@
 package eu.stamp_project.dspot.assertiongenerator.assertiongenerator;
 
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.methodreconstructor.observer.testwithloggenerator.objectlogsyntaxbuilder_constructs.objectlog.Observation;
+import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationException;
 import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.methodreconstructor.AssertionSyntaxBuilder;
@@ -12,6 +13,7 @@ import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.common.compilation.DSpotCompiler;
 
 import eu.stamp_project.dspot.common.compilation.TestCompiler;
+import eu.stamp_project.dspot.common.report.output.assertiongenerator.ValueAssertionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spoon.reflect.code.CtBlock;
@@ -198,11 +200,19 @@ public class MethodReconstructor {
                 }
 
                 CtMethod<?> testWithAssert = CloneHelper.cloneTestMethodForAmp(clonedNoAmpTest, "_assSep");
-                List<CtStatement> statements = Query.getElements(testWithAssert, new TypeFilter<CtStatement>(CtStatement.class));
+                testWithAssert = decideReturn(testWithAssert, test);
+                if (testWithAssert == null) {
+                    continue;
+                }
 
+                List<CtStatement> statements = Query.getElements(testWithAssert, new TypeFilter<CtStatement>(CtStatement.class));
                 int numberOfAddedAssertion = goThroughAssertionStatements(Collections.singletonList(statement), id, statements, 0);
                 Counter.updateAssertionOf(testWithAssert, numberOfAddedAssertion);
-                testsToReturn.add(decideReturn(testWithAssert,test));
+
+                DSpotState.GLOBAL_REPORT.reportModification(test.getDeclaringType(),test.getSimpleName(),
+                        new ValueAssertionReport(statement.toString(),"test"));
+
+                testsToReturn.add(testWithAssert);
             }
         }
         return testsToReturn;
