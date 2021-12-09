@@ -205,12 +205,14 @@ public class MethodReconstructor {
                     continue;
                 }
 
-                List<CtStatement> statements = Query.getElements(testWithAssert, new TypeFilter<CtStatement>(CtStatement.class));
-                int numberOfAddedAssertion = goThroughAssertionStatements(Collections.singletonList(statement), id, statements, 0);
+                List<CtStatement> statements = Query.getElements(testWithAssert,
+                        new TypeFilter<CtStatement>(CtStatement.class));
+                int numberOfAddedAssertion = goThroughAssertionStatements(Collections.singletonList(statement), id,
+                        statements, 0);
                 Counter.updateAssertionOf(testWithAssert, numberOfAddedAssertion);
 
-                DSpotState.GLOBAL_REPORT.reportModification(test.getDeclaringType(),test.getSimpleName(),
-                        new ValueAssertionReport(statement.toString(),"test"));
+                DSpotUtils.reportModification(test.getDeclaringType(), test.getSimpleName(),
+                        testWithAssert.getSimpleName(), new ValueAssertionReport(statement.toString(), id));
 
                 testsToReturn.add(testWithAssert);
             }

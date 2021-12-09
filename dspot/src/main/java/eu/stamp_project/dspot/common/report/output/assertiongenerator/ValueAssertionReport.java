@@ -1,6 +1,8 @@
 package eu.stamp_project.dspot.common.report.output.assertiongenerator;
 
-public class ValueAssertionReport extends AssertionGeneratorReport {
+import eu.stamp_project.dspot.common.report.output.AmplifierReport;
+
+public class ValueAssertionReport extends AmplifierReport {
 
     private String calledMethod;
     private String expectedValue;
@@ -8,6 +10,11 @@ public class ValueAssertionReport extends AssertionGeneratorReport {
     public ValueAssertionReport(String calledMethod, String expectedValue) {
         this.calledMethod = calledMethod;
         this.expectedValue = expectedValue;
+    }
+
+    @Override
+    public boolean isAssertionReport() {
+        return true;
     }
 
 }

@@ -40,8 +40,8 @@ public class MainTest {
     @After
     public void tearDown() throws Exception {
         try {
-//            FileUtils.deleteDirectory(new File("target/trash"));
-//            FileUtils.deleteDirectory(new File("src/test/resources/test-projects/target"));
+            FileUtils.deleteDirectory(new File("target/trash"));
+            FileUtils.deleteDirectory(new File("src/test/resources/test-projects/target"));
         } catch (Exception ignored) {
 
         }
@@ -222,7 +222,9 @@ public class MainTest {
         Main.main(new String[]{
                 "--verbose",
                 "--absolute-path-to-project-root", new File("src/test/resources/test-projects/").getAbsolutePath() + "/",
-                "--amplifiers", "MethodAdderOnExistingObjectsAmplifier",
+                "--amplifiers", "MethodDuplicationAmplifier,MethodRemove,FastLiteralAmplifier," +
+                "MethodAdderOnExistingObjectsAmplifier,ReturnValueAmplifier,NullifierAmplifier," +
+                "ArrayAmplifier",
                 "--test-criterion", "ExtendedCoverageSelector",
                 "--test", "example.TestSuiteExample2",
                 "--dev-friendly",

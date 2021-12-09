@@ -2,7 +2,9 @@
 
 package eu.stamp_project.dspot.amplifier.amplifiers;
 
+import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
+import eu.stamp_project.dspot.common.report.output.amplifiers.ValueAmplifierReport;
 import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import eu.stamp_project.dspot.amplifier.amplifiers.utils.AmplificationChecker;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
@@ -10,6 +12,7 @@ import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.common.miscellaneous.Counter;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.amplifier.amplifiers.utils.RandomHelper;
+import org.eclipse.jdt.internal.compiler.ast.Literal;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.*;
 import spoon.reflect.visitor.Query;
@@ -113,6 +116,7 @@ public class FastLiteralAmplifier implements Amplifier {
 		toReplace.replace(newLiteral);
 		Counter.updateInputOf(cloned_method, 1);
 		addComment(toReplace, "number", oldValue, newValue);
+		reportModification(method, cloned_method, newLiteral, oldValue);
 		return cloned_method;
 	}
 
@@ -133,10 +137,11 @@ public class FastLiteralAmplifier implements Amplifier {
 		CtMethod<?> cloned_method = CloneHelper.cloneTestMethodForAmp(method, "_literalMutationString");
 		Counter.updateInputOf(cloned_method, 1);
 		CtLiteral toReplace = Query.getElements(cloned_method.getBody(), new LiteralToBeMutedFilter())
-				.get(original_lit_index);
+								   .get(original_lit_index);
 		Object oldValue = toReplace.getValue();
 		toReplace.replace(cloned_method.getFactory().Code().createLiteral(newValue));
 		addComment(toReplace, "string", oldValue, newValue);
+		reportModification(method, cloned_method, toReplace, oldValue);
 		return cloned_method;
 	}
 
@@ -150,10 +155,11 @@ public class FastLiteralAmplifier implements Amplifier {
 		CtMethod cloned_method = CloneHelper.cloneTestMethodForAmp(method, "_literalMutationChar");
 		Counter.updateInputOf(cloned_method, 1);
 		CtLiteral toReplace = Query.getElements(cloned_method.getBody(), new LiteralToBeMutedFilter())
-				.get(original_lit_index);
+								   .get(original_lit_index);
 		Object oldValue = toReplace.getValue();
 		toReplace.replace(cloned_method.getFactory().Code().createLiteral(newValue));
 		addComment(toReplace, "char", oldValue, newValue);
+		reportModification(method, cloned_method, toReplace, oldValue);
 		return cloned_method;
 	}
 
@@ -218,16 +224,17 @@ public class FastLiteralAmplifier implements Amplifier {
 	private CtMethod<?> createBooleanMutant(CtMethod test, CtLiteral booleanLiteral) {
 		Boolean value = (Boolean) booleanLiteral.getValue();
 		CtMethod cloned_method = CloneHelper.cloneTestMethodForAmp(test, "_literalMutationBoolean");
-		CtLiteral newValue = cloned_method.getElements(new TypeFilter<CtLiteral>(CtLiteral.class) {
+		CtLiteral literalToReplace = cloned_method.getElements(new TypeFilter<CtLiteral>(CtLiteral.class) {
 			@Override
 			public boolean matches(CtLiteral element) {
 				return element.equals(booleanLiteral);
 			}
 		}).get(0);
-		newValue.setValue(!value);
-		newValue.setTypeCasts(booleanLiteral.getTypeCasts());
+		literalToReplace.setValue(!value);
+		literalToReplace.setTypeCasts(booleanLiteral.getTypeCasts());
 		Counter.updateInputOf(cloned_method, 1);
-		addComment(newValue, "boolean", value, !value);
+		addComment(literalToReplace, "boolean", value, !value);
+		reportModification(test, cloned_method, literalToReplace, value);
 		return cloned_method;
 	}
 
@@ -240,15 +247,24 @@ public class FastLiteralAmplifier implements Amplifier {
 	private Set<Object> getLiterals(CtType type) {
 		if (!literalByClass.containsKey(type)) {
 			Set<Object> set = (Set<Object>) Query.getElements(type, new TypeFilter(CtLiteral.class)).stream()
-					.map(literal -> ((CtLiteral) literal).getValue())
-					.distinct()
-					.collect(Collectors.toSet());
+												 .map(literal -> ((CtLiteral) literal).getValue()).distinct()
+												 .collect(Collectors.toSet());
 			literalByClass.put(type, set);
 		}
 		return literalByClass.get(type);
 	}
 
 	private void addComment(CtElement element, String kind, Object oldValue, Object newValue) {
-		DSpotUtils.addComment(element, "FastLiteralAmplifier: change " + kind + " from '" + oldValue + "' to '" + newValue + "'", CtComment.CommentType.INLINE, CommentEnum.Amplifier);
+		DSpotUtils.addComment(element,
+				"FastLiteralAmplifier: change " + kind + " from '" + oldValue + "' to '" + newValue +
+				"'", CtComment.CommentType.INLINE, CommentEnum.Amplifier);
+	}
+
+	private void reportModification(CtMethod<?> originalTest, CtMethod<?> amplifiedTest, CtLiteral<?> literal,
+									Object oldValue) {
+		DSpotUtils.reportModification(originalTest.getDeclaringType(), originalTest.getSimpleName(),
+				amplifiedTest.getSimpleName(), new ValueAmplifierReport(literal.getParent()
+																																									.toString(), oldValue.toString(), literal.getValue()
+																																																			 .toString()));
 	}
 }

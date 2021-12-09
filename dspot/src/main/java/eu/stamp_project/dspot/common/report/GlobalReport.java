@@ -2,11 +2,12 @@ package eu.stamp_project.dspot.common.report;
 
 import eu.stamp_project.dspot.common.report.error.Error;
 import eu.stamp_project.dspot.common.report.error.ErrorReport;
+import eu.stamp_project.dspot.common.report.output.AmplifierReport;
 import eu.stamp_project.dspot.common.report.output.ModificationReport;
 import eu.stamp_project.dspot.common.report.output.OutputReport;
-import eu.stamp_project.dspot.common.report.output.assertiongenerator.AssertionGeneratorReport;
 import eu.stamp_project.dspot.common.report.output.selector.TestSelectorElementReport;
 import eu.stamp_project.dspot.common.report.output.selector.TestSelectorReport;
+import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 
 import java.util.List;
@@ -93,7 +94,13 @@ public class GlobalReport implements Report, ErrorReport, OutputReport, TestSele
         this.outputReport.addPrintedTestClasses(line);
     }
 
-    public void reportModification(CtType<?> testClass, String testName, AssertionGeneratorReport report) {
-        this.modificationReport.reportModification(testClass, testName, report);
+    public void reportModification(CtType<?> testClass, String testNameBeforeModification,
+                                   String testNameAfterModification, AmplifierReport report) {
+        this.modificationReport.reportModification(testClass, testNameBeforeModification, testNameAfterModification,
+                report);
+    }
+
+    public void filterModifications(CtType<?> testClass, List<CtMethod<?>> selectedTests) {
+        this.modificationReport.filterModifications(testClass, selectedTests);
     }
 }

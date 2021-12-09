@@ -117,8 +117,24 @@ public class DevFriendlyAmplification {
             GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
             return Collections.emptyList();
         }
+        if (amplifiedTests.size() >= 1000) {
+            // executing too many tests over the command line fails because the argument list is too long
+            // that is why we split in smaller chunks that we execute separately
 
-        return selectPassingAndImprovingTests(amplifiedTests,classWithTestMethods,2);
+            List<CtMethod<?>> accumulateSelectedTests = new ArrayList<>();
+            int rounds = amplifiedTests.size() % 1000 + 1;
+            LOGGER.info("Too many tests to run at once. Dividing {} tests into {} rounds", amplifiedTests.size(),
+                    rounds);
+            for (int i = 0; i <= rounds; i++) {
+                List<CtMethod<?>> roundTests = amplifiedTests.subList(i, Math.min((i + 1) * 1000,
+                        amplifiedTests.size()));
+                accumulateSelectedTests.addAll(selectPassingAndImprovingTests(roundTests, classWithTestMethods, 2));
+            }
+            return accumulateSelectedTests;
+
+        } else {
+            return selectPassingAndImprovingTests(amplifiedTests,classWithTestMethods,2);
+        }
     }
 
     private List<CtMethod<?>> selectPassingAndImprovingTests(List<CtMethod<?>> amplifiedTests,

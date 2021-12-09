@@ -2,10 +2,13 @@ package eu.stamp_project.dspot.amplifier.amplifiers;
 
 import eu.stamp_project.dspot.amplifier.amplifiers.value.ValueCreator;
 import eu.stamp_project.dspot.amplifier.amplifiers.value.ValueCreatorHelper;
+import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.amplifier.amplifiers.utils.RandomHelper;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
+import eu.stamp_project.dspot.common.report.output.amplifiers.AddLocalVariableAmplifierReport;
+import eu.stamp_project.dspot.common.report.output.amplifiers.MethodAdderOnExistingObjectsAmplifierReport;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
@@ -90,21 +93,33 @@ public class AmplifierHelper {
             try {
                 final CtLocalVariable<?> localVariable;
                 if (methodToInvokeToAdd.getSimpleName().equals("equals") &&
-                        RandomHelper.getRandom().nextFloat() >= 0.25F) {
+                    RandomHelper.getRandom().nextFloat() >= 0.25F) {
                     localVariable = ValueCreator.createRandomLocalVar(target.getType(), parameter.getSimpleName());
                 } else {
                     localVariable = ValueCreator.createRandomLocalVar(parameter.getType(), parameter.getSimpleName());
                 }
                 body.insertBegin(localVariable);
+
                 DSpotUtils.addComment(localVariable, comment, CtComment.CommentType.INLINE, CommentEnum.Amplifier);
+                DSpotUtils.reportModification(testMethod.getDeclaringType(), testMethod.getSimpleName(),
+                        methodClone.getSimpleName(),
+                        new AddLocalVariableAmplifierReport(localVariable.getSimpleName(), localVariable.getAssignment()
+                                                                                                                                                                                                                      .toString()));
+
                 arguments.add(factory.createVariableRead(localVariable.getReference(), false));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
         CtExpression targetClone = target.clone();
-        CtInvocation newInvocation = factory.Code().createInvocation(targetClone, methodToInvokeToAdd.getReference(), arguments);
+        CtInvocation newInvocation = factory.Code()
+                                            .createInvocation(targetClone, methodToInvokeToAdd.getReference(),
+                                                    arguments);
+
         DSpotUtils.addComment(newInvocation, comment, CtComment.CommentType.INLINE, CommentEnum.Amplifier);
+        DSpotUtils.reportModification(testMethod.getDeclaringType(), testMethod.getSimpleName(),
+                methodClone.getSimpleName(), new MethodAdderOnExistingObjectsAmplifierReport(methodToInvokeToAdd, arguments));
+
         body.insertEnd(newInvocation);
         return methodClone;
     }

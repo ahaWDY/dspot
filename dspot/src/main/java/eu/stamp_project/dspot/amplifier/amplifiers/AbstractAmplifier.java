@@ -1,9 +1,12 @@
 package eu.stamp_project.dspot.amplifier.amplifiers;
 
+import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.common.miscellaneous.Counter;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
+import eu.stamp_project.dspot.common.report.output.amplifiers.ValueAmplifierReport;
+import eu.stamp_project.dspot.common.report.output.assertiongenerator.ValueAssertionReport;
 import spoon.reflect.code.CtComment;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
@@ -74,13 +77,19 @@ public abstract class AbstractAmplifier<T extends CtElement> implements Amplifie
     protected CtMethod<?> replace(T originalElement, T amplifiedElement, CtMethod<?> testMethod) {
         originalElement.replace(amplifiedElement);
         amplifiedElement.putMetadata(this.METADATA_KEY, true);
+
         DSpotUtils.addComment(amplifiedElement,
-                getSuffix() + ": changed '" + originalElement + "' to '" + amplifiedElement + "'",
-                CtComment.CommentType.INLINE, CommentEnum.Amplifier);
+                getSuffix() + ": changed '" + originalElement + "' to '" + amplifiedElement +
+                "'", CtComment.CommentType.INLINE, CommentEnum.Amplifier);
+
         CtMethod<?> clone = CloneHelper.cloneTestMethodForAmp(testMethod, "_" + getSuffix());
         amplifiedElement.replace(originalElement);
+
         DSpotUtils.removeComments(originalElement, getSuffix());
         Counter.updateInputOf(clone, 1);
+        DSpotUtils.reportModification(testMethod.getDeclaringType(), testMethod.getSimpleName(),
+                clone.getSimpleName(), new ValueAmplifierReport("not known", originalElement.toString(),
+                        amplifiedElement.toString()));
         return clone;
     }
 

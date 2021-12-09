@@ -89,9 +89,10 @@ public class AmplificationSetup {
             GLOBAL_REPORT.addTestSelectorReportForTestClass(testClassToBeAmplified, report);
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.error("Something bad happened during the report fot test-criterion.");
+            LOGGER.error("Something bad happened during the report for test-criterion.");
             LOGGER.error("Dspot might not have output correctly!");
         }
+        GLOBAL_REPORT.filterModifications(testClassToBeAmplified, amplifiedTestMethods);
         final CtType<?> amplifiedTestClass = this.output.output(testClassToBeAmplified, amplifiedTestMethods);
         amplifiedTestClasses.add(amplifiedTestClass);
         cleanAfterAmplificationOfOneTestClass(dSpotState.getCompiler(), testClassToBeAmplified);

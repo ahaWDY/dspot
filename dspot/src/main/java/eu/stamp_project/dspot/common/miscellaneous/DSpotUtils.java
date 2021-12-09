@@ -6,6 +6,7 @@ import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.report.error.Error;
 import eu.stamp_project.dspot.common.report.error.ErrorEnum;
+import eu.stamp_project.dspot.common.report.output.AmplifierReport;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -217,6 +218,12 @@ public class DSpotUtils {
             element.removeComment(ampComment);
         }
 
+    }
+
+    public static void reportModification(CtType<?> testClass, String testNameBeforeModification,
+                                          String testNameAfterModification, AmplifierReport report) {
+        DSpotState.GLOBAL_REPORT.reportModification(testClass,testNameBeforeModification, testNameAfterModification,
+                report);
     }
 
     public static final String PATH_TO_DSPOT_DEPENDENCIES = "target/dspot/dependencies/";
