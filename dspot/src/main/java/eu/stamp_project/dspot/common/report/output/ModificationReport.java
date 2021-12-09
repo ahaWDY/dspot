@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Keeps track of the modifications made to each test case during the amplification process.
+ */
 public class ModificationReport implements Report {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModificationReport.class);
@@ -28,7 +31,7 @@ public class ModificationReport implements Report {
     @Override
     public void output(String outputDirectory) {
         this.reportsPerClass.entrySet().stream().filter(entry -> entry.getValue() != null)
-                            .forEach(entry -> entry.getValue().output(entry.getKey(), outputDirectory));
+                .forEach(entry -> entry.getValue().output(entry.getKey(), outputDirectory));
     }
 
     @Override
@@ -110,14 +113,13 @@ public class ModificationReport implements Report {
 
         /**
          * Filter the report to only keep modifications made to the test cases given in
-         *
          * @param selectedTests
          */
         private void filterModifications(List<CtMethod<?>> selectedTests) {
             Set<String> methodNames = selectedTests.stream().map(CtMethod::getSimpleName).collect(Collectors.toSet());
             reportsPerMethod = reportsPerMethod.entrySet().stream()
-                                               .filter(entry -> methodNames.contains(entry.getKey()))
-                                               .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .filter(entry -> methodNames.contains(entry.getKey()))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
     }
 }

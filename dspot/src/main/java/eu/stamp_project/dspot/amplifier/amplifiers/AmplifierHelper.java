@@ -101,10 +101,9 @@ public class AmplifierHelper {
                 body.insertBegin(localVariable);
 
                 DSpotUtils.addComment(localVariable, comment, CtComment.CommentType.INLINE, CommentEnum.Amplifier);
-                DSpotUtils.reportModification(testMethod.getDeclaringType(), testMethod.getSimpleName(),
-                        methodClone.getSimpleName(),
+                DSpotUtils.reportModification(testMethod, methodClone,
                         new AddLocalVariableAmplifierReport(localVariable.getSimpleName(), localVariable.getAssignment()
-                                                                                                                                                                                                                      .toString()));
+                                .toString()));
 
                 arguments.add(factory.createVariableRead(localVariable.getReference(), false));
             } catch (Exception e) {
@@ -113,12 +112,12 @@ public class AmplifierHelper {
         });
         CtExpression targetClone = target.clone();
         CtInvocation newInvocation = factory.Code()
-                                            .createInvocation(targetClone, methodToInvokeToAdd.getReference(),
-                                                    arguments);
+                .createInvocation(targetClone, methodToInvokeToAdd.getReference(),
+                        arguments);
 
         DSpotUtils.addComment(newInvocation, comment, CtComment.CommentType.INLINE, CommentEnum.Amplifier);
-        DSpotUtils.reportModification(testMethod.getDeclaringType(), testMethod.getSimpleName(),
-                methodClone.getSimpleName(), new MethodAdderOnExistingObjectsAmplifierReport(methodToInvokeToAdd, arguments));
+        DSpotUtils.reportModification(testMethod, methodClone,
+                new MethodAdderOnExistingObjectsAmplifierReport(methodToInvokeToAdd, arguments));
 
         body.insertEnd(newInvocation);
         return methodClone;

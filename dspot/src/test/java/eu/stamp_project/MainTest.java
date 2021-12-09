@@ -228,8 +228,9 @@ public class MainTest {
                 "--test-criterion", "ExtendedCoverageSelector",
                 "--test", "example.TestSuiteExample2",
                 "--dev-friendly",
+                "--output-path", "target/trash",
         });
-        assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
+        assertTrue(new File("target/trash/example/TestSuiteExample2.java").exists());
     }
 
 

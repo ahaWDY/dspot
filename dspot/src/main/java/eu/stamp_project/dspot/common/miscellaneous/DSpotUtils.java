@@ -212,17 +212,19 @@ public class DSpotUtils {
         }
 
         List<CtComment> ampComments = element.getComments().stream()
-                                             .filter(ctComment -> ctComment.getContent().startsWith(suffixOfComment))
-                                             .collect(Collectors.toList());
+                .filter(ctComment -> ctComment.getContent().startsWith(suffixOfComment))
+                .collect(Collectors.toList());
         for (CtComment ampComment : ampComments) {
             element.removeComment(ampComment);
         }
 
     }
 
-    public static void reportModification(CtType<?> testClass, String testNameBeforeModification,
-                                          String testNameAfterModification, AmplifierReport report) {
-        DSpotState.GLOBAL_REPORT.reportModification(testClass,testNameBeforeModification, testNameAfterModification,
+    public static void reportModification(CtMethod<?> testBeforeModification,
+                                          CtMethod<?> testAfterModification, AmplifierReport report) {
+        DSpotState.GLOBAL_REPORT.reportModification(testBeforeModification.getDeclaringType(),
+                testBeforeModification.getSimpleName(),
+                testAfterModification.getSimpleName(),
                 report);
     }
 

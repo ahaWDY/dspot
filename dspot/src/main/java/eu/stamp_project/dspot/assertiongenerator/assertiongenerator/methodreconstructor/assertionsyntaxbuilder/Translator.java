@@ -1,5 +1,7 @@
 package eu.stamp_project.dspot.assertiongenerator.assertiongenerator.methodreconstructor.assertionsyntaxbuilder;
 
+import eu.stamp_project.dspot.common.configuration.DSpotState;
+import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.common.miscellaneous.TypeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,13 +125,19 @@ public class Translator {
         String fullQualifiedName = invocationAsString.substring(start + 1, end);
         CtType<?> ctType = getCtType(fullQualifiedName, factory);
         // handling inner types
-        while(ctType == null) {
+        while (ctType == null) {
             final int lastIndexOf = fullQualifiedName.lastIndexOf(".");
             fullQualifiedName = fullQualifiedName.substring(0, lastIndexOf) + "$" + fullQualifiedName.substring(lastIndexOf + 1, fullQualifiedName.length());
             ctType = getCtType(fullQualifiedName, factory);
         }
         final CtTypeReference<?> reference = ctType.getReference();
-        invocation.getTarget().addTypeCast(reference);
+
+        // If using dev-friendly amplification, we don't add the type cast
+        // because we rather have an uncompilable than an unreadable test
+
+        // TODO if-statement!!!
+        //invocation.getTarget().addTypeCast(reference);
+
         final CtExecutableReference<?> referenceToGetter = factory.createExecutableReference();
         referenceToGetter.setSimpleName(executableName);
         referenceToGetter.setDeclaringType(ctType.getReference());

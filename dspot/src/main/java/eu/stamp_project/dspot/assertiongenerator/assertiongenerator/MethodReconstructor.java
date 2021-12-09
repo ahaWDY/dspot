@@ -211,8 +211,7 @@ public class MethodReconstructor {
                         statements, 0);
                 Counter.updateAssertionOf(testWithAssert, numberOfAddedAssertion);
 
-                DSpotUtils.reportModification(test.getDeclaringType(), test.getSimpleName(),
-                        testWithAssert.getSimpleName(), new ValueAssertionReport(statement.toString(), id));
+                DSpotUtils.reportModification(test, testWithAssert, new ValueAssertionReport(statement));
 
                 testsToReturn.add(testWithAssert);
             }

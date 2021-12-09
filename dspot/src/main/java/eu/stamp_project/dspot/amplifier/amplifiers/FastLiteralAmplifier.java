@@ -262,9 +262,8 @@ public class FastLiteralAmplifier implements Amplifier {
 
 	private void reportModification(CtMethod<?> originalTest, CtMethod<?> amplifiedTest, CtLiteral<?> literal,
 									Object oldValue) {
-		DSpotUtils.reportModification(originalTest.getDeclaringType(), originalTest.getSimpleName(),
-				amplifiedTest.getSimpleName(), new ValueAmplifierReport(literal.getParent()
-																																									.toString(), oldValue.toString(), literal.getValue()
-																																																			 .toString()));
+		DSpotUtils.reportModification(originalTest, amplifiedTest,
+				new ValueAmplifierReport(literal.getParent().toString(), oldValue.toString(),
+						literal.getValue().toString()));
 	}
 }

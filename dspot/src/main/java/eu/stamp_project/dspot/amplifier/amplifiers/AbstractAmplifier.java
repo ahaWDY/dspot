@@ -80,16 +80,15 @@ public abstract class AbstractAmplifier<T extends CtElement> implements Amplifie
 
         DSpotUtils.addComment(amplifiedElement,
                 getSuffix() + ": changed '" + originalElement + "' to '" + amplifiedElement +
-                "'", CtComment.CommentType.INLINE, CommentEnum.Amplifier);
+                        "'", CtComment.CommentType.INLINE, CommentEnum.Amplifier);
 
         CtMethod<?> clone = CloneHelper.cloneTestMethodForAmp(testMethod, "_" + getSuffix());
         amplifiedElement.replace(originalElement);
 
         DSpotUtils.removeComments(originalElement, getSuffix());
         Counter.updateInputOf(clone, 1);
-        DSpotUtils.reportModification(testMethod.getDeclaringType(), testMethod.getSimpleName(),
-                clone.getSimpleName(), new ValueAmplifierReport("not known", originalElement.toString(),
-                        amplifiedElement.toString()));
+        DSpotUtils.reportModification(testMethod, clone,
+                new ValueAmplifierReport("not known", originalElement.toString(), amplifiedElement.toString()));
         return clone;
     }
 

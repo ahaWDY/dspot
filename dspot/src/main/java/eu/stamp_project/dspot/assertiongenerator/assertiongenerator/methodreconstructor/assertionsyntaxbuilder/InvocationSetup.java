@@ -70,20 +70,26 @@ public class InvocationSetup {
     }
 
     private static void addTypeCastIfNeeded(CtExpression<?> variableRead, Object value) {
-        if (value instanceof Short) {
-            variableRead.addTypeCast(variableRead.getFactory().Type().shortPrimitiveType());
-        } else if (value instanceof Integer) {
-            variableRead.addTypeCast(variableRead.getFactory().Type().integerPrimitiveType());
-        } else if (value instanceof Long) {
-            variableRead.addTypeCast(variableRead.getFactory().Type().longPrimitiveType());
-        } else if (value instanceof Byte) {
-            variableRead.addTypeCast(variableRead.getFactory().Type().bytePrimitiveType());
-        } else if (value instanceof Float) {
-            variableRead.addTypeCast(variableRead.getFactory().Type().floatPrimitiveType());
-        } else if (value instanceof Double) {
-            variableRead.addTypeCast(variableRead.getFactory().Type().doublePrimitiveType());
-        } else if (value instanceof Character) {
-            variableRead.addTypeCast(variableRead.getFactory().Type().characterPrimitiveType());
+
+        // dirty hack to not include casts in dev-friendly amplification
+        // TODO can we know if the type cast is not needed???
+        if (false) {
+
+            if (value instanceof Short) {
+                variableRead.addTypeCast(variableRead.getFactory().Type().shortPrimitiveType());
+            } else if (value instanceof Integer) {
+                variableRead.addTypeCast(variableRead.getFactory().Type().integerPrimitiveType());
+            } else if (value instanceof Long) {
+                variableRead.addTypeCast(variableRead.getFactory().Type().longPrimitiveType());
+            } else if (value instanceof Byte) {
+                variableRead.addTypeCast(variableRead.getFactory().Type().bytePrimitiveType());
+            } else if (value instanceof Float) {
+                variableRead.addTypeCast(variableRead.getFactory().Type().floatPrimitiveType());
+            } else if (value instanceof Double) {
+                variableRead.addTypeCast(variableRead.getFactory().Type().doublePrimitiveType());
+            } else if (value instanceof Character) {
+                variableRead.addTypeCast(variableRead.getFactory().Type().characterPrimitiveType());
+            }
         }
     }
 
