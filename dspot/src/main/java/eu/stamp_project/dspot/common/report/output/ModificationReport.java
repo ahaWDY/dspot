@@ -103,9 +103,11 @@ public class ModificationReport implements Report {
             // For each modification we also change the name.
             // We take over the previously reported modifications to the new method name
             // (but don't delete it, there could be more new test cases based on the old one)
-            List<AmplifierReport> oldModificationReports = reportsPerMethod.get(testNameBeforeModification);
-            if (oldModificationReports != null) {
-                newModificationReports.addAll(oldModificationReports);
+            if (!testNameAfterModification.equals(testNameBeforeModification)) {
+                List<AmplifierReport> oldModificationReports = reportsPerMethod.get(testNameBeforeModification);
+                if (oldModificationReports != null) {
+                    newModificationReports.addAll(oldModificationReports);
+                }
             }
 
             newModificationReports.add(report);

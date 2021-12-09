@@ -4,16 +4,26 @@ import eu.stamp_project.dspot.common.report.output.AmplifierReport;
 
 public class AddLocalVariableAmplifierReport extends AmplifierReport {
 
-    private String variableName;
-    private String variableValue;
+    private final String variableName;
+    private final String variableValue;
+    private final boolean fromAssertion;
 
-    public AddLocalVariableAmplifierReport(String variableName, String variableValue) {
+    public AddLocalVariableAmplifierReport(String variableName, String variableValue, boolean fromAssertion) {
         this.variableName = variableName;
         this.variableValue = variableValue;
+        this.fromAssertion = fromAssertion;
+    }
+
+    public String getVariableName() {
+        return variableName;
+    }
+
+    public String getVariableValue() {
+        return variableValue;
     }
 
     @Override
     public boolean isAssertionReport() {
-        return false;
+        return fromAssertion;
     }
 }

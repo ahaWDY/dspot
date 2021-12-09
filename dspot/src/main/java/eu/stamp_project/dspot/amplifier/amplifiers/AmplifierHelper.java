@@ -103,7 +103,7 @@ public class AmplifierHelper {
                 DSpotUtils.addComment(localVariable, comment, CtComment.CommentType.INLINE, CommentEnum.Amplifier);
                 DSpotUtils.reportModification(testMethod, methodClone,
                         new AddLocalVariableAmplifierReport(localVariable.getSimpleName(), localVariable.getAssignment()
-                                .toString()));
+                                .toString(), false));
 
                 arguments.add(factory.createVariableRead(localVariable.getReference(), false));
             } catch (Exception e) {
