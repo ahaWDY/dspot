@@ -2,7 +2,6 @@ package example;
 import org.junit.Assert;
 import org.junit.Test;
 public class TestSuiteExample2 {
-    private static int integer = TestResources.integer;
 
     @Test(timeout = 10000)
     public void test2_mg63_assSep152() throws Exception {

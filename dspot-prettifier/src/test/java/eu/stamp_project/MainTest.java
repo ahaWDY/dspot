@@ -33,8 +33,8 @@ public class MainTest {
     @After
     public void tearDown() throws Exception {
         try {
-            FileUtils.deleteDirectory(new File("target/dspot/output/"));
-            FileUtils.deleteDirectory(new File("src/test/resources/sample/target"));
+            //            FileUtils.deleteDirectory(new File("target/dspot/output/"));
+            //            FileUtils.deleteDirectory(new File("src/test/resources/sample/target"));
         } catch (Exception ignored) {
 
         }
@@ -135,20 +135,36 @@ public class MainTest {
                 "--generate-descriptions",
                 "--with-comment", "All",
                 "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
-                "--test", "eu.stamp_project.AppTest",
-                "--test-cases", "test1_mg12_assSep41,test1_mg13_failAssert0"
+                "--test", "example.TestSuiteExample2",
+                "--verbose",
+                //                "--test-cases", "test1_mg12_assSep41,test1_mg13_failAssert0"
         });
-        assertTrue(new File(OUTPUT_PATH_APP_TEST).exists());
-        assertFileContains("Added description to method", "* Checks compute.", OUTPUT_PATH_APP_TEST);
-        assertFileContains("Added description to method", "* Checks throwException.", OUTPUT_PATH_APP_TEST);
-        assertFileContains("Description included in json report", "Checks throwException.", REPORT_PATH_APP_TEST);
+        assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
+        //        assertFileContains("Added description to method", "* Checks compute.", OUTPUT_PATH_APP_TEST);
+        //        assertFileContains("Added description to method", "* Checks throwException.", OUTPUT_PATH_APP_TEST);
+        //        assertFileContains("Description included in json report", "Checks throwException.", REPORT_PATH_APP_TEST);
     }
 
-    private void assertOutputClassContains(String expected) throws Exception{
-        assertOutputClassContains(null,expected);
+    @Test
+    public void testFullDevFriendlyPrettifier() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--generate-descriptions",
+                "--with-comment", "All",
+                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
+                "--test", "example.TestSuiteExample2",
+                "--verbose",
+                //                "--rename-local-variables=SimpleVariableRenamer",
+                //                "--rename-test-methods=ImprovedCoverageTestRenamer",
+        });
+        assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
     }
 
-    private void assertOutputClassContains(String message, String expected) throws Exception{
+    private void assertOutputClassContains(String expected) throws Exception {
+        assertOutputClassContains(null, expected);
+    }
+
+    private void assertOutputClassContains(String message, String expected) throws Exception {
         final File amplifiedTestClass = new File(OUTPUT_PATH_AMPLIFIED_TEST);
 
         try (BufferedReader reader = new BufferedReader(new FileReader(amplifiedTestClass))) {

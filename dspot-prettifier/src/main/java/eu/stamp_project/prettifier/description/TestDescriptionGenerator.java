@@ -2,6 +2,11 @@ package eu.stamp_project.prettifier.description;
 
 import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
+import eu.stamp_project.dspot.common.report.output.AmplifierReport;
+import eu.stamp_project.dspot.common.report.output.ClassModificationReport;
+import eu.stamp_project.dspot.common.report.output.ModificationReport;
+import eu.stamp_project.dspot.common.report.output.amplifiers.AddLocalVariableAmplifierReport;
+import eu.stamp_project.dspot.common.report.output.assertiongenerator.ValueAssertionReport;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestCaseJSON;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestClassJSON;
 import eu.stamp_project.prettifier.Main;
@@ -13,10 +18,7 @@ import org.slf4j.LoggerFactory;
 import spoon.reflect.code.CtComment;
 import spoon.reflect.declaration.CtMethod;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -38,46 +40,109 @@ public class TestDescriptionGenerator implements Prettifier {
     public List<CtMethod<?>> prettify(List<CtMethod<?>> amplifiedTestsToBePrettified) {
         List<CtMethod<?>> prettifiedTests = new ArrayList<>();
 
-        TestClassJSON amplificationReport;
-        try {
-            amplificationReport = (TestClassJSON) Main.report.amplificationReport;
-        } catch (ClassCastException e) {
-            LOGGER.error("No DSpot output is not from ExtendedCoverageSelector! TestDescriptionGenerator not " +
-                         "applied");
+        boolean coverageReportPresent = Main.report.isExtendedCoverageReportPresent(this.getClass().getSimpleName());
+        if (!coverageReportPresent) {
             return amplifiedTestsToBePrettified;
         }
-        if (amplificationReport == null) {
-            LOGGER.error("No json found under configured DSpot output path! TestDescriptionGenerator not " +
-                         "applied");
-            return amplifiedTestsToBePrettified;
-        }
-
+        TestClassJSON amplificationReport = (TestClassJSON) Main.report.amplificationReport;
         Map<String, TestCaseJSON> mapTestNameToResult = amplificationReport.mapTestNameToResult();
 
-        Map<CtMethod<?>, List<String>> testToCoveredMethods = new HashMap<>();
-
-        for (CtMethod<?> test : amplifiedTestsToBePrettified) {
-            TestCaseJSON testCaseJSON = mapTestNameToResult.get(test.getSimpleName());
-            testToCoveredMethods.put(test, Util.getCoveredMethods(testCaseJSON.getCoverageImprovement()));
+        boolean modificationReportPresent = Main.report.isModificationReportPresent(this.getClass().getSimpleName());
+        if (!modificationReportPresent) {
+            return amplifiedTestsToBePrettified;
         }
+        ClassModificationReport modificationReport = Main.report.modificationReport;
 
         for (CtMethod<?> test : amplifiedTestsToBePrettified) {
-            StringBuilder testDescription = new StringBuilder("Checks ");
-            for (String methodName : testToCoveredMethods.get(test)) {
-                testDescription.append(methodName);
-                testDescription.append(" and ");
-            }
-            // replace last " and "
-            testDescription.replace(testDescription.length() - 5, testDescription.length(),".");
+            StringBuilder description = new StringBuilder("Test that ");
 
-            String description = testDescription.toString();
-            DSpotUtils.addComment(test, description, CtComment.CommentType.JAVADOC, CommentEnum.All);
+            addAssertionText(description, test, modificationReport);
+            addChangeText(description, test, modificationReport);
+            addCoverageText(description, test, mapTestNameToResult);
+            addOriginalTestText(description, test, mapTestNameToResult);
+
+            String testDescription = description.toString();
+            DSpotUtils.addComment(test, testDescription, CtComment.CommentType.JAVADOC, CommentEnum.All);
             amplificationReport.updateTestCase(mapTestNameToResult.get(test.getSimpleName()),
-                    mapTestNameToResult.get(test.getSimpleName()).copyAndUpdateDescription(description));
-
+                    mapTestNameToResult.get(test.getSimpleName()).copyAndUpdateDescription(testDescription));
             prettifiedTests.add(test);
         }
 
         return prettifiedTests;
+    }
+
+    private void addAssertionText(StringBuilder description, CtMethod<?> test, ClassModificationReport modificationReport) {
+        ValueAssertionReport assertionReport = null;
+        AddLocalVariableAmplifierReport localVariableReport = null;
+        for (AmplifierReport amplifierReport : modificationReport.getModificationsForTest(test)) {
+            if (!amplifierReport.isAssertionReport()) {
+                continue;
+            }
+            if (amplifierReport.getReportType().equals(ValueAssertionReport.class.getCanonicalName())) {
+                assertionReport = (ValueAssertionReport) amplifierReport;
+            }
+            if (amplifierReport.getReportType().equals(AddLocalVariableAmplifierReport.class.getCanonicalName())) {
+                localVariableReport = (AddLocalVariableAmplifierReport) amplifierReport;
+            }
+        }
+        if (assertionReport == null || localVariableReport == null) {
+            return;
+        }
+        if (!assertionReport.getTestedValue().equals(localVariableReport.getVariableName())) {
+            // TODO does this happen with casts?
+            LOGGER.error("Asserted value and corresponding local variable do not match!!!");
+        }
+
+        // TODO if no local variable, use tested value of assertion report directly
+        description.append(localVariableReport.getVariableValue());
+
+        // TODO adapt to assert method
+        description.append(" is ");
+
+        description.append(assertionReport.getExpectedValue());
+    }
+
+    private void addChangeText(StringBuilder description, CtMethod<?> test, ClassModificationReport modificationReport) {
+        description.append(" when ");
+
+        for (AmplifierReport amplifierReport : modificationReport.getModificationsForTest(test)) {
+            if (amplifierReport.isAssertionReport()) {
+                continue;
+            }
+            if (amplifierReport.getReportType().equals(AddLocalVariableAmplifierReport.class.getCanonicalName())) {
+                AddLocalVariableAmplifierReport localVariableAmplifierReport = (AddLocalVariableAmplifierReport) amplifierReport;
+                description.append(localVariableAmplifierReport.getVariableName())
+                        .append(" is ")
+                        .append(localVariableAmplifierReport.getVariableValue());
+                description.append(" and ");
+            }
+        }
+        replaceLastAnd(description);
+    }
+
+    private void addCoverageText(StringBuilder description, CtMethod<?> test,
+                                 Map<String, TestCaseJSON> mapTestNameToResult) {
+        description.append(" This test tests the methods ");
+        Map<CtMethod<?>, List<String>> testToCoveredMethods = new HashMap<>();
+        TestCaseJSON testCaseJSON = mapTestNameToResult.get(test.getSimpleName());
+        testToCoveredMethods.put(test, Util.getCoveredMethods(testCaseJSON.getCoverageImprovement()));
+        for (String methodName : testToCoveredMethods.get(test)) {
+            description.append(methodName);
+            description.append(" and ");
+        }
+        replaceLastAnd(description);
+    }
+
+    private void addOriginalTestText(StringBuilder description, CtMethod<?> test, Map<String, TestCaseJSON> mapTestNameToResult) {
+        description.append(" It is based on ").append("<TODO pass original test name>").append(".");
+    }
+
+    /**
+     * replace last " and " by "."
+     *
+     * @param description
+     */
+    private void replaceLastAnd(StringBuilder description) {
+        description.replace(description.length() - 5, description.length(), ".");
     }
 }

@@ -2,10 +2,22 @@ package eu.stamp_project.prettifier;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
+import eu.stamp_project.dspot.common.report.output.AmplifierReport;
+import eu.stamp_project.dspot.common.report.output.ClassModificationReport;
+import eu.stamp_project.dspot.common.report.output.ModificationReport;
+import eu.stamp_project.dspot.common.report.output.amplifiers.AddLocalVariableAmplifierReport;
+import eu.stamp_project.dspot.common.report.output.amplifiers.MethodAdderOnExistingObjectsAmplifierReport;
+import eu.stamp_project.dspot.common.report.output.amplifiers.ValueAmplifierReport;
+import eu.stamp_project.dspot.common.report.output.assertiongenerator.ValueAssertionReport;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestClassJSON;
 import eu.stamp_project.dspot.selector.extendedcoverageselector.CoverageImprovement;
 import eu.stamp_project.dspot.selector.extendedcoverageselector.MethodCoverage;
 import eu.stamp_project.prettifier.configuration.UserInput;
+import eu.stamp_project.prettifier.output.report.ReportJSON;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spoon.reflect.code.CtLocalVariable;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.reference.CtLocalVariableReference;
@@ -17,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Util {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Util.class);
 
     public static final class LOCAL_VARIABLE_READ_FILTER extends TypeFilter<CtVariableRead<?>> {
         private final CtLocalVariableReference<?> localVariableReference;
@@ -33,23 +47,40 @@ public class Util {
     }
 
     public static TestClassJSON readExtendedCoverageResultJSON(UserInput configuration) {
-        Gson gson = new Gson();
+        return (TestClassJSON) readReportJSON(configuration, "", TestClassJSON.class);
+    }
+
+    public static ClassModificationReport readModificationReport(UserInput configuration) {
+        return (ClassModificationReport) readReportJSON(configuration, "_modification", ClassModificationReport.class);
+    }
+
+    private static Object readReportJSON(UserInput configuration, String specifier, Class<?> targetClass) {
+        RuntimeTypeAdapterFactory<AmplifierReport> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
+                .of(AmplifierReport.class, "reportType")
+                .registerSubtype(ValueAssertionReport.class, ValueAssertionReport.class.getCanonicalName())
+                .registerSubtype(MethodAdderOnExistingObjectsAmplifierReport.class, MethodAdderOnExistingObjectsAmplifierReport.class.getCanonicalName())
+                .registerSubtype(ValueAmplifierReport.class, ValueAmplifierReport.class.getCanonicalName())
+                .registerSubtype(AddLocalVariableAmplifierReport.class,
+                        AddLocalVariableAmplifierReport.class.getCanonicalName());
+        Gson gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
         try {
-            return gson.fromJson(new FileReader(configuration.getPathToDSpotReports()+ File.separator
-                                                + configuration.getTestClasses().get(0) + "_report.json"),
-                    TestClassJSON.class);
+            return gson.fromJson(new FileReader(configuration.getPathToDSpotReports() + File.separator
+                            + configuration.getTestClasses().get(0) + specifier + "_report.json"),
+                    targetClass);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static void writeExtendedCoverageResultJSON(UserInput configuration, TestClassJSON testClassJSON) {
+    public static void writeReportJSON(UserInput configuration, Object json, String specifier) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        final File file = new File(configuration.getPathToDSpotReports()+ File.separator
-                                   + configuration.getTestClasses().get(0) + "_report.json");
+        final String pathname = configuration.getOutputDirectory() + File.separator
+                + configuration.getTestClasses().get(0) + specifier + "_report.json";
+        LOGGER.info("Output {} report in {}", specifier, pathname);
+        final File file = new File(pathname);
         try (FileWriter writer = new FileWriter(file, false)) {
-            writer.write(gson.toJson(testClassJSON));
+            writer.write(gson.toJson(json));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
