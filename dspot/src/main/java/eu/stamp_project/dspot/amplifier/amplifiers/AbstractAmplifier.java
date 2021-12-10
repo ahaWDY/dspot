@@ -1,12 +1,10 @@
 package eu.stamp_project.dspot.amplifier.amplifiers;
 
-import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.common.miscellaneous.Counter;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.common.report.output.amplifiers.ValueAmplifierReport;
-import eu.stamp_project.dspot.common.report.output.assertiongenerator.ValueAssertionReport;
 import spoon.reflect.code.CtComment;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;

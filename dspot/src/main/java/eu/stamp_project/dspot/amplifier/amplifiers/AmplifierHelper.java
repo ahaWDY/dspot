@@ -1,11 +1,10 @@
 package eu.stamp_project.dspot.amplifier.amplifiers;
 
+import eu.stamp_project.dspot.amplifier.amplifiers.utils.RandomHelper;
 import eu.stamp_project.dspot.amplifier.amplifiers.value.ValueCreator;
 import eu.stamp_project.dspot.amplifier.amplifiers.value.ValueCreatorHelper;
-import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
-import eu.stamp_project.dspot.amplifier.amplifiers.utils.RandomHelper;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.common.report.output.amplifiers.AddLocalVariableAmplifierReport;
 import eu.stamp_project.dspot.common.report.output.amplifiers.MethodAdderOnExistingObjectsAmplifierReport;

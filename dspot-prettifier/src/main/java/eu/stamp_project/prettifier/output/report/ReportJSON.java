@@ -1,9 +1,6 @@
 package eu.stamp_project.prettifier.output.report;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import eu.stamp_project.dspot.common.report.output.ClassModificationReport;
-import eu.stamp_project.dspot.common.report.output.ModificationReport;
 import eu.stamp_project.dspot.common.report.output.selector.TestClassJSON;
 import eu.stamp_project.prettifier.Main;
 import eu.stamp_project.prettifier.Util;
@@ -13,11 +10,6 @@ import eu.stamp_project.prettifier.output.report.minimization.pit.PitMinimizatio
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spoon.reflect.declaration.CtType;
-import sun.java2d.pipe.OutlineTextRenderer;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 /**
  * created by Benjamin DANGLOT

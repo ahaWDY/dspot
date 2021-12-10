@@ -2,19 +2,23 @@
 
 package eu.stamp_project.dspot.amplifier.amplifiers;
 
-import eu.stamp_project.dspot.common.configuration.DSpotState;
-import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
-import eu.stamp_project.dspot.common.report.output.amplifiers.ValueAmplifierReport;
-import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import eu.stamp_project.dspot.amplifier.amplifiers.utils.AmplificationChecker;
+import eu.stamp_project.dspot.amplifier.amplifiers.utils.RandomHelper;
+import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.common.miscellaneous.Counter;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
-import eu.stamp_project.dspot.amplifier.amplifiers.utils.RandomHelper;
-import org.eclipse.jdt.internal.compiler.ast.Literal;
-import spoon.reflect.code.*;
-import spoon.reflect.declaration.*;
+import eu.stamp_project.dspot.common.report.output.amplifiers.ValueAmplifierReport;
+import eu.stamp_project.dspot.common.test_framework.TestFramework;
+import spoon.reflect.code.CtComment;
+import spoon.reflect.code.CtLiteral;
+import spoon.reflect.code.CtUnaryOperator;
+import spoon.reflect.code.UnaryOperatorKind;
+import spoon.reflect.declaration.CtAnnotation;
+import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtType;
 import spoon.reflect.visitor.Query;
 import spoon.reflect.visitor.filter.TypeFilter;
 

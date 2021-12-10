@@ -2,11 +2,9 @@ package eu.stamp_project.prettifier;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapterFactory;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 import eu.stamp_project.dspot.common.report.output.AmplifierReport;
 import eu.stamp_project.dspot.common.report.output.ClassModificationReport;
-import eu.stamp_project.dspot.common.report.output.ModificationReport;
 import eu.stamp_project.dspot.common.report.output.amplifiers.AddLocalVariableAmplifierReport;
 import eu.stamp_project.dspot.common.report.output.amplifiers.MethodAdderOnExistingObjectsAmplifierReport;
 import eu.stamp_project.dspot.common.report.output.amplifiers.ValueAmplifierReport;
@@ -15,7 +13,6 @@ import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.jso
 import eu.stamp_project.dspot.selector.extendedcoverageselector.CoverageImprovement;
 import eu.stamp_project.dspot.selector.extendedcoverageselector.MethodCoverage;
 import eu.stamp_project.prettifier.configuration.UserInput;
-import eu.stamp_project.prettifier.output.report.ReportJSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spoon.reflect.code.CtLocalVariable;

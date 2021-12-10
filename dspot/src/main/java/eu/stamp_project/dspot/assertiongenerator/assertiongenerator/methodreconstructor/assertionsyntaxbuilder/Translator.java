@@ -1,7 +1,5 @@
 package eu.stamp_project.dspot.assertiongenerator.assertiongenerator.methodreconstructor.assertionsyntaxbuilder;
 
-import eu.stamp_project.dspot.common.configuration.DSpotState;
-import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.common.miscellaneous.TypeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

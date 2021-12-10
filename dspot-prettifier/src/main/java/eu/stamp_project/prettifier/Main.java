@@ -1,25 +1,23 @@
 package eu.stamp_project.prettifier;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import eu.stamp_project.dspot.common.automaticbuilder.AutomaticBuilder;
-import eu.stamp_project.prettifier.configuration.TestRenamerEnum;
-import eu.stamp_project.prettifier.configuration.VariableRenamerEnum;
-import eu.stamp_project.prettifier.description.TestDescriptionGenerator;
-import eu.stamp_project.prettifier.testnaming.Code2VecTestRenamer;
-import eu.stamp_project.prettifier.variablenaming.Context2NameVariableRenamer;
-import eu.stamp_project.prettifier.minimization.GeneralMinimizer;
-import eu.stamp_project.prettifier.minimization.Minimizer;
-import eu.stamp_project.prettifier.minimization.PitMutantMinimizer;
-import eu.stamp_project.prettifier.configuration.UserInput;
-import eu.stamp_project.prettifier.output.PrettifiedTestMethods;
-import eu.stamp_project.prettifier.output.report.ReportJSON;
-import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.InitializeDSpot;
 import eu.stamp_project.dspot.common.configuration.check.Checker;
 import eu.stamp_project.dspot.common.configuration.check.InputErrorException;
+import eu.stamp_project.dspot.common.test_framework.TestFramework;
+import eu.stamp_project.prettifier.configuration.TestRenamerEnum;
+import eu.stamp_project.prettifier.configuration.UserInput;
+import eu.stamp_project.prettifier.configuration.VariableRenamerEnum;
+import eu.stamp_project.prettifier.description.TestDescriptionGenerator;
+import eu.stamp_project.prettifier.minimization.GeneralMinimizer;
+import eu.stamp_project.prettifier.minimization.Minimizer;
+import eu.stamp_project.prettifier.minimization.PitMutantMinimizer;
+import eu.stamp_project.prettifier.output.PrettifiedTestMethods;
+import eu.stamp_project.prettifier.output.report.ReportJSON;
+import eu.stamp_project.prettifier.testnaming.Code2VecTestRenamer;
 import eu.stamp_project.prettifier.testnaming.ImprovedCoverageTestRenamer;
+import eu.stamp_project.prettifier.variablenaming.Context2NameVariableRenamer;
 import eu.stamp_project.prettifier.variablenaming.SimpleVariableRenamer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,13 +26,11 @@ import spoon.Launcher;
 import spoon.reflect.code.CtStatement;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
-import spoon.reflect.declaration.CtTypeInformation;
 import spoon.reflect.visitor.filter.TypeFilter;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 

@@ -4,7 +4,6 @@ import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.common.report.output.AmplifierReport;
 import eu.stamp_project.dspot.common.report.output.ClassModificationReport;
-import eu.stamp_project.dspot.common.report.output.ModificationReport;
 import eu.stamp_project.dspot.common.report.output.amplifiers.AddLocalVariableAmplifierReport;
 import eu.stamp_project.dspot.common.report.output.assertiongenerator.ValueAssertionReport;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestCaseJSON;
@@ -18,9 +17,10 @@ import org.slf4j.LoggerFactory;
 import spoon.reflect.code.CtComment;
 import spoon.reflect.declaration.CtMethod;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Generates a textual description of the contribution that the passed test cases make.

@@ -1,17 +1,10 @@
 package eu.stamp_project.prettifier.variablenaming;
 
-import eu.stamp_project.dspot.amplifier.amplifiers.utils.AmplificationChecker;
-import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import eu.stamp_project.prettifier.Prettifier;
 import eu.stamp_project.prettifier.Util;
-import spoon.reflect.code.CtExpression;
-import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLocalVariable;
 import spoon.reflect.code.CtVariableRead;
-import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.reference.CtLocalVariableReference;
-import spoon.reflect.visitor.Filter;
 import spoon.reflect.visitor.filter.TypeFilter;
 
 import java.util.List;
