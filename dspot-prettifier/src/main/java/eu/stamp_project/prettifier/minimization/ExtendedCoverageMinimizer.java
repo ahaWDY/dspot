@@ -126,13 +126,8 @@ public class ExtendedCoverageMinimizer implements Minimizer {
         if (clone.equals(testToBeAmplified))
             return true;
 
-        try {
-            if (runTestCase(clone)) {
-                return true;
-            }
-        } catch (Exception e) {
-            //Pit throws an exception if the test case fails/doesn't run anymore.
-            return false;
+        if (runTestCase(clone)) {
+            return true;
         }
 
         return false;
@@ -453,7 +448,7 @@ public class ExtendedCoverageMinimizer implements Minimizer {
         TestFramework.getAllTest(clone).stream().filter(test -> !test.equals(minimizedTest))
                 .forEach(clone::removeMethod);
 
-        ExtendedCoverageSelector selector = new ExtendedCoverageSelector(builder, configuration);
+        ExtendedCoverageSelector selector = new ExtendedCoverageSelector(builder, configuration, testClass);
         CoveragePerTestMethod coveragePerTestMethod = selector.computeCoverageForGivenTestMethods(Collections.singletonList(minimizedTest));
         ExtendedCoverage coverageOfTest =
                 new ExtendedCoverage(coveragePerTestMethod.getCoverageOf(testClass.getQualifiedName() + "#" + minimizedTest.getSimpleName()));

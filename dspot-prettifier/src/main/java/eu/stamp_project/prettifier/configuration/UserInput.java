@@ -114,8 +114,9 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
     }
 
     @CommandLine.Option(
-            names = "--apply-research-project-minimizer",
-            description = "Apply the research project minimizer to remove statements that do not affect the mutation score." +
+            names = "--apply-extended-coverage-minimizer",
+            description = "Apply the extended coverage minimizer to remove statements that do not affect the " +
+                    "contributed coverage." +
                     " Default value: ${DEFAULT-VALUE}",
             defaultValue = "false"
     )

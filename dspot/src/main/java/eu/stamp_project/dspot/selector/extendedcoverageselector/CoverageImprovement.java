@@ -1,5 +1,7 @@
 package eu.stamp_project.dspot.selector.extendedcoverageselector;
 
+import java.util.Objects;
+
 public class CoverageImprovement {
 
     public CoverageImprovement(ProjectCoverageMap instructionDiff) {
@@ -40,5 +42,22 @@ public class CoverageImprovement {
         });
         explanation.replace(explanation.length() - 1, explanation.length(), "");
         return explanation.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CoverageImprovement that = (CoverageImprovement) o;
+        return Objects.equals(instructionImprovement, that.instructionImprovement);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(instructionImprovement);
     }
 }

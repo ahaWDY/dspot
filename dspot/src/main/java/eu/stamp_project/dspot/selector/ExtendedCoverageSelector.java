@@ -14,6 +14,7 @@ import eu.stamp_project.dspot.selector.extendedcoverageselector.CoverageImprovem
 import eu.stamp_project.dspot.selector.extendedcoverageselector.ExtendedCoverage;
 import eu.stamp_project.testrunner.EntryPoint;
 import eu.stamp_project.testrunner.listener.CoveragePerTestMethod;
+import eu.stamp_project.testrunner.runner.ParserOptions;
 import spoon.reflect.code.CtComment;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
@@ -23,6 +24,9 @@ import spoon.reflect.declaration.CtType;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Selects amplified test cases based on whether they cover new instructions in the code.
+ */
 public class ExtendedCoverageSelector extends TakeAllSelector {
 
     ExtendedCoverage initialCoverage;
@@ -37,6 +41,12 @@ public class ExtendedCoverageSelector extends TakeAllSelector {
         super(automaticBuilder, configuration);
         this.coverageImprovementPerAmplifiedMethod = new HashMap<>();
         this.fullCoveragePerAmplifiedMethod = new HashMap<>();
+        EntryPoint.coverageDetail = ParserOptions.CoverageTransformerDetail.METHOD_DETAIL;
+    }
+
+    public ExtendedCoverageSelector(AutomaticBuilder automaticBuilder, UserInput configuration, CtType<?> testClass) {
+        this(automaticBuilder, configuration);
+        this.currentClassTestToBeAmplified = testClass;
     }
 
     @Override
@@ -109,10 +119,10 @@ public class ExtendedCoverageSelector extends TakeAllSelector {
                 this.cumulativeAmplifiedCoverage);
         this.selectedAmplifiedTest.stream()
                 .map(ctMethod -> new TestCaseJSON(ctMethod.getSimpleName(),
-                    Counter.getAssertionOfSinceOrigin(ctMethod),
-                    Counter.getInputOfSinceOrigin(ctMethod),
-                    this.coverageImprovementPerAmplifiedMethod.get(ctMethod),
-                    this.fullCoveragePerAmplifiedMethod.get(ctMethod)))
+                        Counter.getAssertionOfSinceOrigin(ctMethod),
+                        Counter.getInputOfSinceOrigin(ctMethod),
+                        this.coverageImprovementPerAmplifiedMethod.get(ctMethod),
+                        this.fullCoveragePerAmplifiedMethod.get(ctMethod)))
                 .forEach(testClassJSON::addTestCase);
 
         return testClassJSON;

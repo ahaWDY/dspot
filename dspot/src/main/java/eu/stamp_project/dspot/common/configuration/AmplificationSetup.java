@@ -1,27 +1,28 @@
 package eu.stamp_project.dspot.common.configuration;
 
 import eu.stamp_project.dspot.common.automaticbuilder.maven.DSpotPOMCreator;
-import eu.stamp_project.dspot.common.miscellaneous.AmplificationException;
-import eu.stamp_project.dspot.selector.TestSelector;
-import eu.stamp_project.dspot.common.test_framework.TestFramework;
-import eu.stamp_project.testrunner.EntryPoint;
-import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
-import eu.stamp_project.dspot.common.miscellaneous.Counter;
 import eu.stamp_project.dspot.common.compilation.DSpotCompiler;
 import eu.stamp_project.dspot.common.compilation.TestCompiler;
+import eu.stamp_project.dspot.common.miscellaneous.AmplificationException;
+import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
+import eu.stamp_project.dspot.common.miscellaneous.Counter;
 import eu.stamp_project.dspot.common.report.GlobalReport;
 import eu.stamp_project.dspot.common.report.error.Error;
 import eu.stamp_project.dspot.common.report.output.Output;
 import eu.stamp_project.dspot.common.report.output.selector.TestSelectorElementReport;
-import eu.stamp_project.testrunner.runner.ParserOptions;
+import eu.stamp_project.dspot.common.test_framework.TestFramework;
+import eu.stamp_project.dspot.selector.TestSelector;
+import eu.stamp_project.testrunner.EntryPoint;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import static eu.stamp_project.dspot.common.report.error.ErrorEnum.ERROR_EXEC_TEST_BEFORE_AMPLIFICATION;
 import static eu.stamp_project.dspot.common.report.error.ErrorEnum.ERROR_PRE_SELECTION;
 
@@ -64,9 +65,6 @@ public class AmplificationSetup {
         final boolean jUnit5 = TestFramework.isJUnit5(testMethodsToBeAmplified.get(0));
         EntryPoint.jUnit5Mode = jUnit5;
         DSpotPOMCreator.isCurrentlyJUnit5 = jUnit5;
-        if (dSpotState.isDevFriendlyAmplification()) {
-            EntryPoint.coverageDetail = ParserOptions.CoverageTransformerDetail.METHOD_DETAIL;
-        }
         Counter.reset();
         if (dSpotState.shouldGenerateAmplifiedTestClass()) {
             testClassToBeAmplified = AmplificationHelper.renameTestClassUnderAmplification(testClassToBeAmplified);

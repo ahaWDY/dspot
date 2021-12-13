@@ -156,7 +156,7 @@ public class MainTest {
                 "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
                 "--test", "example.TestSuiteExample2",
                 "--verbose",
-                "--apply-general-minimizer",
+                "--apply-extended-coverage-minimizer",
                 //                "--rename-local-variables=SimpleVariableRenamer",
                 //                "--rename-test-methods=ImprovedCoverageTestRenamer",
         });

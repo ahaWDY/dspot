@@ -42,6 +42,7 @@ public class ReportJSON {
         this.pitMinimizationJSON = new PitMinimizationJSON();
         this.amplificationReport = Util.readExtendedCoverageResultJSON(configuration);
         this.modificationReport = Util.readModificationReport(configuration);
+        this.extendedCoverageMinimizationJSON = new ExtendedCoverageMinimizationJSON();
     }
 
     public void output(UserInput configuration, CtType<?> amplifiedTestClass) {
