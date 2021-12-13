@@ -5,6 +5,7 @@ import eu.stamp_project.dspot.common.report.output.selector.TestClassJSON;
 import eu.stamp_project.prettifier.Main;
 import eu.stamp_project.prettifier.Util;
 import eu.stamp_project.prettifier.configuration.UserInput;
+import eu.stamp_project.prettifier.output.report.minimization.extendedcoverage.ExtendedCoverageMinimizationJSON;
 import eu.stamp_project.prettifier.output.report.minimization.general.GeneralMinimizationJSON;
 import eu.stamp_project.prettifier.output.report.minimization.pit.PitMinimizationJSON;
 import org.slf4j.Logger;
@@ -23,6 +24,8 @@ public class ReportJSON {
     public GeneralMinimizationJSON generalMinimizationJSON;
 
     public PitMinimizationJSON pitMinimizationJSON;
+
+    public ExtendedCoverageMinimizationJSON extendedCoverageMinimizationJSON;
 
     public TestClassJSON amplificationReport;
 

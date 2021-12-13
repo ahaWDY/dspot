@@ -8,7 +8,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
@@ -154,6 +156,7 @@ public class MainTest {
                 "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
                 "--test", "example.TestSuiteExample2",
                 "--verbose",
+                "--apply-general-minimizer",
                 //                "--rename-local-variables=SimpleVariableRenamer",
                 //                "--rename-test-methods=ImprovedCoverageTestRenamer",
         });

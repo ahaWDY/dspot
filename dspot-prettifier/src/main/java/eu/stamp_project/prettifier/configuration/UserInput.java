@@ -1,8 +1,6 @@
 package eu.stamp_project.prettifier.configuration;
 
-import eu.stamp_project.Main;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
-import eu.stamp_project.dspot.common.configuration.check.InputErrorException;
 import eu.stamp_project.dspot.common.report.error.Error;
 import eu.stamp_project.dspot.common.report.error.ErrorEnum;
 import picocli.CommandLine;
@@ -112,6 +110,23 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
 
     public UserInput setApplyPitMinimizer(boolean applyPitMinimizer) {
         this.applyPitMinimizer = applyPitMinimizer;
+        return this;
+    }
+
+    @CommandLine.Option(
+            names = "--apply-research-project-minimizer",
+            description = "Apply the research project minimizer to remove statements that do not affect the mutation score." +
+                    " Default value: ${DEFAULT-VALUE}",
+            defaultValue = "false"
+    )
+    private boolean applyExtendedCoverageMinimizer;
+
+    public boolean isApplyExtendedCoverageMinimizer() {
+        return applyExtendedCoverageMinimizer;
+    }
+
+    public UserInput setApplyExtendedCoverageMinimizer(boolean applyExtendedCoverageMinimizer) {
+        this.applyExtendedCoverageMinimizer = applyExtendedCoverageMinimizer;
         return this;
     }
 

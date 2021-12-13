@@ -65,7 +65,10 @@ public class ExtendedCoverageSelector extends TakeAllSelector {
                     .getCoverageOf(ctMethod.getParent(CtClass.class).getQualifiedName() + "#" + ctMethod.getSimpleName()));
 
             if (newCoverage.isBetterThan(this.cumulativeAmplifiedCoverage)) {
-                //note: we still explain the improvement to the coverage before amplification. Maybe we should change?
+                // Note: we still explain to users that the coverage improves compared to the initial coverage, even
+                // though we compare to the cumulative up top (to not have overlapping proposed test cases)
+                // Should we adapt the coverage improvement to also be calculated against the cumulative coverage?
+                // !!! Changing this will break the current ExtendedCoverageMinimizer
                 CoverageImprovement coverageImprovement = newCoverage.coverageImprovementOver(this.initialCoverage);
                 DSpotUtils.addComment(ctMethod, coverageImprovement.toString(), CtComment.CommentType.BLOCK, CommentEnum.Coverage);
                 methodsKept.add(ctMethod);
@@ -79,15 +82,15 @@ public class ExtendedCoverageSelector extends TakeAllSelector {
         return methodsKept;
     }
 
-    private CoveragePerTestMethod computeCoverageForGivenTestMethods(List<CtMethod<?>> testsToBeAmplified) {
+    public CoveragePerTestMethod computeCoverageForGivenTestMethods(List<CtMethod<?>> testsToBeAmplified) {
         final String[] methodNames = testsToBeAmplified.stream().map(CtNamedElement::getSimpleName)
                 .toArray(String[]::new);
         try {
             return EntryPoint.runCoveragePerTestMethods(
-                            this.classpath + AmplificationHelper.PATH_SEPARATOR + this.targetClasses,
-                            this.targetClasses,
-                            this.currentClassTestToBeAmplified.getQualifiedName(),
-                            methodNames);
+                    this.classpath + AmplificationHelper.PATH_SEPARATOR + this.targetClasses,
+                    this.targetClasses,
+                    this.currentClassTestToBeAmplified.getQualifiedName(),
+                    methodNames);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

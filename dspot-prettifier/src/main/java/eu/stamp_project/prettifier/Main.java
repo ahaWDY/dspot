@@ -10,6 +10,7 @@ import eu.stamp_project.prettifier.configuration.TestRenamerEnum;
 import eu.stamp_project.prettifier.configuration.UserInput;
 import eu.stamp_project.prettifier.configuration.VariableRenamerEnum;
 import eu.stamp_project.prettifier.description.TestDescriptionGenerator;
+import eu.stamp_project.prettifier.minimization.ExtendedCoverageMinimizer;
 import eu.stamp_project.prettifier.minimization.GeneralMinimizer;
 import eu.stamp_project.prettifier.minimization.Minimizer;
 import eu.stamp_project.prettifier.minimization.PitMutantMinimizer;
@@ -79,10 +80,15 @@ public class Main {
         InitializeDSpot initializeDSpot = new InitializeDSpot();
         initializeDSpot.init(inputConfiguration);
         dSpotState = initializeDSpot.getDSpotState();
-
         report = new ReportJSON(inputConfiguration);
+        long startTime = System.currentTimeMillis();
 
         runPrettifier(inputConfiguration);
+
+        final long elapsedTime = System.currentTimeMillis() - startTime;
+        LOGGER.info("Reduced tests in {} ms.",
+                elapsedTime
+        );
     }
 
     public static void runPrettifier(UserInput configuration) {
@@ -132,7 +138,7 @@ public class Main {
         final List<CtMethod<?>> minimizedAmplifiedTestMethods;
 
         // 1 minimize amplified test methods
-        if (configuration.isApplyAllPrettifiers() ||  configuration.isApplyGeneralMinimizer() || configuration.isApplyPitMinimizer()) {
+        if (configuration.isApplyAllPrettifiers() || configuration.isApplyGeneralMinimizer() || configuration.isApplyPitMinimizer() || configuration.isApplyExtendedCoverageMinimizer()) {
             minimizedAmplifiedTestMethods = applyMinimization(
                     testMethods,
                     amplifiedTestClass,
@@ -187,6 +193,19 @@ public class Main {
                             configuration.getAbsolutePathToProjectRoot(),
                             configuration.getClasspathClassesProject(),
                             configuration.getAbsolutePathToTestClasses()
+                    ),
+                    amplifiedTestMethodsToBeMinimized
+            );
+        }
+
+        // 3 apply extended coverage minimization
+        if (configuration.isApplyAllPrettifiers() || configuration.isApplyExtendedCoverageMinimizer()) {
+            final AutomaticBuilder automaticBuilder = configuration.getBuilderEnum().getAutomaticBuilder(configuration);
+            amplifiedTestMethodsToBeMinimized = Main.applyGivenMinimizer(
+                    new ExtendedCoverageMinimizer(
+                            amplifiedTestClass,
+                            automaticBuilder,
+                            configuration
                     ),
                     amplifiedTestMethodsToBeMinimized
             );
