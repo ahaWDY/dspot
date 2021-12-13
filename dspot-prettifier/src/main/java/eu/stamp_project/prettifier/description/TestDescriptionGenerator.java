@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Generates a textual description of the contribution that the passed test cases make.
@@ -32,8 +33,17 @@ public class TestDescriptionGenerator implements Prettifier {
 
     UserInput configuration;
 
+    /**
+     * Maps the variables newly defined by DSpot in the test case to their values.
+     * As (most? all?) are inlined by the general minimizer, the names can be generally replaced by the value in the
+     * descriptions.
+     * Is cleared before describing a new test case.
+     */
+    private final Map<String, String> variableValues;
+
     public TestDescriptionGenerator(UserInput configuration) {
         this.configuration = configuration;
+        variableValues = new HashMap<>();
     }
 
     @Override
@@ -44,7 +54,7 @@ public class TestDescriptionGenerator implements Prettifier {
         if (!coverageReportPresent) {
             return amplifiedTestsToBePrettified;
         }
-        TestClassJSON amplificationReport = (TestClassJSON) Main.report.amplificationReport;
+        TestClassJSON amplificationReport = (TestClassJSON) Main.report.extendedCoverageReport;
         Map<String, TestCaseJSON> mapTestNameToResult = amplificationReport.mapTestNameToResult();
 
         boolean modificationReportPresent = Main.report.isModificationReportPresent(this.getClass().getSimpleName());
@@ -54,87 +64,95 @@ public class TestDescriptionGenerator implements Prettifier {
         ClassModificationReport modificationReport = Main.report.modificationReport;
 
         for (CtMethod<?> test : amplifiedTestsToBePrettified) {
-            StringBuilder description = new StringBuilder("Test that ");
-
-            addAssertionText(description, test, modificationReport);
-            addChangeText(description, test, modificationReport);
-            addCoverageText(description, test, mapTestNameToResult);
-            addOriginalTestText(description, test, mapTestNameToResult);
-
-            String testDescription = description.toString();
-            DSpotUtils.addComment(test, testDescription, CtComment.CommentType.JAVADOC, CommentEnum.All);
-            amplificationReport.updateTestCase(mapTestNameToResult.get(test.getSimpleName()),
-                    mapTestNameToResult.get(test.getSimpleName()).copyAndUpdateDescription(testDescription));
-            prettifiedTests.add(test);
+            prettifiedTests.add(prettify(test, modificationReport.getModificationsForTest(test),
+                    mapTestNameToResult.get(test.getSimpleName())));
         }
 
         return prettifiedTests;
     }
 
-    private void addAssertionText(StringBuilder description, CtMethod<?> test, ClassModificationReport modificationReport) {
-        ValueAssertionReport assertionReport = null;
-        AddLocalVariableAmplifierReport localVariableReport = null;
-        for (AmplifierReport amplifierReport : modificationReport.getModificationsForTest(test)) {
-            if (!amplifierReport.isAssertionReport()) {
-                continue;
-            }
-            if (amplifierReport.getReportType().equals(ValueAssertionReport.class.getCanonicalName())) {
-                assertionReport = (ValueAssertionReport) amplifierReport;
-            }
-            if (amplifierReport.getReportType().equals(AddLocalVariableAmplifierReport.class.getCanonicalName())) {
-                localVariableReport = (AddLocalVariableAmplifierReport) amplifierReport;
-            }
-        }
-        if (assertionReport == null || localVariableReport == null) {
-            return;
-        }
-        if (!assertionReport.getTestedValue().equals(localVariableReport.getVariableName())) {
-            // TODO does this happen with casts?
-            LOGGER.error("Asserted value and corresponding local variable do not match!!!");
+    private CtMethod<?> prettify(CtMethod<?> amplifiedTest, List<AmplifierReport> modificationsForTest,
+                                 TestCaseJSON testCaseResult) {
+        variableValues.clear();
+        // Map modifications per type
+        Map<String, List<AmplifierReport>> modifications =
+                modificationsForTest.stream().collect(Collectors.groupingBy(AmplifierReport::getReportType));
+
+        for (AmplifierReport localVariableReport : modifications.get(AddLocalVariableAmplifierReport.class.getCanonicalName())) {
+            rememberLocalVariable((AddLocalVariableAmplifierReport) localVariableReport);
         }
 
-        // TODO if no local variable, use tested value of assertion report directly
-        description.append(localVariableReport.getVariableValue());
+        StringBuilder description = new StringBuilder("Test that ");
 
-        // TODO adapt to assert method
-        description.append(" is ");
+        addAssertionText(description, amplifiedTest, modifications);
+        addChangeText(description, amplifiedTest, modifications);
+        addCoverageText(description, amplifiedTest, testCaseResult);
+        addOriginalTestText(description, amplifiedTest, testCaseResult);
 
-        description.append(assertionReport.getExpectedValue());
+        String testDescription = description.toString();
+        DSpotUtils.addComment(amplifiedTest, testDescription, CtComment.CommentType.JAVADOC, CommentEnum.All);
+        Main.report.extendedCoverageReport.updateTestCase(testCaseResult,
+                testCaseResult.copyAndUpdateDescription(testDescription));
+        return amplifiedTest;
     }
 
-    private void addChangeText(StringBuilder description, CtMethod<?> test, ClassModificationReport modificationReport) {
+    /**
+     * Adds a text for the assertion in the form of "testedExpression is expectedValue"
+     *
+     * @param description   the string builder holding the description
+     * @param test          the test to be described
+     * @param modifications the modifications made to the test during the amplification
+     */
+    private void addAssertionText(StringBuilder description, CtMethod<?> test, Map<String, List<AmplifierReport>> modifications) {
+        List<AmplifierReport> assertionReports = modifications.get(ValueAssertionReport.class.getCanonicalName());
+
+        for (AmplifierReport report : assertionReports) {
+            ValueAssertionReport valueAssertionReport = (ValueAssertionReport) report;
+
+            description.append(replaceLocalVariableIfPresent(valueAssertionReport.getTestedValue()));
+            // TODO adapt to assert method
+            description.append(" is ");
+            description.append(valueAssertionReport.getExpectedValue());
+        }
+    }
+
+    private void addChangeText(StringBuilder description, CtMethod<?> test, Map<String, List<AmplifierReport>> modifications) {
         description.append(" when ");
 
-        for (AmplifierReport amplifierReport : modificationReport.getModificationsForTest(test)) {
+        for (AmplifierReport amplifierReport : modifications.get(AddLocalVariableAmplifierReport.class.getCanonicalName())) {
             if (amplifierReport.isAssertionReport()) {
+                // local variable used in assertion, so it is not mentioned when describing the change.
                 continue;
             }
             if (amplifierReport.getReportType().equals(AddLocalVariableAmplifierReport.class.getCanonicalName())) {
                 AddLocalVariableAmplifierReport localVariableAmplifierReport = (AddLocalVariableAmplifierReport) amplifierReport;
-                description.append(localVariableAmplifierReport.getVariableName())
-                        .append(" is ")
-                        .append(localVariableAmplifierReport.getVariableValue());
-                description.append(" and ");
+                if (description.indexOf(localVariableAmplifierReport.getVariableName()) != -1) {
+                    // variable is used in description until now, so we should report its value!
+                    description.append(localVariableAmplifierReport.getVariableName())
+                            .append(" is ")
+                            .append(replaceLocalVariableIfPresent(localVariableAmplifierReport.getVariableValue()));
+                    description.append(" and ");
+                }
             }
         }
-        replaceLastAnd(description);
+        replaceEndByPeriodIfThere(description, " when ");
+        replaceEndByPeriodIfThere(description, " and ");
     }
 
     private void addCoverageText(StringBuilder description, CtMethod<?> test,
-                                 Map<String, TestCaseJSON> mapTestNameToResult) {
+                                 TestCaseJSON testCaseResult) {
         description.append(" This tests the methods ");
         Map<CtMethod<?>, List<String>> testToCoveredMethods = new HashMap<>();
-        TestCaseJSON testCaseJSON = mapTestNameToResult.get(test.getSimpleName());
-        testToCoveredMethods.put(test, Util.getCoveredMethods(testCaseJSON.getCoverageImprovement()));
+        testToCoveredMethods.put(test, Util.getCoveredMethods(testCaseResult.getCoverageImprovement()));
         for (String methodName : testToCoveredMethods.get(test)) {
             description.append(methodName);
             description.append(" and ");
         }
-        replaceLastAnd(description);
+        replaceEndByPeriodIfThere(description, " and ");
     }
 
-    private void addOriginalTestText(StringBuilder description, CtMethod<?> test, Map<String, TestCaseJSON> mapTestNameToResult) {
-        description.append(" It is based on ").append("<TODO pass original test name>").append(".");
+    private void addOriginalTestText(StringBuilder description, CtMethod<?> test, TestCaseJSON testCaseResult) {
+        description.append(" It is based on ").append(testCaseResult.getNameOfBaseTestCase()).append(".");
     }
 
     /**
@@ -142,7 +160,31 @@ public class TestDescriptionGenerator implements Prettifier {
      *
      * @param description
      */
-    private void replaceLastAnd(StringBuilder description) {
-        description.replace(description.length() - 5, description.length(), ".");
+    private void replaceEndByPeriodIfThere(StringBuilder description, String textToReplace) {
+        if (description.subSequence(description.length() - textToReplace.length(), description.length()).equals(textToReplace)) {
+            description.replace(description.length() - textToReplace.length(), description.length(), ".");
+        }
+    }
+
+    /**
+     * Remembers name & value of a created local variable to use in the description later.
+     *
+     * @param report
+     */
+    private void rememberLocalVariable(AddLocalVariableAmplifierReport report) {
+        variableValues.put(report.getVariableName(), report.getVariableValue());
+    }
+
+    /**
+     * Replaces any remembered local variables with their value.
+     * This is a plain string.replace, no actual parsing of code takes place.
+     */
+    private String replaceLocalVariableIfPresent(String codeSnippet) {
+        for (String variableName : variableValues.keySet()) {
+            if (codeSnippet.contains(variableName)) {
+                codeSnippet = codeSnippet.replace(variableName, variableValues.get(variableName));
+            }
+        }
+        return codeSnippet;
     }
 }

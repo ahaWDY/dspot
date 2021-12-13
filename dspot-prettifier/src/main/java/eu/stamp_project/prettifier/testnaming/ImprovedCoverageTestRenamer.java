@@ -1,10 +1,7 @@
 package eu.stamp_project.prettifier.testnaming;
 
-import eu.stamp_project.dspot.common.miscellaneous.AmplificationException;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestCaseJSON;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestClassJSON;
-import eu.stamp_project.dspot.selector.extendedcoverageselector.CoverageImprovement;
-import eu.stamp_project.dspot.selector.extendedcoverageselector.MethodCoverage;
 import eu.stamp_project.prettifier.Main;
 import eu.stamp_project.prettifier.Prettifier;
 import eu.stamp_project.prettifier.Util;
@@ -13,9 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spoon.reflect.declaration.CtMethod;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
@@ -37,7 +35,7 @@ public class ImprovedCoverageTestRenamer implements Prettifier {
 
         TestClassJSON amplificationReport;
         try {
-            amplificationReport = (TestClassJSON) Main.report.amplificationReport;
+            amplificationReport = (TestClassJSON) Main.report.extendedCoverageReport;
         } catch (ClassCastException e) {
             LOGGER.error("No DSpot output is not from ExtendedCoverageSelector! ImprovedCoverageTestRenamer not " +
                          "applied");
@@ -60,13 +58,11 @@ public class ImprovedCoverageTestRenamer implements Prettifier {
                 continue;
             }
 
-            TestCaseJSON testCaseJSON = mapTestNameToResult.get(test.getSimpleName());
+            Main.report.renamingReport.addTestRenaming(test, newTestName);
+            Main.report.updateReportsForNewTestName(test.getSimpleName(), newTestName);
 
             CtMethod<?> renamedTest = test.clone();
             renamedTest.setSimpleName(newTestName);
-
-            amplificationReport.updateTestCase(testCaseJSON,testCaseJSON.copyAndUpdateName(newTestName));
-
             prettifiedTests.add(renamedTest);
         }
 

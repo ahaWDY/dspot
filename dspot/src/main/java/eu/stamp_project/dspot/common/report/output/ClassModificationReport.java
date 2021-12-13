@@ -74,4 +74,13 @@ public class ClassModificationReport {
         }
         return amplifierReports;
     }
+
+    public void updateNameOfTest(String oldName, String newName) {
+        List<AmplifierReport> amplifierReports = reportsPerMethod.get(oldName);
+        if (amplifierReports == null) {
+            return;
+        }
+        reportsPerMethod.remove(oldName);
+        reportsPerMethod.put(newName, amplifierReports);
+    }
 }

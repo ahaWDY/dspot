@@ -1,7 +1,8 @@
 package eu.stamp_project.prettifier.output.report;
 
 import eu.stamp_project.dspot.common.report.output.ClassModificationReport;
-import eu.stamp_project.dspot.common.report.output.selector.TestClassJSON;
+import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestCaseJSON;
+import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestClassJSON;
 import eu.stamp_project.prettifier.Main;
 import eu.stamp_project.prettifier.Util;
 import eu.stamp_project.prettifier.configuration.UserInput;
@@ -22,14 +23,12 @@ public class ReportJSON {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportJSON.class);
 
     public GeneralMinimizationJSON generalMinimizationJSON;
-
     public PitMinimizationJSON pitMinimizationJSON;
-
     public ExtendedCoverageMinimizationJSON extendedCoverageMinimizationJSON;
 
-    public TestClassJSON amplificationReport;
-
+    public TestClassJSON extendedCoverageReport;
     public ClassModificationReport modificationReport;
+    public RenamingReport renamingReport;
 
     public int nbTestMethods;
 
@@ -40,9 +39,10 @@ public class ReportJSON {
     public ReportJSON(UserInput configuration) {
         this.generalMinimizationJSON = new GeneralMinimizationJSON();
         this.pitMinimizationJSON = new PitMinimizationJSON();
-        this.amplificationReport = Util.readExtendedCoverageResultJSON(configuration);
+        this.extendedCoverageReport = Util.readExtendedCoverageResultJSON(configuration);
         this.modificationReport = Util.readModificationReport(configuration);
         this.extendedCoverageMinimizationJSON = new ExtendedCoverageMinimizationJSON();
+        this.renamingReport = new RenamingReport();
     }
 
     public void output(UserInput configuration, CtType<?> amplifiedTestClass) {
@@ -50,18 +50,9 @@ public class ReportJSON {
     }
 
     public boolean isExtendedCoverageReportPresent(String prettifierToApply) {
-        TestClassJSON report;
-        try {
-            report =
-                    (eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestClassJSON) amplificationReport;
-        } catch (ClassCastException e) {
-            LOGGER.error("No DSpot output is not from ExtendedCoverageSelector! " + prettifierToApply
-                    + " not applied");
-            return false;
-        }
-        if (report == null) {
-            LOGGER.error("No json found under configured DSpot output path! TestDescriptionGenerator not " +
-                    "applied");
+        if (extendedCoverageReport == null) {
+            LOGGER.error("No json from the ExtendedCoverageSelector found under configured DSpot output path! " +
+                    prettifierToApply + " not applied");
             return false;
         }
         return true;
@@ -75,5 +66,19 @@ public class ReportJSON {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Updates the reports provided by DSpot to use the newName to identify a test case instead of oldName.
+     * Changes the extendedCoverageReport and the modificationReport.
+     *
+     * @param oldName
+     * @param newName
+     */
+    public void updateReportsForNewTestName(String oldName, String newName) {
+        TestCaseJSON testCaseJSON = extendedCoverageReport.mapTestNameToResult().get(oldName);
+        extendedCoverageReport.updateTestCase(testCaseJSON, testCaseJSON.copyAndUpdateName(newName));
+
+        modificationReport.updateNameOfTest(oldName, newName);
     }
 }

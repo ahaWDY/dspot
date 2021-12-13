@@ -105,4 +105,14 @@ public class Util {
         });
         return methodNames;
     }
+
+    /**
+     * Checks whether a variable name was assigned by DSpot.
+     *
+     * @param variableName
+     * @return
+     */
+    public static boolean variableNamedByDSpot(String variableName) {
+        return variableName.startsWith("__DSPOT_") || (variableName.startsWith("o_") && variableName.contains("__"));
+    }
 }

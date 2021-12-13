@@ -157,8 +157,9 @@ public class MainTest {
                 "--test", "example.TestSuiteExample2",
                 "--verbose",
                 "--apply-extended-coverage-minimizer",
-                //                "--rename-local-variables=SimpleVariableRenamer",
-                //                "--rename-test-methods=ImprovedCoverageTestRenamer",
+                "--rename-local-variables=SimpleVariableRenamer",
+                "--rename-test-methods=ImprovedCoverageTestRenamer",
+                "--apply-general-minimizer",
         });
         assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
     }

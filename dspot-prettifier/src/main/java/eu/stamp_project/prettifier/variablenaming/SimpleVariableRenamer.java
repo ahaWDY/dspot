@@ -1,5 +1,6 @@
 package eu.stamp_project.prettifier.variablenaming;
 
+import eu.stamp_project.prettifier.Main;
 import eu.stamp_project.prettifier.Prettifier;
 import eu.stamp_project.prettifier.Util;
 import spoon.reflect.code.CtLocalVariable;
@@ -23,9 +24,11 @@ public class SimpleVariableRenamer implements Prettifier {
         final List<CtLocalVariable<?>> localVariables = prettifiedTest.getElements(new TypeFilter<>(CtLocalVariable.class));
         int counter = 1;
         for (CtLocalVariable<?> localVariable : localVariables) {
-            if (variableNamedByDSpot(localVariable.getSimpleName())) {
+            if (Util.variableNamedByDSpot(localVariable.getSimpleName())) {
                 String newName = localVariable.getType().getSimpleName() + counter;
                 counter++;
+
+                Main.report.renamingReport.addVariableRenaming(test, localVariable.getSimpleName(), newName);
 
                 // rename usages of variable
                 List<CtVariableRead<?>> variableReads =
@@ -38,10 +41,6 @@ public class SimpleVariableRenamer implements Prettifier {
         }
 
         return prettifiedTest;
-    }
-
-    private static boolean variableNamedByDSpot(String variableName) {
-        return variableName.startsWith("__DSPOT_") || (variableName.startsWith("o_") && variableName.contains("__"));
     }
 
 }

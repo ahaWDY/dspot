@@ -122,7 +122,8 @@ public class ExtendedCoverageSelector extends TakeAllSelector {
                         Counter.getAssertionOfSinceOrigin(ctMethod),
                         Counter.getInputOfSinceOrigin(ctMethod),
                         this.coverageImprovementPerAmplifiedMethod.get(ctMethod),
-                        this.fullCoveragePerAmplifiedMethod.get(ctMethod)))
+                        this.fullCoveragePerAmplifiedMethod.get(ctMethod),
+                        AmplificationHelper.getOriginalTestMethod(ctMethod).getSimpleName()))
                 .forEach(testClassJSON::addTestCase);
 
         return testClassJSON;

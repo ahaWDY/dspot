@@ -60,7 +60,8 @@
           }
         }
       },
-      "description": ""
+      "description": "",
+      "nameOfBaseTestCase": "test2"
     }
   ],
   "initialCoverage": {
