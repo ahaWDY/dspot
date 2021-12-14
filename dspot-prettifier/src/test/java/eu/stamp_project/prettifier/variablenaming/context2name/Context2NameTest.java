@@ -1,6 +1,5 @@
 package eu.stamp_project.prettifier.variablenaming.context2name;
 
-import eu.stamp_project.prettifier.Main;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import eu.stamp_project.prettifier.variablenaming.Context2NameVariableRenamer;
 import org.junit.Ignore;

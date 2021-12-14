@@ -65,7 +65,7 @@ public class ExtendedCoverageMinimizer implements Minimizer {
         this.builder = automaticBuilder;
 
         extendedCoverageReportPresent = Main.report.isExtendedCoverageReportPresent(this.getClass().getSimpleName());
-        TestClassJSON extendedCoverageReport = (TestClassJSON) Main.report.extendedCoverageReport;
+        TestClassJSON extendedCoverageReport = Main.report.extendedCoverageReport;
         initialCoverage = extendedCoverageReport.getInitialCoverage();
         originalImprovedCoveragePerTest = extendedCoverageReport.mapTestNameToResult();
     }
@@ -126,11 +126,7 @@ public class ExtendedCoverageMinimizer implements Minimizer {
         if (clone.equals(testToBeAmplified))
             return true;
 
-        if (runTestCase(clone)) {
-            return true;
-        }
-
-        return false;
+        return runTestCase(clone);
     }
 
     /**

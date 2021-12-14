@@ -22,13 +22,13 @@ public class ReportJSON {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportJSON.class);
 
-    public GeneralMinimizationJSON generalMinimizationJSON;
-    public PitMinimizationJSON pitMinimizationJSON;
-    public ExtendedCoverageMinimizationJSON extendedCoverageMinimizationJSON;
+    public final GeneralMinimizationJSON generalMinimizationJSON;
+    public final PitMinimizationJSON pitMinimizationJSON;
+    public final ExtendedCoverageMinimizationJSON extendedCoverageMinimizationJSON;
 
-    public TestClassJSON extendedCoverageReport;
-    public ClassModificationReport modificationReport;
-    public RenamingReport renamingReport;
+    public final TestClassJSON extendedCoverageReport;
+    public final ClassModificationReport modificationReport;
+    public final RenamingReport renamingReport;
 
     public int nbTestMethods;
 
@@ -76,9 +76,13 @@ public class ReportJSON {
      * @param newName
      */
     public void updateReportsForNewTestName(String oldName, String newName) {
-        TestCaseJSON testCaseJSON = extendedCoverageReport.mapTestNameToResult().get(oldName);
-        extendedCoverageReport.updateTestCase(testCaseJSON, testCaseJSON.copyAndUpdateName(newName));
+        if (isModificationReportPresent("update report")) {
+            TestCaseJSON testCaseJSON = extendedCoverageReport.mapTestNameToResult().get(oldName);
+            extendedCoverageReport.updateTestCase(testCaseJSON, testCaseJSON.copyAndUpdateName(newName));
+        }
 
-        modificationReport.updateNameOfTest(oldName, newName);
+        if (isModificationReportPresent("update report")) {
+            modificationReport.updateNameOfTest(oldName, newName);
+        }
     }
 }

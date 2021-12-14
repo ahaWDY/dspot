@@ -1,7 +1,7 @@
 package eu.stamp_project.prettifier.output;
 
-import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
+import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spoon.reflect.declaration.CtMethod;
@@ -19,7 +19,7 @@ public class PrettifiedTestMethods {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PrettifiedTestMethods.class);
 
-    private String outputDirectory;
+    private final String outputDirectory;
 
     public PrettifiedTestMethods(String outputDirectory) {
         this.outputDirectory = outputDirectory;

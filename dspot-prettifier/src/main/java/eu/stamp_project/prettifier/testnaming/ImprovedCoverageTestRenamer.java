@@ -23,7 +23,7 @@ public class ImprovedCoverageTestRenamer implements Prettifier {
     public static final String PREFIX = "test";
     public static final String STR_AND = "And";
 
-    UserInput configuration;
+    final UserInput configuration;
 
     public ImprovedCoverageTestRenamer(UserInput configuration) {
         this.configuration = configuration;

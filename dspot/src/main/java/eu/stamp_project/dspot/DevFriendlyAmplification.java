@@ -1,6 +1,5 @@
 package eu.stamp_project.dspot;
 
-import eu.stamp_project.dspot.common.configuration.AmplificationSetup;
 import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.TestTuple;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationException;
@@ -21,15 +20,13 @@ public class DevFriendlyAmplification {
 
     private final DSpot dSpot;
     private final DSpotState dSpotState;
-    private final AmplificationSetup setup;
     private final Logger LOGGER;
     private final GlobalReport GLOBAL_REPORT;
 
-    public DevFriendlyAmplification(DSpot dSpot, DSpotState dSpotState, AmplificationSetup setup, Logger LOGGER,
+    public DevFriendlyAmplification(DSpot dSpot, DSpotState dSpotState, Logger LOGGER,
                                     GlobalReport GLOBAL_REPORT) {
         this.dSpot = dSpot;
         this.dSpotState = dSpotState;
-        this.setup = setup;
         this.LOGGER = LOGGER;
         this.GLOBAL_REPORT = GLOBAL_REPORT;
     }

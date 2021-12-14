@@ -65,7 +65,7 @@ public class Util {
                             + configuration.getTestClasses().get(0) + specifier + "_report.json"),
                     targetClass);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.warn(e.getMessage());
         }
         return null;
     }

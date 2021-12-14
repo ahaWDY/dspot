@@ -31,7 +31,7 @@ public class TestDescriptionGenerator implements Prettifier {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestDescriptionGenerator.class);
 
-    UserInput configuration;
+    final UserInput configuration;
 
     /**
      * Maps the variables newly defined by DSpot in the test case to their values.
@@ -54,7 +54,7 @@ public class TestDescriptionGenerator implements Prettifier {
         if (!coverageReportPresent) {
             return amplifiedTestsToBePrettified;
         }
-        TestClassJSON amplificationReport = (TestClassJSON) Main.report.extendedCoverageReport;
+        TestClassJSON amplificationReport = Main.report.extendedCoverageReport;
         Map<String, TestCaseJSON> mapTestNameToResult = amplificationReport.mapTestNameToResult();
 
         boolean modificationReportPresent = Main.report.isModificationReportPresent(this.getClass().getSimpleName());
