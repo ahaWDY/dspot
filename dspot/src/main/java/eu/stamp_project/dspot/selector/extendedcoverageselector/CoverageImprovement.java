@@ -21,6 +21,13 @@ public class CoverageImprovement {
         return instructionImprovement;
     }
 
+    /**
+     * @return the total sum of additional instructions covered.
+     */
+    public int totalCoverageIncrease() {
+        return instructionImprovement.sum();
+    }
+
     @Override
     public String toString() {
         StringBuilder explanation = new StringBuilder("Coverage improved at\n");

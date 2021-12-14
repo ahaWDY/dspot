@@ -132,6 +132,40 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
     }
 
     @CommandLine.Option(
+            names = "--filter-dev-friendly",
+            description = "Filter the test cases according to which tests developers find useful." +
+                    " Default value: ${DEFAULT-VALUE}",
+            defaultValue = "false"
+    )
+    private boolean filterDevFriendly;
+
+    public boolean isFilterDevFriendly() {
+        return filterDevFriendly;
+    }
+
+    public UserInput setFilterDevFriendly(boolean filterDevFriendly) {
+        this.filterDevFriendly = filterDevFriendly;
+        return this;
+    }
+
+    @CommandLine.Option(
+            names = "--prioritize-most-coverage",
+            description = "Filter the test cases according to which tests developers find useful." +
+                    " Default value: ${DEFAULT-VALUE}",
+            defaultValue = "false"
+    )
+    private boolean prioritizeMostCoverage;
+
+    public boolean isPrioritizeMostCoverage() {
+        return prioritizeMostCoverage;
+    }
+
+    public UserInput setPrioritizeMostCoverage(boolean prioritizeMostCoverage) {
+        this.prioritizeMostCoverage = prioritizeMostCoverage;
+        return this;
+    }
+
+    @CommandLine.Option(
             names = "--rename-test-methods",
             description = "Choose a TestRenamer to give the tests new names." +
                     " Valid values: ${COMPLETION-CANDIDATES}" +

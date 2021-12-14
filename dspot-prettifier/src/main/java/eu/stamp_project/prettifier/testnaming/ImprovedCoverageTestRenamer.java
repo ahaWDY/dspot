@@ -33,21 +33,13 @@ public class ImprovedCoverageTestRenamer implements Prettifier {
     public List<CtMethod<?>> prettify(List<CtMethod<?>> amplifiedTestsToBePrettified) {
         List<CtMethod<?>> prettifiedTests = new ArrayList<>();
 
-        TestClassJSON amplificationReport;
-        try {
-            amplificationReport = (TestClassJSON) Main.report.extendedCoverageReport;
-        } catch (ClassCastException e) {
-            LOGGER.error("No DSpot output is not from ExtendedCoverageSelector! ImprovedCoverageTestRenamer not " +
-                         "applied");
+        boolean coverageReportPresent = Main.report.isExtendedCoverageReportPresent(this.getClass().getSimpleName());
+        if (!coverageReportPresent) {
             return amplifiedTestsToBePrettified;
         }
-        if (amplificationReport == null) {
-            LOGGER.error("No json found under configured DSpot output path! ImprovedCoverageTestRenamer not " +
-                         "applied");
-            return amplifiedTestsToBePrettified;
-        }
-
+        TestClassJSON amplificationReport = Main.report.extendedCoverageReport;
         Map<String, TestCaseJSON> mapTestNameToResult = amplificationReport.mapTestNameToResult();
+
         Map<CtMethod<?>, String> testToNames =
                 buildNameMapForTests(mapTestNameToResult, amplifiedTestsToBePrettified);
 

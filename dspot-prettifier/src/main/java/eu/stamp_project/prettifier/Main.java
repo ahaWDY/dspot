@@ -10,12 +10,14 @@ import eu.stamp_project.prettifier.configuration.TestRenamerEnum;
 import eu.stamp_project.prettifier.configuration.UserInput;
 import eu.stamp_project.prettifier.configuration.VariableRenamerEnum;
 import eu.stamp_project.prettifier.description.TestDescriptionGenerator;
+import eu.stamp_project.prettifier.filter.DevFriendlyTestFilter;
 import eu.stamp_project.prettifier.minimization.ExtendedCoverageMinimizer;
 import eu.stamp_project.prettifier.minimization.GeneralMinimizer;
 import eu.stamp_project.prettifier.minimization.Minimizer;
 import eu.stamp_project.prettifier.minimization.PitMutantMinimizer;
 import eu.stamp_project.prettifier.output.PrettifiedTestMethods;
 import eu.stamp_project.prettifier.output.report.ReportJSON;
+import eu.stamp_project.prettifier.prioritize.MostAddedCoveragePrioritizer;
 import eu.stamp_project.prettifier.testnaming.Code2VecTestRenamer;
 import eu.stamp_project.prettifier.testnaming.ImprovedCoverageTestRenamer;
 import eu.stamp_project.prettifier.variablenaming.Context2NameVariableRenamer;
@@ -135,31 +137,42 @@ public class Main {
 
     public static List<CtMethod<?>> prettify(CtType<?> amplifiedTestClass, List<CtMethod<?>> testMethods,
                                              UserInput configuration) {
-        final List<CtMethod<?>> minimizedAmplifiedTestMethods;
+        List<CtMethod<?>> prettifiedTestMethods = testMethods;
 
-        // 1 minimize amplified test methods
+        // 1 filter test methods
+        if (configuration.isFilterDevFriendly()) {
+            prettifiedTestMethods = new DevFriendlyTestFilter().prettify(prettifiedTestMethods);
+        }
+
+        // 1 minimize test methods
         if (configuration.isApplyAllPrettifiers() || configuration.isApplyGeneralMinimizer() || configuration.isApplyPitMinimizer() || configuration.isApplyExtendedCoverageMinimizer()) {
-            minimizedAmplifiedTestMethods = applyMinimization(
+            prettifiedTestMethods = applyMinimization(
                     testMethods,
                     amplifiedTestClass,
                     configuration
             );
-        } else {
-            minimizedAmplifiedTestMethods = testMethods;
         }
-        List<CtMethod<?>> prettifiedTestMethods = minimizedAmplifiedTestMethods;
+
         // 2 rename test methods
         if (configuration.isApplyAllPrettifiers() || configuration.getTestRenamer() != TestRenamerEnum.None) {
             prettifiedTestMethods = applyTestRenaming(prettifiedTestMethods, configuration);
         }
+
         // 3 rename local variables
         if (configuration.isApplyAllPrettifiers() || configuration.getVariableRenamer() != VariableRenamerEnum.None) {
             prettifiedTestMethods = applyVariableRenaming(prettifiedTestMethods, configuration);
         }
+
         // 4 generate test descriptions
         if (configuration.isApplyAllPrettifiers() || configuration.isGenerateTestDescriptions()) {
             prettifiedTestMethods = new TestDescriptionGenerator(configuration).prettify(prettifiedTestMethods);
         }
+
+        // 6 prioritize test methods
+        if (configuration.isPrioritizeMostCoverage()) {
+            prettifiedTestMethods = new MostAddedCoveragePrioritizer().prettify(prettifiedTestMethods);
+        }
+
         return prettifiedTestMethods;
     }
 

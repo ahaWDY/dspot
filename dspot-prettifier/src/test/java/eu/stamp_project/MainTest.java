@@ -160,6 +160,8 @@ public class MainTest {
                 "--rename-local-variables=SimpleVariableRenamer",
                 "--rename-test-methods=ImprovedCoverageTestRenamer",
                 "--apply-general-minimizer",
+                "--filter-dev-friendly",
+                "--prioritize-most-coverage",
         });
         assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
     }

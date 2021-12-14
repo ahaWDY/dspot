@@ -48,12 +48,15 @@ public class MethodCoverage {
             if (instructionImprovement <= 0) {
                 continue;
             }
-            map.put(index,instructionImprovement);
+            map.put(index, instructionImprovement);
         }
         return map;
     }
 
-    public int totalAdditionallyCoveredInstructions() {
+    /**
+     * @return the total number of covered instructions.
+     */
+    public int sum() {
         return lineCoverage.stream().mapToInt(Integer::intValue).sum();
     }
 

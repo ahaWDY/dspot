@@ -60,6 +60,13 @@ public class ProjectCoverageMap {
         return accumulated;
     }
 
+    /**
+     * @return the total number of covered instructions.
+     */
+    public int sum() {
+        return classCoverageMaps.values().stream().map(ClassCoverageMap::sum).mapToInt(Integer::intValue).sum();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

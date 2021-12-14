@@ -57,6 +57,13 @@ public class ClassCoverageMap {
 
     }
 
+    /**
+     * @return the total number of covered instructions.
+     */
+    public int sum() {
+        return methodCoverageMap.values().stream().map(MethodCoverage::sum).mapToInt(Integer::intValue).sum();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

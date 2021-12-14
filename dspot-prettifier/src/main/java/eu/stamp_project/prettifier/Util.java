@@ -95,8 +95,8 @@ public class Util {
 
             // put the methods with most additional coverage first (to be first in the name later)
             methodNamesAndMethodCoverages.sort((e1, e2) ->
-                    Integer.compare(e1.getValue().totalAdditionallyCoveredInstructions(),
-                            e2.getValue().totalAdditionallyCoveredInstructions())
+                    Integer.compare(e1.getValue().sum(),
+                            e2.getValue().sum())
             );
 
             methodNamesAndMethodCoverages.forEach((entry) -> {
