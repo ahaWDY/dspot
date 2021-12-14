@@ -129,13 +129,7 @@ public class Translator {
             ctType = getCtType(fullQualifiedName, factory);
         }
         final CtTypeReference<?> reference = ctType.getReference();
-
-        // If using dev-friendly amplification, we don't add the type cast
-        // because we rather have an uncompilable than an unreadable test
-
-        // TODO if-statement!!!
-        //invocation.getTarget().addTypeCast(reference);
-
+        invocation.getTarget().addTypeCast(reference);
         final CtExecutableReference<?> referenceToGetter = factory.createExecutableReference();
         referenceToGetter.setSimpleName(executableName);
         referenceToGetter.setDeclaringType(ctType.getReference());

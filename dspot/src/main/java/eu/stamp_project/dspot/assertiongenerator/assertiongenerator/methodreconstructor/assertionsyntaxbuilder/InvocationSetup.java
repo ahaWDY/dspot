@@ -9,6 +9,7 @@ import spoon.reflect.code.CtStatement;
 import spoon.reflect.declaration.*;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtFieldReference;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
@@ -70,26 +71,21 @@ public class InvocationSetup {
     }
 
     private static void addTypeCastIfNeeded(CtExpression<?> variableRead, Object value) {
-
-        // dirty hack to not include casts in dev-friendly amplification
-        // TODO can we know if the type cast is not needed???
-        if (false) {
-
-            if (value instanceof Short) {
-                variableRead.addTypeCast(variableRead.getFactory().Type().shortPrimitiveType());
-            } else if (value instanceof Integer) {
-                variableRead.addTypeCast(variableRead.getFactory().Type().integerPrimitiveType());
-            } else if (value instanceof Long) {
-                variableRead.addTypeCast(variableRead.getFactory().Type().longPrimitiveType());
-            } else if (value instanceof Byte) {
-                variableRead.addTypeCast(variableRead.getFactory().Type().bytePrimitiveType());
-            } else if (value instanceof Float) {
-                variableRead.addTypeCast(variableRead.getFactory().Type().floatPrimitiveType());
-            } else if (value instanceof Double) {
-                variableRead.addTypeCast(variableRead.getFactory().Type().doublePrimitiveType());
-            } else if (value instanceof Character) {
-                variableRead.addTypeCast(variableRead.getFactory().Type().characterPrimitiveType());
-            }
+        // TODO actually check if a type cast is needed
+        if (value instanceof Short) {
+            variableRead.addTypeCast(variableRead.getFactory().Type().shortPrimitiveType());
+        } else if (value instanceof Integer) {
+            variableRead.addTypeCast(variableRead.getFactory().Type().integerPrimitiveType());
+        } else if (value instanceof Long) {
+            variableRead.addTypeCast(variableRead.getFactory().Type().longPrimitiveType());
+        } else if (value instanceof Byte) {
+            variableRead.addTypeCast(variableRead.getFactory().Type().bytePrimitiveType());
+        } else if (value instanceof Float) {
+            variableRead.addTypeCast(variableRead.getFactory().Type().floatPrimitiveType());
+        } else if (value instanceof Double) {
+            variableRead.addTypeCast(variableRead.getFactory().Type().doublePrimitiveType());
+        } else if (value instanceof Character) {
+            variableRead.addTypeCast(variableRead.getFactory().Type().characterPrimitiveType());
         }
     }
 
