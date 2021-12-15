@@ -6,8 +6,8 @@ import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 import eu.stamp_project.dspot.common.report.output.AmplifierReport;
 import eu.stamp_project.dspot.common.report.output.ClassModificationReport;
 import eu.stamp_project.dspot.common.report.output.amplifiers.AddLocalVariableAmplifierReport;
+import eu.stamp_project.dspot.common.report.output.amplifiers.LiteralAmplifierReport;
 import eu.stamp_project.dspot.common.report.output.amplifiers.MethodAdderOnExistingObjectsAmplifierReport;
-import eu.stamp_project.dspot.common.report.output.amplifiers.ValueAmplifierReport;
 import eu.stamp_project.dspot.common.report.output.assertiongenerator.ValueAssertionReport;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestClassJSON;
 import eu.stamp_project.dspot.selector.extendedcoverageselector.CoverageImprovement;
@@ -56,7 +56,7 @@ public class Util {
                 .of(AmplifierReport.class, "reportType")
                 .registerSubtype(ValueAssertionReport.class, ValueAssertionReport.class.getCanonicalName())
                 .registerSubtype(MethodAdderOnExistingObjectsAmplifierReport.class, MethodAdderOnExistingObjectsAmplifierReport.class.getCanonicalName())
-                .registerSubtype(ValueAmplifierReport.class, ValueAmplifierReport.class.getCanonicalName())
+                .registerSubtype(LiteralAmplifierReport.class, LiteralAmplifierReport.class.getCanonicalName())
                 .registerSubtype(AddLocalVariableAmplifierReport.class,
                         AddLocalVariableAmplifierReport.class.getCanonicalName());
         Gson gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();

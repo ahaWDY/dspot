@@ -4,7 +4,7 @@ import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.common.miscellaneous.Counter;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
-import eu.stamp_project.dspot.common.report.output.amplifiers.ValueAmplifierReport;
+import eu.stamp_project.dspot.common.report.output.amplifiers.LiteralAmplifierReport;
 import spoon.reflect.code.CtComment;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
@@ -86,7 +86,7 @@ public abstract class AbstractAmplifier<T extends CtElement> implements Amplifie
         DSpotUtils.removeComments(originalElement, getSuffix());
         Counter.updateInputOf(clone, 1);
         DSpotUtils.reportModification(testMethod, clone,
-                new ValueAmplifierReport("not known", originalElement.toString(), amplifiedElement.toString()));
+                new LiteralAmplifierReport("not known", originalElement.toString(), amplifiedElement.toString()));
         return clone;
     }
 

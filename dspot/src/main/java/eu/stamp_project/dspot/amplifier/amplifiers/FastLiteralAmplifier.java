@@ -9,7 +9,7 @@ import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.common.miscellaneous.Counter;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
-import eu.stamp_project.dspot.common.report.output.amplifiers.ValueAmplifierReport;
+import eu.stamp_project.dspot.common.report.output.amplifiers.LiteralAmplifierReport;
 import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import spoon.reflect.code.CtComment;
 import spoon.reflect.code.CtLiteral;
@@ -267,7 +267,7 @@ public class FastLiteralAmplifier implements Amplifier {
 	private void reportModification(CtMethod<?> originalTest, CtMethod<?> amplifiedTest, CtLiteral<?> literal,
 									Object oldValue) {
 		DSpotUtils.reportModification(originalTest, amplifiedTest,
-				new ValueAmplifierReport(literal.getParent().toString(), oldValue.toString(),
+				new LiteralAmplifierReport(literal.getParent().toString(), oldValue.toString(),
 						literal.getValue().toString()));
 	}
 }
