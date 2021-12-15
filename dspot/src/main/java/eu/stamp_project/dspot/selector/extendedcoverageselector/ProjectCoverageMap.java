@@ -1,6 +1,7 @@
 package eu.stamp_project.dspot.selector.extendedcoverageselector;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProjectCoverageMap {
 
@@ -65,6 +66,18 @@ public class ProjectCoverageMap {
      */
     public int sum() {
         return classCoverageMaps.values().stream().map(ClassCoverageMap::sum).mapToInt(Integer::intValue).sum();
+    }
+
+    /**
+     * Returns the method coverages for all methods whose name matches the provided regex.
+     *
+     * @param methodNameRegex matched on the simple name of each covered
+     * @return all method coverages provided in this project coverage, where the name matches the provided regex.
+     */
+    public List<MethodCoverage> getCoverageForMethodsMatching(String methodNameRegex) {
+        return classCoverageMaps.values().stream()
+                .map(classCoverageMap -> classCoverageMap.getCoverageForMethodsMatching(methodNameRegex))
+                .flatMap(List::stream).collect(Collectors.toList());
     }
 
     @Override
