@@ -29,6 +29,7 @@ public class ReportJSON {
     public final TestClassJSON extendedCoverageReport;
     public final ClassModificationReport modificationReport;
     public final RenamingReport renamingReport;
+    public final FilterReport filterReport;
 
     public int nbTestMethods;
 
@@ -43,6 +44,7 @@ public class ReportJSON {
         this.modificationReport = Util.readModificationReport(configuration);
         this.extendedCoverageMinimizationJSON = new ExtendedCoverageMinimizationJSON();
         this.renamingReport = new RenamingReport();
+        this.filterReport = new FilterReport();
     }
 
     public void output(UserInput configuration, CtType<?> amplifiedTestClass) {

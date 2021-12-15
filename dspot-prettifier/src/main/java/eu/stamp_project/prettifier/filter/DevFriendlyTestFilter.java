@@ -1,6 +1,8 @@
 package eu.stamp_project.prettifier.filter;
 
+import eu.stamp_project.dspot.common.report.output.AmplifierReport;
 import eu.stamp_project.dspot.common.report.output.ClassModificationReport;
+import eu.stamp_project.dspot.common.report.output.assertiongenerator.ExceptionAssertionReport;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestCaseJSON;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestClassJSON;
 import eu.stamp_project.dspot.selector.extendedcoverageselector.MethodCoverage;
@@ -9,7 +11,6 @@ import eu.stamp_project.prettifier.Prettifier;
 import spoon.reflect.declaration.CtMethod;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -42,14 +43,19 @@ public class DevFriendlyTestFilter implements Prettifier {
         }
         ClassModificationReport modificationReport = Main.report.modificationReport;
 
-        List<CtMethod<?>> prettifiedTests = new ArrayList<>(filterExceptionTests(amplifiedTestsToBePrettified));
-        List<CtMethod<?>> excludedTestsForGettersSetters = filterSimpleGetterSetterTests(amplifiedTestsToBePrettified);
-        List<CtMethod<?>> excludedTestsForHashCode = filterHashCodeTests(amplifiedTestsToBePrettified);
+        List<CtMethod<?>> prettifiedTests = new ArrayList<>(filterExceptionTests(amplifiedTestsToBePrettified, modificationReport));
+        Main.report.filterReport.numberOfIncludedExceptionTests = prettifiedTests.size();
 
-        // TODO report numbers of excluded tests?
+        List<CtMethod<?>> excludedTestsForGettersSetters = filterSimpleGetterSetterTests(amplifiedTestsToBePrettified,
+                mapTestNameToResult);
+        Main.report.filterReport.numberOfExcludedGetterSetterTests = excludedTestsForGettersSetters.size();
+
+        List<CtMethod<?>> excludedTestsForHashCode = filterHashCodeTests(amplifiedTestsToBePrettified, mapTestNameToResult);
+        Main.report.filterReport.numberOfExcludedHashCodeTests = excludedTestsForHashCode.size();
 
         // remaining tests that passed all filters
         prettifiedTests.addAll(amplifiedTestsToBePrettified);
+        Main.report.filterReport.totalNumberOfIncludedTests = prettifiedTests.size();
 
         return prettifiedTests;
     }
@@ -61,7 +67,20 @@ public class DevFriendlyTestFilter implements Prettifier {
      * @return all tests where the assertion checks for an exception.
      */
     private List<CtMethod<?>> filterExceptionTests(List<CtMethod<?>> tests, ClassModificationReport modificationReport) {
-        return Collections.emptyList();
+        List<CtMethod<?>> filteredTests = new ArrayList<>();
+        List<CtMethod<?>> remainingTests = new ArrayList<>();
+        for (CtMethod<?> test : tests) {
+            List<AmplifierReport> modificationsForTest = modificationReport.getModificationsForTest(test);
+            if (modificationsForTest.stream().anyMatch(reports ->
+                    reports.getReportType().equals(ExceptionAssertionReport.class.getCanonicalName()))) {
+                // an assertion expecting an exception was generated
+                filteredTests.add(test);
+            } else {
+                remainingTests.add(test);
+            }
+        }
+        tests = remainingTests;
+        return filteredTests;
     }
 
     /**
