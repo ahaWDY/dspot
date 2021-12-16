@@ -22,6 +22,10 @@ public class AddLocalVariableAmplifierReport extends AmplifierReport {
         return variableValue;
     }
 
+    public boolean isFromAssertion() {
+        return fromAssertion;
+    }
+
     @Override
     public boolean isAssertionReport() {
         return fromAssertion;

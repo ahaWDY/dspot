@@ -219,7 +219,7 @@ public class MainTest {
         Main.main(new String[]{
                 "--verbose",
                 "--absolute-path-to-project-root", new File("src/test/resources/test-projects/").getAbsolutePath() + "/",
-                "--amplifiers", "MethodDuplicationAmplifier,MethodRemove,FastLiteralAmplifier," +
+                "--amplifiers", "FastLiteralAmplifier,MethodDuplicationAmplifier,MethodRemoveAmplifier," +
                 "MethodAdderOnExistingObjectsAmplifier,ReturnValueAmplifier,NullifierAmplifier," +
                 "ArrayAmplifier",
                 "--test-criterion", "ExtendedCoverageSelector",

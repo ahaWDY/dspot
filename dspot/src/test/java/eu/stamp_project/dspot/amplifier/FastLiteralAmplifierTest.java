@@ -13,16 +13,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by Benjamin DANGLOT
  * benjamin.danglot@inria.fr
  * on 11/23/16
  */
-public class TestDataMutatorTest extends AbstractTestOnSample {
+public class FastLiteralAmplifierTest extends AbstractTestOnSample {
 
     private static final String SUFFIX_MUTATION = "_literalMutation";
 

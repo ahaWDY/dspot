@@ -6,6 +6,7 @@ import eu.stamp_project.dspot.common.miscellaneous.Counter;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.common.report.output.amplifiers.LiteralAmplifierReport;
 import spoon.reflect.code.CtComment;
+import spoon.reflect.code.CtExpression;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
 
@@ -19,7 +20,7 @@ import java.util.stream.Stream;
  * benjamin.danglot@inria.fr
  * on 16/07/18
  */
-public abstract class AbstractAmplifier<T extends CtElement> implements Amplifier {
+public abstract class AbstractAmplifier<T extends CtExpression<?>> implements Amplifier {
 
     /**
      * String used to mark an element as amplified
@@ -86,7 +87,7 @@ public abstract class AbstractAmplifier<T extends CtElement> implements Amplifie
         DSpotUtils.removeComments(originalElement, getSuffix());
         Counter.updateInputOf(clone, 1);
         DSpotUtils.reportModification(testMethod, clone,
-                new LiteralAmplifierReport("not known", originalElement.toString(), amplifiedElement.toString()));
+                new LiteralAmplifierReport(originalElement, amplifiedElement));
         return clone;
     }
 
@@ -95,8 +96,21 @@ public abstract class AbstractAmplifier<T extends CtElement> implements Amplifie
      */
     protected abstract String getSuffix();
 
+    /**
+     * Identifies the code elements in a test that are eligible to be amplified.
+     *
+     * @param testMethod the test to be amplified.
+     * @return the elements in the test which could be changed by the amplifier.
+     */
     protected abstract List<T> getOriginals(CtMethod<?> testMethod);
 
+    /**
+     * Creates the new values for the original literal to amplify the test method.
+     *
+     * @param original   the original literal to be mutated
+     * @param testMethod the test method to be amplified
+     * @return a set of new values for the literal
+     */
     protected abstract Set<T> amplify(T original, CtMethod<?> testMethod);
 
     @Override
