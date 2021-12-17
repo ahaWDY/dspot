@@ -4,7 +4,8 @@ import eu.stamp_project.dspot.common.configuration.options.CommentEnum;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import eu.stamp_project.dspot.common.report.output.AmplifierReport;
 import eu.stamp_project.dspot.common.report.output.ClassModificationReport;
-import eu.stamp_project.dspot.common.report.output.amplifiers.AddLocalVariableAmplifierReport;
+import eu.stamp_project.dspot.common.report.output.amplifiers.*;
+import eu.stamp_project.dspot.common.report.output.assertiongenerator.ExceptionAssertionReport;
 import eu.stamp_project.dspot.common.report.output.assertiongenerator.ValueAssertionReport;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestCaseJSON;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestClassJSON;
@@ -104,22 +105,60 @@ public class TestDescriptionGenerator implements Prettifier {
      * @param modifications the modifications made to the test during the amplification
      */
     private void addAssertionText(StringBuilder description, CtMethod<?> test, Map<String, List<AmplifierReport>> modifications) {
-        List<AmplifierReport> assertionReports = modifications.get(ValueAssertionReport.class.getCanonicalName());
+        List<AmplifierReport> valueAssertionReports = modifications.get(ValueAssertionReport.class.getCanonicalName());
 
-        for (AmplifierReport report : assertionReports) {
-            ValueAssertionReport valueAssertionReport = (ValueAssertionReport) report;
+        if (!valueAssertionReports.isEmpty()) {
+            for (AmplifierReport report : valueAssertionReports) {
+                ValueAssertionReport valueAssertionReport = (ValueAssertionReport) report;
 
-            description.append(replaceLocalVariableIfPresent(valueAssertionReport.getTestedValue()));
-            // TODO adapt to assert method
-            description.append(" is ");
-            description.append(valueAssertionReport.getExpectedValue());
+                description.append(replaceLocalVariableIfPresent(valueAssertionReport.getTestedValue()));
+                // TODO adapt to assert method
+                description.append(" is ");
+                description.append(valueAssertionReport.getExpectedValue());
+                description.append(" and ");
+            }
+            replaceEndByPeriodIfThere(description, " and ");
+        } else {
+            List<AmplifierReport> exceptionAssertionReports =
+                    modifications.get(ExceptionAssertionReport.class.getCanonicalName());
+
+            if (!exceptionAssertionReports.isEmpty()) {
+                for (AmplifierReport report : exceptionAssertionReports) {
+                    ExceptionAssertionReport exceptionAssertionReport = (ExceptionAssertionReport) report;
+                    description.append("a ");
+                    description.append(exceptionAssertionReport.getExceptionName());
+                    description.append(" and ");
+                }
+                replaceEndIfThere(description, " and ", "");
+                description.append(" is thrown");
+            } else {
+                LOGGER.warn("Tried to generate description for test without any reported assertion modifications, no " +
+                        "assertion text added.");
+            }
         }
     }
 
     private void addChangeText(StringBuilder description, CtMethod<?> test, Map<String, List<AmplifierReport>> modifications) {
         description.append(" when ");
 
-        for (AmplifierReport amplifierReport : modifications.get(AddLocalVariableAmplifierReport.class.getCanonicalName())) {
+        addLiteralChangedText(description, modifications.get(LiteralAmplifierReport.class.getCanonicalName()));
+
+        List<AmplifierReport> methodAdderReports =
+                modifications.get(MethodDuplicationAmplifierReport.class.getCanonicalName());
+        methodAdderReports.addAll(modifications.get(MethodAdderOnExistingObjectsAmplifierReport.class.getCanonicalName()));
+        addMethodCalledOrDuplicationText(description, methodAdderReports);
+
+        addMethodCallRemovedText(description, modifications.get(MethodRemoveAmplifierReport.class.getCanonicalName()));
+        addLocalVariableText(description, modifications.get(AddLocalVariableAmplifierReport.class.getCanonicalName()));
+
+        replaceEndByPeriodIfThere(description, " when ");
+    }
+
+    /**
+     * reports for {@link AddLocalVariableAmplifierReport}
+     */
+    private void addLocalVariableText(StringBuilder description, List<AmplifierReport> modifications) {
+        for (AmplifierReport amplifierReport : modifications) {
             if (amplifierReport.isAssertionReport()) {
                 // local variable used in assertion, so it is not mentioned when describing the change.
                 continue;
@@ -128,16 +167,84 @@ public class TestDescriptionGenerator implements Prettifier {
                 AddLocalVariableAmplifierReport localVariableAmplifierReport = (AddLocalVariableAmplifierReport) amplifierReport;
                 if (description.indexOf(localVariableAmplifierReport.getVariableName()) != -1) {
                     // variable is used in description until now, so we should report its value!
-                    description.append(localVariableAmplifierReport.getVariableName())
-                            .append(" is ")
-                            .append(replaceLocalVariableIfPresent(localVariableAmplifierReport.getVariableValue()));
+                    description.append(localVariableAmplifierReport.getVariableName());
+                    description.append(" is ");
+                    description.append(replaceLocalVariableIfPresent(localVariableAmplifierReport.getVariableValue()));
                     description.append(" and ");
                 }
             }
         }
-        replaceEndByPeriodIfThere(description, " when ");
         replaceEndByPeriodIfThere(description, " and ");
     }
+
+    /**
+     * reports for {@link LiteralAmplifierReport}
+     */
+    private void addLiteralChangedText(StringBuilder description, List<AmplifierReport> modifications) {
+        for (AmplifierReport amplifierReport : modifications) {
+            if (amplifierReport.getReportType().equals(LiteralAmplifierReport.class.getCanonicalName())) {
+                LiteralAmplifierReport literalAmplifierReport = (LiteralAmplifierReport) amplifierReport;
+                if (literalAmplifierReport.isLocalVariable()) {
+                    description.append(literalAmplifierReport.getVariableName());
+                    description.append(" is ");
+                    description.append(literalAmplifierReport.getNewValue());
+                } else {
+                    // new literal is method call parameter
+                    description.append("the parameter ");
+                    description.append(literalAmplifierReport.getVariableName());
+                    description.append(" of the method ");
+                    description.append(literalAmplifierReport.getMethodName());
+                    description.append(" is set to ");
+                    description.append(literalAmplifierReport.getNewValue());
+                }
+                description.append(" and ");
+            }
+        }
+        replaceEndByPeriodIfThere(description, " and ");
+    }
+
+    /**
+     * reports for {@link MethodDuplicationAmplifierReport} and {@link MethodAdderOnExistingObjectsAmplifierReport}
+     */
+    private void addMethodCalledOrDuplicationText(StringBuilder description, List<AmplifierReport> modifications) {
+        for (AmplifierReport amplifierReport : modifications) {
+            if (amplifierReport.getReportType().equals(MethodDuplicationAmplifierReport.class.getCanonicalName())) {
+                MethodDuplicationAmplifierReport methodDuplicationAmplifierReport = (MethodDuplicationAmplifierReport) amplifierReport;
+                description.append(methodDuplicationAmplifierReport.getDuplicatedCall());
+                description.append(" is called");
+            } else if (amplifierReport.getReportType().equals(MethodAdderOnExistingObjectsAmplifierReport.class.getCanonicalName())) {
+                MethodAdderOnExistingObjectsAmplifierReport methodAdderOnExistingObjectsAmplifierReport =
+                        (MethodAdderOnExistingObjectsAmplifierReport) amplifierReport;
+                description.append(methodAdderOnExistingObjectsAmplifierReport.getInvokedMethod().getName());
+                description.append(" is called with the parameters ");
+                for (MethodAdderOnExistingObjectsAmplifierReport.MethodParameter parameter : methodAdderOnExistingObjectsAmplifierReport.getInvokedMethod().getParameters()) {
+                    description.append(parameter.getName());
+                    description.append("=");
+                    description.append(parameter.getValue());
+                    description.append(", ");
+                }
+                replaceEndIfThere(description, ", ", "");
+            }
+            description.append(" and ");
+        }
+        replaceEndByPeriodIfThere(description, " and ");
+    }
+
+    /**
+     * reports for {@link MethodRemoveAmplifierReport}
+     */
+    private void addMethodCallRemovedText(StringBuilder description, List<AmplifierReport> modifications) {
+        for (AmplifierReport amplifierReport : modifications) {
+            if (amplifierReport.getReportType().equals(MethodRemoveAmplifierReport.class.getCanonicalName())) {
+                MethodRemoveAmplifierReport methodRemoveAmplifierReport = (MethodRemoveAmplifierReport) amplifierReport;
+                description.append(methodRemoveAmplifierReport.getRemovedCall());
+                description.append(" is not called");
+            }
+            description.append(" and ");
+        }
+        replaceEndByPeriodIfThere(description, " and ");
+    }
+
 
     private void addCoverageText(StringBuilder description, CtMethod<?> test,
                                  TestCaseJSON testCaseResult) {
@@ -155,15 +262,17 @@ public class TestDescriptionGenerator implements Prettifier {
         description.append(" It is based on ").append(testCaseResult.getNameOfBaseTestCase()).append(".");
     }
 
+    private void replaceEndIfThere(StringBuilder description, String textToReplace, String replacement) {
+        if (description.subSequence(description.length() - textToReplace.length(), description.length()).equals(textToReplace)) {
+            description.replace(description.length() - textToReplace.length(), description.length(), replacement);
+        }
+    }
+
     /**
-     * replace last " and " by "."
-     *
-     * @param description
+     * replace trailing textToReplace by "."
      */
     private void replaceEndByPeriodIfThere(StringBuilder description, String textToReplace) {
-        if (description.subSequence(description.length() - textToReplace.length(), description.length()).equals(textToReplace)) {
-            description.replace(description.length() - textToReplace.length(), description.length(), ".");
-        }
+        replaceEndIfThere(description, textToReplace, ".");
     }
 
     /**

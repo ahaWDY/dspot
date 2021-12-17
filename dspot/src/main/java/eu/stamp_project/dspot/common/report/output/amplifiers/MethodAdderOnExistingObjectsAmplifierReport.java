@@ -32,7 +32,7 @@ public class MethodAdderOnExistingObjectsAmplifierReport extends AmplifierReport
     /**
      * Represents the data relevant for one method invocation.
      */
-    private static class MethodInvocation {
+    public static class MethodInvocation {
 
         private final String name;
         private final String returnType;
@@ -63,7 +63,7 @@ public class MethodAdderOnExistingObjectsAmplifierReport extends AmplifierReport
     /**
      * Represents the data relevant for one parameter of a method invocation.
      */
-    private static class MethodParameter {
+    public static class MethodParameter {
 
         private final String name;
         private final String type;
