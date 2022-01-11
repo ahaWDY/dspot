@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
+
 /**
  * Generates a textual description of the contribution that the passed test cases make.
  * The description is added as a javadoc comment and saved in the report.
@@ -79,15 +81,21 @@ public class TestDescriptionGenerator implements Prettifier {
         Map<String, List<AmplifierReport>> modifications =
                 modificationsForTest.stream().collect(Collectors.groupingBy(AmplifierReport::getReportType));
 
-        for (AmplifierReport localVariableReport : modifications.get(AddLocalVariableAmplifierReport.class.getCanonicalName())) {
+        for (AmplifierReport localVariableReport :
+                modifications.getOrDefault(AddLocalVariableAmplifierReport.class.getCanonicalName(), emptyList())) {
             rememberLocalVariable((AddLocalVariableAmplifierReport) localVariableReport);
         }
 
         StringBuilder description = new StringBuilder("Test that ");
 
+        // Test that
+        // x is y
         addAssertionText(description, amplifiedTest, modifications);
+        // , when a=3 and b=5 .
         addChangeText(description, amplifiedTest, modifications);
+        // This tests the methods ...
         addCoverageText(description, amplifiedTest, testCaseResult);
+        // The test is based on ...
         addOriginalTestText(description, amplifiedTest, testCaseResult);
 
         String testDescription = description.toString();
@@ -105,7 +113,8 @@ public class TestDescriptionGenerator implements Prettifier {
      * @param modifications the modifications made to the test during the amplification
      */
     private void addAssertionText(StringBuilder description, CtMethod<?> test, Map<String, List<AmplifierReport>> modifications) {
-        List<AmplifierReport> valueAssertionReports = modifications.get(ValueAssertionReport.class.getCanonicalName());
+        List<AmplifierReport> valueAssertionReports =
+                modifications.getOrDefault(ValueAssertionReport.class.getCanonicalName(), emptyList());
 
         if (!valueAssertionReports.isEmpty()) {
             for (AmplifierReport report : valueAssertionReports) {
@@ -117,10 +126,10 @@ public class TestDescriptionGenerator implements Prettifier {
                 description.append(valueAssertionReport.getExpectedValue());
                 description.append(" and ");
             }
-            replaceEndByPeriodIfThere(description, " and ");
+            replaceEndIfThere(description, " and ", "");
         } else {
             List<AmplifierReport> exceptionAssertionReports =
-                    modifications.get(ExceptionAssertionReport.class.getCanonicalName());
+                    modifications.getOrDefault(ExceptionAssertionReport.class.getCanonicalName(), emptyList());
 
             if (!exceptionAssertionReports.isEmpty()) {
                 for (AmplifierReport report : exceptionAssertionReports) {
@@ -141,15 +150,18 @@ public class TestDescriptionGenerator implements Prettifier {
     private void addChangeText(StringBuilder description, CtMethod<?> test, Map<String, List<AmplifierReport>> modifications) {
         description.append(" when ");
 
-        addLiteralChangedText(description, modifications.get(LiteralAmplifierReport.class.getCanonicalName()));
+        addLiteralChangedText(description, modifications.getOrDefault(LiteralAmplifierReport.class.getCanonicalName(),
+                emptyList()));
 
         List<AmplifierReport> methodAdderReports =
-                modifications.get(MethodDuplicationAmplifierReport.class.getCanonicalName());
-        methodAdderReports.addAll(modifications.get(MethodAdderOnExistingObjectsAmplifierReport.class.getCanonicalName()));
+                modifications.getOrDefault(MethodDuplicationAmplifierReport.class.getCanonicalName(), new ArrayList<>());
+        methodAdderReports.addAll(modifications.getOrDefault(MethodAdderOnExistingObjectsAmplifierReport.class.getCanonicalName(), emptyList()));
         addMethodCalledOrDuplicationText(description, methodAdderReports);
 
-        addMethodCallRemovedText(description, modifications.get(MethodRemoveAmplifierReport.class.getCanonicalName()));
-        addLocalVariableText(description, modifications.get(AddLocalVariableAmplifierReport.class.getCanonicalName()));
+        addMethodCallRemovedText(description,
+                modifications.getOrDefault(MethodRemoveAmplifierReport.class.getCanonicalName(), emptyList()));
+        addLocalVariableText(description,
+                modifications.getOrDefault(AddLocalVariableAmplifierReport.class.getCanonicalName(), emptyList()));
 
         replaceEndByPeriodIfThere(description, " when ");
     }
@@ -187,7 +199,7 @@ public class TestDescriptionGenerator implements Prettifier {
                 if (literalAmplifierReport.isLocalVariable()) {
                     description.append(literalAmplifierReport.getVariableName());
                     description.append(" is ");
-                    description.append(literalAmplifierReport.getNewValue());
+                    description.append(replaceLocalVariableIfPresent(literalAmplifierReport.getNewValue()));
                 } else {
                     // new literal is method call parameter
                     description.append("the parameter ");
@@ -195,7 +207,7 @@ public class TestDescriptionGenerator implements Prettifier {
                     description.append(" of the method ");
                     description.append(literalAmplifierReport.getMethodName());
                     description.append(" is set to ");
-                    description.append(literalAmplifierReport.getNewValue());
+                    description.append(replaceLocalVariableIfPresent(literalAmplifierReport.getNewValue()));
                 }
                 description.append(" and ");
             }
@@ -219,11 +231,11 @@ public class TestDescriptionGenerator implements Prettifier {
                 description.append(" is called with the parameters ");
                 for (MethodAdderOnExistingObjectsAmplifierReport.MethodParameter parameter : methodAdderOnExistingObjectsAmplifierReport.getInvokedMethod().getParameters()) {
                     description.append(parameter.getName());
-                    description.append("=");
-                    description.append(parameter.getValue());
-                    description.append(", ");
+                    description.append(" = ");
+                    description.append(replaceLocalVariableIfPresent(parameter.getValue()));
+                    description.append(" and ");
                 }
-                replaceEndIfThere(description, ", ", "");
+                replaceEndIfThere(description, " and ", "");
             }
             description.append(" and ");
         }
@@ -259,7 +271,7 @@ public class TestDescriptionGenerator implements Prettifier {
     }
 
     private void addOriginalTestText(StringBuilder description, CtMethod<?> test, TestCaseJSON testCaseResult) {
-        description.append(" It is based on ").append(testCaseResult.getNameOfBaseTestCase()).append(".");
+        description.append(" The test is based on ").append(testCaseResult.getNameOfBaseTestCase()).append(".");
     }
 
     private void replaceEndIfThere(StringBuilder description, String textToReplace, String replacement) {
