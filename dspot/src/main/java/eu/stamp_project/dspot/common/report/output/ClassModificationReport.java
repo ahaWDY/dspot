@@ -1,7 +1,6 @@
 package eu.stamp_project.dspot.common.report.output;
 
 import com.google.gson.GsonBuilder;
-import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ public class ClassModificationReport {
 
     public void output(String testClass, String outputDirectory) {
         final String allReports = new GsonBuilder().setPrettyPrinting().create().toJson(this).toString();
-        LOGGER.info("{}{}", AmplificationHelper.LINE_SEPARATOR, allReports);
         final String reportPathName =
                 DSpotUtils.shouldAddSeparator.apply(outputDirectory) + testClass + "_modification_report.json";
         try (FileWriter writer = new FileWriter(reportPathName, false)) {
