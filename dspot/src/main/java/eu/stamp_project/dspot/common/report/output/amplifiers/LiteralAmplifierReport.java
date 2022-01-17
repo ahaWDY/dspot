@@ -50,9 +50,8 @@ public class LiteralAmplifierReport extends AmplifierReport {
             this.variableName = ((CtLocalVariable<?>) parent).getSimpleName();
             this.isLocalVariable = true;
             this.methodName = "";
-        }
-        // - method/constructor parameter
-        else if (parent instanceof CtInvocation<?>) {
+        } else if (parent instanceof CtInvocation<?>) {
+            // - method/constructor parameter
             int literalIndex = ((CtInvocation<?>) parent).getArguments().indexOf(literal);
             if (literalIndex == -1) { // not a parameter -> parts of a parameter were changed
                 // find the argument of the invocation which is a parent of the literal and use that index instead
