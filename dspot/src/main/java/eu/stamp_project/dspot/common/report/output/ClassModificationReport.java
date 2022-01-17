@@ -37,8 +37,11 @@ public class ClassModificationReport {
     public void reportModification(String testNameBeforeModification, String testNameAfterModification,
                                     AmplifierReport report) {
 
-        List<AmplifierReport> newModificationReports = reportsPerMethod.computeIfAbsent(testNameAfterModification
-                , s -> new ArrayList<>(1));
+        List<AmplifierReport> newModificationReports = reportsPerMethod.get(testNameAfterModification);
+        if (newModificationReports == null) {
+            newModificationReports = new ArrayList<>(1);
+            reportsPerMethod.put(testNameAfterModification, newModificationReports);
+        }
 
         // For each modification we also change the name.
         // We take over the previously reported modifications to the new method name
@@ -59,9 +62,7 @@ public class ClassModificationReport {
      */
     public void filterModifications(List<CtMethod<?>> selectedTests) {
         Set<String> methodNames = selectedTests.stream().map(CtMethod::getSimpleName).collect(Collectors.toSet());
-        reportsPerMethod = reportsPerMethod.entrySet().stream()
-                .filter(entry -> methodNames.contains(entry.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        reportsPerMethod.keySet().retainAll(methodNames);
     }
 
     public List<AmplifierReport> getModificationsForTest(CtMethod<?> testMethod) {

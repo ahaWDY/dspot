@@ -28,6 +28,9 @@ public class ModificationReport implements Report {
     public void output(String outputDirectory) {
         this.reportsPerClass.entrySet().stream().filter(entry -> entry.getValue() != null)
                 .forEach(entry -> entry.getValue().output(entry.getKey(), outputDirectory));
+
+        LOGGER.info("Modification report was output to {}", outputDirectory);
+        LOGGER.info("Modification report was: {}", reportsPerClass.toString());
     }
 
     @Override
@@ -45,13 +48,16 @@ public class ModificationReport implements Report {
      */
     public void reportModification(CtType<?> testClass, String testNameBeforeModification,
                                    String testNameAfterModification, AmplifierReport report) {
-        String testClassName = "null class name";
+        String testClassName = "null_class_name";
         if (testClass != null) {
             testClassName = testClass.getQualifiedName();
         }
 
-        ClassModificationReport classModificationReport = reportsPerClass.computeIfAbsent(testClassName,
-                s -> new ClassModificationReport());
+        ClassModificationReport classModificationReport = reportsPerClass.get(testClassName);
+        if (classModificationReport == null) {
+            classModificationReport = new ClassModificationReport();
+            reportsPerClass.put(testClassName, classModificationReport);
+        }
         classModificationReport.reportModification(testNameBeforeModification, testNameAfterModification, report);
     }
 

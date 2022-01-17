@@ -1,22 +1,22 @@
 package eu.stamp_project.dspot.common.configuration;
 
+import eu.stamp_project.dspot.amplifier.amplifiers.Amplifier;
 import eu.stamp_project.dspot.amplifier.amplifiers.utils.RandomHelper;
+import eu.stamp_project.dspot.assertiongenerator.AssertionGenerator;
+import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.AssertionGeneratorUtils;
+import eu.stamp_project.dspot.common.automaticbuilder.AutomaticBuilder;
+import eu.stamp_project.dspot.common.collector.CollectorFactory;
+import eu.stamp_project.dspot.common.collector.smtp.EmailSender;
+import eu.stamp_project.dspot.common.compilation.DSpotCompiler;
+import eu.stamp_project.dspot.common.compilation.TestCompiler;
+import eu.stamp_project.dspot.common.configuration.check.Checker;
+import eu.stamp_project.dspot.common.configuration.options.AmplifierEnum;
+import eu.stamp_project.dspot.common.configuration.test_finder.TestFinder;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
-import eu.stamp_project.dspot.common.automaticbuilder.AutomaticBuilder;
-import eu.stamp_project.dspot.amplifier.amplifiers.Amplifier;
-import eu.stamp_project.dspot.assertiongenerator.AssertionGenerator;
-import eu.stamp_project.dspot.assertiongenerator.assertiongenerator.AssertionGeneratorUtils;
-import eu.stamp_project.dspot.common.test_framework.TestFramework;
-import eu.stamp_project.dspot.common.collector.CollectorFactory;
-import eu.stamp_project.dspot.common.compilation.DSpotCompiler;
-import eu.stamp_project.dspot.common.compilation.TestCompiler;
-import eu.stamp_project.dspot.common.configuration.options.AmplifierEnum;
-import eu.stamp_project.dspot.common.configuration.check.Checker;
 import eu.stamp_project.dspot.common.report.output.Output;
-import eu.stamp_project.dspot.common.collector.smtp.EmailSender;
-import eu.stamp_project.dspot.common.configuration.test_finder.TestFinder;
+import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;

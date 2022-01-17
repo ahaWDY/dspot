@@ -138,6 +138,7 @@ public class DevFriendlyAmplification {
                                                              CtType<?> classWithTestMethods,
                                                              int path) {
         if (amplifiedTests.isEmpty()) {
+            LOGGER.info("Dev friendly amplification, path {}: 0 test method(s) passed to improvement selection.", path);
             return Collections.emptyList();
         }
         final List<CtMethod<?>> amplifiedPassingTests = dSpotState.getTestCompiler()

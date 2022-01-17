@@ -1,5 +1,6 @@
 package eu.stamp_project.dspot.common.report.output.amplifiers;
 
+import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.miscellaneous.TypeUtils;
 import eu.stamp_project.dspot.common.report.output.AmplifierReport;
 import org.slf4j.Logger;
@@ -69,10 +70,25 @@ public class LiteralAmplifierReport extends AmplifierReport {
 
             if (literalIndex != -1) { // literal index is now set to a useful value
                 CtExecutable<?> methodCalled = ((CtInvocation<?>) parent).getExecutable().getDeclaration();
-                CtParameter<?> parameter = methodCalled.getParameters().get(literalIndex);
-                this.variableName = parameter.getSimpleName();
-                this.methodName =
-                        methodCalled.getParent(CtClass.class).getSimpleName() + "." + methodCalled.getSimpleName();
+                if (methodCalled == null || methodCalled.getParameters() == null) {
+                    if (DSpotState.verbose) {
+                        LOGGER.info("No method or parameters found during literal modification reporting. Literal {}, " +
+                                        "Invocation {}",
+                                literal.toString(), parent.toString());
+                    }
+                    if (methodCalled == null) {
+                        this.methodName = parent.toString();
+                    } else {
+                        this.methodName =
+                                methodCalled.getParent(CtClass.class).getSimpleName() + "." + methodCalled.getSimpleName();
+                    }
+                    this.variableName = "unknown";
+                } else {
+                    CtParameter<?> parameter = methodCalled.getParameters().get(literalIndex);
+                    this.variableName = parameter.getSimpleName();
+                    this.methodName =
+                            methodCalled.getParent(CtClass.class).getSimpleName() + "." + methodCalled.getSimpleName();
+                }
                 this.isLocalVariable = false;
             } else {
                 // this means the literal is involved in the top statement invocation but not part of the
