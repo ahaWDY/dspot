@@ -1,6 +1,8 @@
 package eu.stamp_project.dspot.common.report.output.assertiongenerator;
 
 import eu.stamp_project.dspot.common.report.output.AmplifierReport;
+import eu.stamp_project.dspot.common.test_framework.TestFramework;
+import eu.stamp_project.dspot.common.test_framework.assertions.AssertEnum;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtStatement;
 
@@ -13,6 +15,7 @@ public class ValueAssertionReport extends AmplifierReport {
     private final String assertMethodDeclaredType;
     private final String testedValue;
     private final String expectedValue;
+    private final AssertEnum assertionType;
 
     public ValueAssertionReport(CtStatement assertStatement) {
         CtInvocation<?> assertInvocation = (CtInvocation<?>) assertStatement;
@@ -24,6 +27,8 @@ public class ValueAssertionReport extends AmplifierReport {
             this.testedValue = null;
         }
         this.expectedValue = assertInvocation.getArguments().get(0).toString();
+        this.assertionType = AssertEnum.fromStringAccordingToClass(TestFramework.get().getClass(),
+                assertInvocation.getExecutable().getSimpleName());
     }
 
     public String getAssertMethodName() {
@@ -47,4 +52,7 @@ public class ValueAssertionReport extends AmplifierReport {
         return true;
     }
 
+    public AssertEnum getAssertionType() {
+        return assertionType;
+    }
 }

@@ -121,9 +121,34 @@ public class TestDescriptionGenerator implements Prettifier {
                 ValueAssertionReport valueAssertionReport = (ValueAssertionReport) report;
 
                 description.append(replaceLocalVariableIfPresent(valueAssertionReport.getTestedValue()));
-                // TODO adapt to assert method
-                description.append(" is ");
-                description.append(valueAssertionReport.getExpectedValue());
+
+                switch (valueAssertionReport.getAssertionType()) {
+                    case ASSERT_NULL:
+                        description.append(" is null");
+                        break;
+                    case ASSERT_NOT_NULL:
+                        description.append(" is not null");
+                        break;
+                    case ASSERT_TRUE:
+                        description.append(" is true");
+                        break;
+                    case ASSERT_FALSE:
+                        description.append(" is false");
+                        break;
+                    case ASSERT_EQUALS:
+                        description.append(" is equal to ");
+                        description.append(valueAssertionReport.getExpectedValue());
+                        break;
+                    case ASSERT_NOT_EQUALS:
+                        description.append(" is not equal to ");
+                        description.append(valueAssertionReport.getExpectedValue());
+                        break;
+                    case ASSERT_ARRAY_EQUALS:
+                        description.append(" is equal to the array ");
+                        description.append(valueAssertionReport.getExpectedValue());
+                        break;
+                }
+
                 description.append(" and ");
             }
             replaceEndIfThere(description, " and ", "");
