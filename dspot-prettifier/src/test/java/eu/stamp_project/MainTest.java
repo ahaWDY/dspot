@@ -151,16 +151,17 @@ public class MainTest {
     public void testFullDevFriendlyPrettifier() throws Exception {
         Main.main(new String[]{
                 "--absolute-path-to-project-root", "src/test/resources/sample/",
-                "--generate-descriptions",
                 "--with-comment", "All",
                 "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
                 "--test", "example.TestSuiteExample2",
                 "--verbose",
-                "--apply-extended-coverage-minimizer",
-                "--rename-local-variables=SimpleVariableRenamer",
-                "--rename-test-methods=ImprovedCoverageTestRenamer",
-                "--apply-general-minimizer",
                 "--filter-dev-friendly",
+                "--apply-general-minimizer",
+                "--apply-extended-coverage-minimizer",
+                "--rename-test-methods=ImprovedCoverageTestRenamer",
+                "--rename-local-variables=SimpleVariableRenamer",
+                "--remove-redundant-casts",
+                "--generate-descriptions",
                 "--prioritize-most-coverage",
         });
         assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());

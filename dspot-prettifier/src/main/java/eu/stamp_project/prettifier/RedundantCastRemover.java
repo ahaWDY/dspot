@@ -6,6 +6,7 @@ import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.reference.CtTypeReference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,21 +14,35 @@ import java.util.List;
  * benjamin.danglot@inria.fr
  * on 04/02/19
  */
-public class RedundantCastRemover {
+public class RedundantCastRemover implements Prettifier {
 
+    @Override
+    public List<CtMethod<?>> prettify(List<CtMethod<?>> amplifiedTestsToBePrettified) {
+        List<CtMethod<?>> prettifiedTests = new ArrayList<>();
+
+        for (CtMethod<?> test : amplifiedTestsToBePrettified) {
+            prettifiedTests.add(remove(test));
+        }
+
+        return prettifiedTests;
+    }
 
     public CtMethod<?> remove(CtMethod<?> testMethod) {
         final List<CtInvocation<?>> assertions = testMethod.getElements(TestFramework.ASSERTIONS_FILTER);
         for (CtInvocation<?> assertion : assertions) {
-            // it should be a assertTrue or assertFalse
+            // check if assertion compares two values
+            // at the moment DSpot does not add a message to the assertion, so if there are two values we expect both to
+            // be the compared values
             if (assertion.getArguments().size() >= 2) {
-                this.remove(assertion);
+                this.removeCastsInComparingAssertion(assertion);
+            } else { // assertTrue or assertFalse
+                removeCastsInBooleanAssertion(assertion);
             }
         }
         return testMethod;
     }
 
-    private void remove(CtInvocation<?> assertion) {
+    private void removeCastsInComparingAssertion(CtInvocation<?> assertion) {
         final CtExpression<?> actualValue = assertion.getArguments().get(assertion.getArguments().size() - 1);
         final CtExpression<?> expectedValue = assertion.getArguments().get(assertion.getArguments().size() - 2);
         // top cast compared to the expected value
@@ -36,6 +51,14 @@ public class RedundantCastRemover {
             actualValue.getTypeCasts().remove(0);
         }
         // inner casts that can be removed
+        removeCastInvocations(actualValue);
+    }
+
+    private void removeCastsInBooleanAssertion(CtInvocation<?> assertion) {
+        final CtExpression<?> actualValue = assertion.getArguments().get(0);
+        if (actualValue.getTypeCasts().get(0).equals(assertion.getFactory().createCtTypeReference(Boolean.class))) {
+            actualValue.getTypeCasts().remove(0);
+        }
         removeCastInvocations(actualValue);
     }
 

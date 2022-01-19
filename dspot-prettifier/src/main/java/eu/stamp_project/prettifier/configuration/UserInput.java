@@ -218,6 +218,23 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
         return this;
     }
 
+    @CommandLine.Option(
+            names = "--remove-redundant-casts",
+            description = "Remove redundant casts in the generated assertions." +
+                    " Default value: ${DEFAULT-VALUE}",
+            defaultValue = "false"
+    )
+    private boolean removeRedundantCasts;
+
+    public boolean isRemoveRedundantCasts() {
+        return removeRedundantCasts;
+    }
+
+    public UserInput setRemoveRedundantCasts(boolean removeRedundantCasts) {
+        this.removeRedundantCasts = removeRedundantCasts;
+        return this;
+    }
+
     // Code2Vec
 
     @CommandLine.Option(

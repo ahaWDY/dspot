@@ -5,9 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 import eu.stamp_project.dspot.common.report.output.AmplifierReport;
 import eu.stamp_project.dspot.common.report.output.ClassModificationReport;
-import eu.stamp_project.dspot.common.report.output.amplifiers.AddLocalVariableAmplifierReport;
-import eu.stamp_project.dspot.common.report.output.amplifiers.LiteralAmplifierReport;
-import eu.stamp_project.dspot.common.report.output.amplifiers.MethodAdderOnExistingObjectsAmplifierReport;
+import eu.stamp_project.dspot.common.report.output.amplifiers.*;
+import eu.stamp_project.dspot.common.report.output.assertiongenerator.ExceptionAssertionReport;
 import eu.stamp_project.dspot.common.report.output.assertiongenerator.ValueAssertionReport;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestClassJSON;
 import eu.stamp_project.dspot.selector.extendedcoverageselector.CoverageImprovement;
@@ -54,11 +53,14 @@ public class Util {
     private static Object readReportJSON(UserInput configuration, String specifier, Class<?> targetClass) {
         RuntimeTypeAdapterFactory<AmplifierReport> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
                 .of(AmplifierReport.class, "reportType")
-                .registerSubtype(ValueAssertionReport.class, ValueAssertionReport.class.getCanonicalName())
-                .registerSubtype(MethodAdderOnExistingObjectsAmplifierReport.class, MethodAdderOnExistingObjectsAmplifierReport.class.getCanonicalName())
-                .registerSubtype(LiteralAmplifierReport.class, LiteralAmplifierReport.class.getCanonicalName())
                 .registerSubtype(AddLocalVariableAmplifierReport.class,
-                        AddLocalVariableAmplifierReport.class.getCanonicalName());
+                        AddLocalVariableAmplifierReport.class.getCanonicalName())
+                .registerSubtype(LiteralAmplifierReport.class, LiteralAmplifierReport.class.getCanonicalName())
+                .registerSubtype(MethodAdderOnExistingObjectsAmplifierReport.class, MethodAdderOnExistingObjectsAmplifierReport.class.getCanonicalName())
+                .registerSubtype(MethodDuplicationAmplifierReport.class, MethodDuplicationAmplifierReport.class.getCanonicalName())
+                .registerSubtype(MethodRemoveAmplifierReport.class, MethodRemoveAmplifierReport.class.getCanonicalName())
+                .registerSubtype(ExceptionAssertionReport.class, ExceptionAssertionReport.class.getCanonicalName())
+                .registerSubtype(ValueAssertionReport.class, ValueAssertionReport.class.getCanonicalName());
         Gson gson = new GsonBuilder().registerTypeAdapterFactory(runtimeTypeAdapterFactory).create();
         try {
             return gson.fromJson(new FileReader(configuration.getPathToDSpotReports() + File.separator

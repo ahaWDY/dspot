@@ -139,12 +139,12 @@ public class Main {
                                              UserInput configuration) {
         List<CtMethod<?>> prettifiedTestMethods = testMethods;
 
-        // 1 filter test methods
+        // filter test methods
         if (configuration.isFilterDevFriendly()) {
             prettifiedTestMethods = new DevFriendlyTestFilter().prettify(prettifiedTestMethods);
         }
 
-        // 1 minimize test methods
+        // minimize test methods
         if (configuration.isApplyAllPrettifiers() || configuration.isApplyGeneralMinimizer() || configuration.isApplyPitMinimizer() || configuration.isApplyExtendedCoverageMinimizer()) {
             prettifiedTestMethods = applyMinimization(
                     testMethods,
@@ -153,22 +153,27 @@ public class Main {
             );
         }
 
-        // 2 rename test methods
+        // rename test methods
         if (configuration.isApplyAllPrettifiers() || configuration.getTestRenamer() != TestRenamerEnum.None) {
             prettifiedTestMethods = applyTestRenaming(prettifiedTestMethods, configuration);
         }
 
-        // 3 rename local variables
+        // rename local variables
         if (configuration.isApplyAllPrettifiers() || configuration.getVariableRenamer() != VariableRenamerEnum.None) {
             prettifiedTestMethods = applyVariableRenaming(prettifiedTestMethods, configuration);
         }
 
-        // 4 generate test descriptions
+        // remove redundant casts
+        if (configuration.isApplyAllPrettifiers() || configuration.isRemoveRedundantCasts()) {
+            prettifiedTestMethods = new RedundantCastRemover().prettify(prettifiedTestMethods);
+        }
+
+        // generate test descriptions
         if (configuration.isApplyAllPrettifiers() || configuration.isGenerateTestDescriptions()) {
             prettifiedTestMethods = new TestDescriptionGenerator(configuration).prettify(prettifiedTestMethods);
         }
 
-        // 6 prioritize test methods
+        // prioritize test methods
         if (configuration.isPrioritizeMostCoverage()) {
             prettifiedTestMethods = new MostAddedCoveragePrioritizer().prettify(prettifiedTestMethods);
         }
