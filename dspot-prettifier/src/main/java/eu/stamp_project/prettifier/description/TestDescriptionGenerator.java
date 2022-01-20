@@ -44,6 +44,7 @@ public class TestDescriptionGenerator implements Prettifier {
      */
     private final Map<String, String> variableValues;
 
+
     public TestDescriptionGenerator(UserInput configuration) {
         this.configuration = configuration;
         variableValues = new HashMap<>();
@@ -98,7 +99,8 @@ public class TestDescriptionGenerator implements Prettifier {
         // The test is based on ...
         addOriginalTestText(description, amplifiedTest, testCaseResult);
 
-        String testDescription = description.toString();
+        String testDescription = replaceRenamedVariableNamesIfPresent(description.toString(), amplifiedTest);
+
         DSpotUtils.addComment(amplifiedTest, testDescription, CtComment.CommentType.JAVADOC, CommentEnum.All);
         Main.report.extendedCoverageReport.updateTestCase(testCaseResult,
                 testCaseResult.copyAndUpdateDescription(testDescription));
@@ -223,16 +225,19 @@ public class TestDescriptionGenerator implements Prettifier {
                 LiteralAmplifierReport literalAmplifierReport = (LiteralAmplifierReport) amplifierReport;
                 if (literalAmplifierReport.isLocalVariable()) {
                     description.append(literalAmplifierReport.getVariableName());
-                    description.append(" is ");
+                    // TODO maybe only add " when it's a string? would need to save type of literal then
+                    description.append(" is \"");
                     description.append(replaceLocalVariableIfPresent(literalAmplifierReport.getNewValue()));
+                    description.append("\"");
                 } else {
                     // new literal is method call parameter
                     description.append("the parameter ");
                     description.append(literalAmplifierReport.getVariableName());
                     description.append(" of the method ");
                     description.append(literalAmplifierReport.getMethodName());
-                    description.append(" is set to ");
+                    description.append(" is set to \"");
                     description.append(replaceLocalVariableIfPresent(literalAmplifierReport.getNewValue()));
+                    description.append("\"");
                 }
                 description.append(" and ");
             }
@@ -332,5 +337,21 @@ public class TestDescriptionGenerator implements Prettifier {
             }
         }
         return codeSnippet;
+    }
+
+    private String replaceRenamedVariableNamesIfPresent(String description, CtMethod<?> test) {
+        // check if a variable name that was renamed by a VariableRenamer is present in the description
+        for (Map.Entry<String, String> renamingEntry : Main.report.renamingReport.getRenamedVariables().entrySet()) {
+            // testName#oldVariableName
+            String[] keyParts = renamingEntry.getKey().split("#");
+            if (!test.getSimpleName().equals(keyParts[0])) {
+                continue;
+            }
+
+            if (description.contains(keyParts[1])) {
+                description = description.replace(keyParts[1], renamingEntry.getValue());
+            }
+        }
+        return description;
     }
 }

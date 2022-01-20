@@ -37,9 +37,14 @@ public class RenamingReport {
         return Optional.ofNullable(renamedVariables.get(test.getSimpleName() + "#" + oldName));
     }
 
+    public Map<String, String> getRenamedVariables() {
+        return renamedVariables;
+    }
+
     /**
      * Reports the renaming of a test method
-     * @param test the amplified test case *before* renaming.
+     *
+     * @param test    the amplified test case *before* renaming.
      * @param newName the original test case name.
      */
     public void addTestRenaming(CtMethod<?> test, String newName) {

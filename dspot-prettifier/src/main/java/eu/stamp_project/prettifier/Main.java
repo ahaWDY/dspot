@@ -269,6 +269,9 @@ public class Main {
     }
 
     public static <T extends Number & Comparable<T>> Double getMedian(List<T> list) {
+        if (list.size() == 0) {
+            return (double) 0;
+        }
         Collections.sort(list);
         return list.size() % 2 == 0 ?
                 list.stream().skip(list.size() / 2 - 1).limit(2).mapToDouble(value -> new Double(value.toString())).average().getAsDouble() :
