@@ -137,7 +137,7 @@ public class MethodReconstructor {
             numberOfAddedAssertion = goThroughAssertionStatements(assertStatements, id, statements,
                     numberOfAddedAssertion, testWithAssert);
             for (CtStatement assertStatement : assertStatements) {
-                DSpotUtils.reportModification(test, testWithAssert, new ValueAssertionReport(assertStatement));
+                DSpotUtils.reportModification(test, testWithAssert, new ValueAssertionReport(assertStatement, test));
             }
 
         }
@@ -207,7 +207,7 @@ public class MethodReconstructor {
                         statements, 0, test);
                 Counter.updateAssertionOf(testWithAssert, numberOfAddedAssertion);
 
-                DSpotUtils.reportModification(test, testWithAssert, new ValueAssertionReport(statement));
+                DSpotUtils.reportModification(test, testWithAssert, new ValueAssertionReport(statement, test));
 
                 testsToReturn.add(testWithAssert);
             }

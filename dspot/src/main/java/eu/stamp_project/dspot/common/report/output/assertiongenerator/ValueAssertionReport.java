@@ -5,6 +5,7 @@ import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import eu.stamp_project.dspot.common.test_framework.assertions.AssertEnum;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtStatement;
+import spoon.reflect.declaration.CtMethod;
 
 /**
  * Reports about a generated assertion that compares the result of a method call to a value.
@@ -17,7 +18,7 @@ public class ValueAssertionReport extends AmplifierReport {
     private final String expectedValue;
     private final AssertEnum assertionType;
 
-    public ValueAssertionReport(CtStatement assertStatement) {
+    public ValueAssertionReport(CtStatement assertStatement, CtMethod<?> test) {
         CtInvocation<?> assertInvocation = (CtInvocation<?>) assertStatement;
         this.assertMethodName = assertInvocation.getExecutable().getSimpleName();
         this.assertMethodDeclaredType = assertInvocation.getExecutable().getDeclaringType().getQualifiedName();
@@ -27,8 +28,7 @@ public class ValueAssertionReport extends AmplifierReport {
             this.testedValue = null;
         }
         this.expectedValue = assertInvocation.getArguments().get(0).toString();
-        this.assertionType = AssertEnum.fromStringAccordingToClass(TestFramework.get().getClass(),
-                assertInvocation.getExecutable().getSimpleName());
+        this.assertionType = TestFramework.get().classifyAssertMethod(this.assertMethodName, test);
     }
 
     public String getAssertMethodName() {
