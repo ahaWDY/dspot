@@ -48,7 +48,8 @@
         "testedValue": "o_test2_mg63__7",
         "expectedValue": "\u0027?\u0027",
         "assertionReport": true,
-        "reportType": "eu.stamp_project.dspot.common.report.output.assertiongenerator.ValueAssertionReport"
+        "reportType": "eu.stamp_project.dspot.common.report.output.assertiongenerator.ValueAssertionReport",
+        "assertionType": "ASSERT_EQUALS"
       }
     ]
   }
