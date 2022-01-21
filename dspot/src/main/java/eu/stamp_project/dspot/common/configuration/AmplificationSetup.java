@@ -74,7 +74,7 @@ public class AmplificationSetup {
         return tuple;
     }
 
-    public void postAmplification(CtType<?> testClassToBeAmplified,List<CtMethod<?>> amplifiedTestMethods){
+    public void postAmplification(CtType<?> testClassToBeAmplified, List<CtMethod<?>> amplifiedTestMethods) {
         final long elapsedTime = System.currentTimeMillis() - time;
         LOGGER.info("elapsedTime {}", elapsedTime);
         this.output.addClassTimeJSON(testClassToBeAmplified.getQualifiedName(), elapsedTime);

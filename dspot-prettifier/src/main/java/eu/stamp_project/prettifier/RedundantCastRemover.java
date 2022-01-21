@@ -56,9 +56,8 @@ public class RedundantCastRemover implements Prettifier {
 
     private void removeCastsInBooleanAssertion(CtInvocation<?> assertion) {
         final CtExpression<?> actualValue = assertion.getArguments().get(0);
-        if (actualValue.getTypeCasts().get(0).equals(assertion.getFactory().createCtTypeReference(Boolean.class))) {
-            actualValue.getTypeCasts().remove(0);
-        }
+        // in the produced tests there is no final casting of the result value to boolean, so we skip removing casts
+        // on the actualValue (and only on the invocations it contains)
         removeCastInvocations(actualValue);
     }
 

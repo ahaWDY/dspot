@@ -62,7 +62,11 @@ public class ClassModificationReport {
      */
     public void filterModifications(List<CtMethod<?>> selectedTests) {
         List<String> methodNames = selectedTests.stream().map(CtMethod::getSimpleName).collect(Collectors.toList());
-        reportsPerMethod.keySet().retainAll(methodNames);
+        for (String k : reportsPerMethod.keySet()) {
+            if (!methodNames.contains(k)) {
+                reportsPerMethod.remove(k);
+            }
+        }
     }
 
     public List<AmplifierReport> getModificationsForTest(CtMethod<?> testMethod) {

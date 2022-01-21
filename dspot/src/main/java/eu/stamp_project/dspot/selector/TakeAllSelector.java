@@ -62,6 +62,7 @@ public class TakeAllSelector extends AbstractTestSelector {
 
 	protected void reset() {
 		this.currentClassTestToBeAmplified = null;
+		this.selectedAmplifiedTest.clear();
 	}
 
 }

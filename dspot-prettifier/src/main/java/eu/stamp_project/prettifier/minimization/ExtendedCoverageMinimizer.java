@@ -10,6 +10,7 @@ import eu.stamp_project.dspot.selector.extendedcoverageselector.ExtendedCoverage
 import eu.stamp_project.prettifier.Main;
 import eu.stamp_project.prettifier.configuration.UserInput;
 import eu.stamp_project.prettifier.output.report.ReportJSON;
+import eu.stamp_project.testrunner.listener.Coverage;
 import eu.stamp_project.testrunner.listener.CoveragePerTestMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,9 @@ import java.util.stream.Collectors;
  * Remove all potentially redundant statements and add them back slowly until the test case shows the same extended
  * coverage as originally.
  * Originally created by Wessel Oosterbroek for the SCAM paper "Removing Redundant Statements in Amplified Test
- * Cases" to minimize test cases but not lower their PIT mutation score.
+ * Cases" to minimize test cases but not lower their PIT mutation score. Rewritten to support ExtendedCoverage
+ * instead of mutation score.
+ * <p>
  * w.oosterbroek@student.tudelft.nl
  * on 23/05/2021
  */
@@ -46,8 +49,8 @@ public class ExtendedCoverageMinimizer implements Minimizer {
     private final List<Long> timesMinimizationInMillis = new ArrayList<>();
 
     private final boolean extendedCoverageReportPresent;
-    private final Map<String, TestCaseJSON> originalImprovedCoveragePerTest;
-    private final ExtendedCoverage initialCoverage;
+    private Map<String, TestCaseJSON> originalImprovedCoveragePerTest;
+    private ExtendedCoverage initialCoverage;
 
     private final AutomaticBuilder builder;
     private final UserInput configuration;
@@ -65,9 +68,11 @@ public class ExtendedCoverageMinimizer implements Minimizer {
         this.builder = automaticBuilder;
 
         extendedCoverageReportPresent = Main.report.isExtendedCoverageReportPresent(this.getClass().getSimpleName());
-        TestClassJSON extendedCoverageReport = Main.report.extendedCoverageReport;
-        initialCoverage = extendedCoverageReport.getInitialCoverage();
-        originalImprovedCoveragePerTest = extendedCoverageReport.mapTestNameToResult();
+        if (extendedCoverageReportPresent) {
+            TestClassJSON extendedCoverageReport = Main.report.extendedCoverageReport;
+            initialCoverage = extendedCoverageReport.getInitialCoverage();
+            originalImprovedCoveragePerTest = extendedCoverageReport.mapTestNameToResult();
+        }
     }
 
     /**
@@ -446,10 +451,15 @@ public class ExtendedCoverageMinimizer implements Minimizer {
 
         ExtendedCoverageSelector selector = new ExtendedCoverageSelector(builder, configuration, testClass);
         CoveragePerTestMethod coveragePerTestMethod = selector.computeCoverageForGivenTestMethods(Collections.singletonList(minimizedTest));
-        ExtendedCoverage coverageOfTest =
-                new ExtendedCoverage(coveragePerTestMethod.getCoverageOf(testClass.getQualifiedName() + "#" + minimizedTest.getSimpleName()));
+
+        Coverage coverageOfTest = coveragePerTestMethod.getCoverageOf(testClass.getQualifiedName() + "#" + minimizedTest.getSimpleName());
+        if (coverageOfTest == null) {
+            // no coverage for test found during the computation -> assume the worst and return false so that the
+            // test before this minimization (step) is used
+            return false;
+        }
         CoverageImprovement remainingImprovement =
-                new CoverageImprovement(coverageOfTest.coverageImprovementOver(initialCoverage));
+                new CoverageImprovement(new ExtendedCoverage(coverageOfTest).coverageImprovementOver(initialCoverage));
 
         // check if the original improvement is still maintained
         return remainingImprovement.equals(originalImprovedCoveragePerTest.get(minimizedTest.getSimpleName()).getCoverageImprovement());
