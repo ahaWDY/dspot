@@ -61,7 +61,7 @@ public class ClassModificationReport {
      * @param selectedTests
      */
     public void filterModifications(List<CtMethod<?>> selectedTests) {
-        Set<String> methodNames = selectedTests.stream().map(CtMethod::getSimpleName).collect(Collectors.toSet());
+        List<String> methodNames = selectedTests.stream().map(CtMethod::getSimpleName).collect(Collectors.toList());
         reportsPerMethod.keySet().retainAll(methodNames);
     }
 
