@@ -51,6 +51,11 @@ public class ReportJSON {
         Util.writeReportJSON(configuration, this, "_prettifier");
     }
 
+    /**
+     * @param prettifierToApply name of the prettifier that needs the report (used in error message)
+     * @return whether the {@link eu.stamp_project.dspot.selector.ExtendedCoverageSelector} report from DSpot was found
+     * at the configured DSpot output location. Logs an error if not.
+     */
     public boolean isExtendedCoverageReportPresent(String prettifierToApply) {
         if (extendedCoverageReport == null) {
             LOGGER.error("No json from the ExtendedCoverageSelector found under configured DSpot output path! " +
@@ -60,6 +65,11 @@ public class ReportJSON {
         return true;
     }
 
+    /**
+     * @param prettifierToApply name of the prettifier that needs the report (used in error message)
+     * @return whether the {@link eu.stamp_project.dspot.common.report.output.ModificationReport} from DSpot was found
+     * at the configured DSpot output location. Logs an error if not.
+     */
     public boolean isModificationReportPresent(String prettifierToApply) {
         ClassModificationReport report = Main.report.modificationReport;
         if (report == null) {
@@ -73,12 +83,9 @@ public class ReportJSON {
     /**
      * Updates the reports provided by DSpot to use the newName to identify a test case instead of oldName.
      * Changes the extendedCoverageReport and the modificationReport.
-     *
-     * @param oldName
-     * @param newName
      */
     public void updateReportsForNewTestName(String oldName, String newName) {
-        if (isModificationReportPresent("update report")) {
+        if (isExtendedCoverageReportPresent("update report")) {
             TestCaseJSON testCaseJSON = extendedCoverageReport.mapTestNameToResult().get(oldName);
             extendedCoverageReport.updateTestCase(testCaseJSON, testCaseJSON.copyAndUpdateName(newName));
         }

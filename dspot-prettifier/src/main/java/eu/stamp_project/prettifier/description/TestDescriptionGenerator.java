@@ -331,6 +331,9 @@ public class TestDescriptionGenerator implements Prettifier {
      * This is a plain string.replace, no actual parsing of code takes place.
      */
     private String replaceLocalVariableIfPresent(String codeSnippet) {
+        if (codeSnippet == null) {
+            return null;
+        }
         for (String variableName : variableValues.keySet()) {
             if (codeSnippet.contains(variableName)) {
                 codeSnippet = codeSnippet.replace(variableName, variableValues.get(variableName));

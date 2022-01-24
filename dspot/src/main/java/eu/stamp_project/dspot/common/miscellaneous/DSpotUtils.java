@@ -90,6 +90,7 @@ public class DSpotUtils {
             processor.createJavaFile(type);
             env.setAutoImports(false);
         } catch (Exception e) {
+            e.printStackTrace(System.out);
             printCtTypUsingToStringToGivenDirectory(type, directory);
         }
     }

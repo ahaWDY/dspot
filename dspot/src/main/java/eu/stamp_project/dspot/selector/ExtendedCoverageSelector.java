@@ -109,7 +109,10 @@ public class ExtendedCoverageSelector extends TakeAllSelector {
     @Override
     public TestSelectorElementReport report() {
         final String report = "Amplification results with " + this.selectedAmplifiedTest.size() + " new tests.";
-        return new TestSelectorElementReportImpl(report, jsonReport(), Collections.emptyList(), "");
+        TestSelectorElementReportImpl testSelectorElementReport =
+                new TestSelectorElementReportImpl(report, jsonReport(), Collections.emptyList(), "");
+        reset();
+        return testSelectorElementReport;
     }
 
     private TestClassJSON jsonReport() {
