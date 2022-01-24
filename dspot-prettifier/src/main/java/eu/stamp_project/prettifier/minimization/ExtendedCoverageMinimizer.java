@@ -1,6 +1,7 @@
 package eu.stamp_project.prettifier.minimization;
 
 import eu.stamp_project.dspot.common.automaticbuilder.AutomaticBuilder;
+import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestCaseJSON;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestClassJSON;
 import eu.stamp_project.dspot.common.test_framework.TestFramework;
@@ -86,9 +87,9 @@ public class ExtendedCoverageMinimizer implements Minimizer {
             return amplifiedTestToBeMinimized;
         }
 
-        CtMethod<?> clone = amplifiedTestToBeMinimized.clone();
+        CtMethod<?> clone = CloneHelper.cloneTestMethodNoAmp(amplifiedTestToBeMinimized);
         this.startTime = System.currentTimeMillis();
-        this.currentTestClass = cloneAndRemoveAllTestsButTheGivenOne(amplifiedTestToBeMinimized);
+        this.currentTestClass = CloneHelper.cloneTestClassAndAddGivenTest(testClass, Collections.singletonList(amplifiedTestToBeMinimized));
 
         //First step: Everything else except for needed declarations are removed.
         removeUnnecessaryStatementsBroad(clone);
@@ -98,7 +99,7 @@ public class ExtendedCoverageMinimizer implements Minimizer {
         }
 
         //Second Step: Keep all statements that interact with (indirectly) used objects.
-        clone = amplifiedTestToBeMinimized.clone();
+        clone = CloneHelper.cloneTestMethodNoAmp(amplifiedTestToBeMinimized);
         removeUnnecessaryStatements(clone);
         if (checkMethodEquivalence(clone, amplifiedTestToBeMinimized)) {
             printResult(clone);
@@ -106,7 +107,7 @@ public class ExtendedCoverageMinimizer implements Minimizer {
         }
 
         //Third step: only remove unused objects.
-        clone = amplifiedTestToBeMinimized.clone();
+        clone = CloneHelper.cloneTestMethodNoAmp(amplifiedTestToBeMinimized);
         removeUnnecessaryStatementsSafe(clone);
         if (checkMethodEquivalence(clone, amplifiedTestToBeMinimized)) {
             printResult(clone);
@@ -114,7 +115,7 @@ public class ExtendedCoverageMinimizer implements Minimizer {
         }
 
         //All steps failed, return original test case.
-        clone = amplifiedTestToBeMinimized.clone();
+        clone = CloneHelper.cloneTestMethodNoAmp(amplifiedTestToBeMinimized);
         printResult(clone);
         return clone;
     }
@@ -147,20 +148,12 @@ public class ExtendedCoverageMinimizer implements Minimizer {
                 prettifiedTest.getBody().getStatements().size(),
                 elapsedTime
         );
-        this.testClass.getPackage().removeType(this.currentTestClass);;
+        // TODO: check
+        // This creates a NullPointerException deep in the Java Pretty Printer...
+        // does it break anything to leave it out?
+        //this.testClass.getPackage().removeType(this.currentTestClass);;
     }
 
-    /**
-     * Source: PitMutantMinimizer, by Benjamin DANGLOT.
-     * @return cloned test class that contains onl the specific test provided.
-     */
-    private CtType<?> cloneAndRemoveAllTestsButTheGivenOne(CtMethod<?> amplifiedTestToBeMinimized) {
-        CtType<?> testClone = testClass.clone();
-        testClass.getPackage().addType(testClone);
-        TestFramework.getAllTest(testClone).stream().filter(test -> !test.equals(amplifiedTestToBeMinimized))
-                .forEach(testClone::removeMethod);
-        return testClone;
-    }
 
     /**
      * Removes all statements, expect for necessary declarations.
@@ -440,14 +433,7 @@ public class ExtendedCoverageMinimizer implements Minimizer {
      * @return True if the extended coverage did not get worse, false if it did get worse.
      */
     public boolean runTestCase(CtMethod<?> minimizedTest) {
-        CtType<?> clone = this.testClass.clone();
-        this.testClass.getPackage().addType(clone);
-        clone.setParent(this.testClass.getParent());
-        clone.addMethod(minimizedTest);
-
-        //Remove all other tests from the created class, except the one we are interested in.
-        TestFramework.getAllTest(clone).stream().filter(test -> !test.equals(minimizedTest))
-                .forEach(clone::removeMethod);
+        CtType<?> clone = CloneHelper.cloneTestClassAndAddGivenTest(testClass, Collections.singletonList(minimizedTest));
 
         ExtendedCoverageSelector selector = new ExtendedCoverageSelector(builder, configuration, testClass);
         CoveragePerTestMethod coveragePerTestMethod = selector.computeCoverageForGivenTestMethods(Collections.singletonList(minimizedTest));

@@ -167,6 +167,58 @@ public class MainTest {
         assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
     }
 
+    @Test
+    public void testFilterDevFriendly() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--with-comment", "All",
+                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
+                "--test", "example.TestSuiteExample2",
+                "--verbose",
+                "--filter-dev-friendly",
+        });
+        assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
+    }
+
+    @Test
+    public void testPrioritizeMostCoverage() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--with-comment", "All",
+                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
+                "--test", "example.TestSuiteExample2",
+                "--verbose",
+                "--prioritize-most-coverage",
+        });
+        assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
+    }
+
+    @Test
+    public void testExtendedCoverageMinimizer() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--with-comment", "All",
+                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
+                "--test", "example.TestSuiteExample2",
+                "--verbose",
+                "--apply-extended-coverage-minimizer",
+        });
+        assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
+    }
+
+    @Test
+    public void testRemoveRedundantCasts() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--with-comment", "All",
+                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
+                "--test", "example.TestSuiteExample2",
+                "--verbose",
+                "--remove-redundant-casts",
+        });
+        assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
+    }
+
     private void assertOutputClassContains(String expected) throws Exception {
         assertOutputClassContains(null, expected);
     }
