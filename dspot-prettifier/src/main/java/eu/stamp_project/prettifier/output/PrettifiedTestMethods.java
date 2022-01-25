@@ -1,7 +1,7 @@
 package eu.stamp_project.prettifier.output;
 
+import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.common.miscellaneous.DSpotUtils;
-import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spoon.reflect.declaration.CtMethod;
@@ -28,13 +28,15 @@ public class PrettifiedTestMethods {
     public void output(
             CtType<?> testClass,
             List<CtMethod<?>> prettifiedAmplifiedTestMethods) {
-        testClass.getMethods().stream()
-                .filter(TestFramework.get()::isTest)
-                .forEach(testClass::removeMethod);
-        prettifiedAmplifiedTestMethods.forEach(testClass::addMethod);
-        LOGGER.info(testClass.toString());
-        DSpotUtils.printCtTypeToGivenDirectory(testClass, new File(outputDirectory), true);
-        LOGGER.info("Print {} in {}", testClass.getQualifiedName(), outputDirectory);
+        CtType<?> finalTestClass = CloneHelper.cloneTestClassRemoveOldTestsAndAddGivenTest(testClass, prettifiedAmplifiedTestMethods);
+        LOGGER.info(finalTestClass.toString());
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        DSpotUtils.printCtTypeToGivenDirectory(finalTestClass, new File(outputDirectory), true);
+        LOGGER.info("Print {} in {}", finalTestClass.getQualifiedName(), outputDirectory);
     }
 
 }

@@ -1,5 +1,6 @@
 package eu.stamp_project.prettifier.testnaming;
 
+import eu.stamp_project.dspot.common.miscellaneous.CloneHelper;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestCaseJSON;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestClassJSON;
 import eu.stamp_project.prettifier.Main;
@@ -53,7 +54,7 @@ public class ImprovedCoverageTestRenamer implements Prettifier {
             Main.report.renamingReport.addTestRenaming(test, newTestName);
             Main.report.updateReportsForNewTestName(test.getSimpleName(), newTestName);
 
-            CtMethod<?> renamedTest = test.clone();
+            CtMethod<?> renamedTest = CloneHelper.cloneTestMethodNoAmp(test);
             renamedTest.setSimpleName(newTestName);
             prettifiedTests.add(renamedTest);
         }

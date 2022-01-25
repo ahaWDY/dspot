@@ -89,7 +89,6 @@ public class ExtendedCoverageMinimizer implements Minimizer {
 
         CtMethod<?> clone = CloneHelper.cloneTestMethodNoAmp(amplifiedTestToBeMinimized);
         this.startTime = System.currentTimeMillis();
-        this.currentTestClass = CloneHelper.cloneTestClassAndAddGivenTest(testClass, Collections.singletonList(amplifiedTestToBeMinimized));
 
         //First step: Everything else except for needed declarations are removed.
         removeUnnecessaryStatementsBroad(clone);
@@ -148,10 +147,6 @@ public class ExtendedCoverageMinimizer implements Minimizer {
                 prettifiedTest.getBody().getStatements().size(),
                 elapsedTime
         );
-        // TODO: check
-        // This creates a NullPointerException deep in the Java Pretty Printer...
-        // does it break anything to leave it out?
-        //this.testClass.getPackage().removeType(this.currentTestClass);;
     }
 
 
@@ -433,7 +428,7 @@ public class ExtendedCoverageMinimizer implements Minimizer {
      * @return True if the extended coverage did not get worse, false if it did get worse.
      */
     public boolean runTestCase(CtMethod<?> minimizedTest) {
-        CtType<?> clone = CloneHelper.cloneTestClassAndAddGivenTest(testClass, Collections.singletonList(minimizedTest));
+        CtType<?> clone = CloneHelper.cloneTestClassRemoveOldTestsAndAddGivenTest(testClass, Collections.singletonList(minimizedTest));
 
         ExtendedCoverageSelector selector = new ExtendedCoverageSelector(builder, configuration, testClass);
         CoveragePerTestMethod coveragePerTestMethod = selector.computeCoverageForGivenTestMethods(Collections.singletonList(minimizedTest));
