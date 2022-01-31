@@ -170,6 +170,30 @@ public class UserInput {
     )
     private boolean devFriendlyAmplification;
 
+    @CommandLine.Option(
+            names = {"--target-class"},
+            defaultValue = "",
+            description = "Specify the class to test." +
+                    "By default, DSpot does not consider target class."
+    )
+    private String targetClass = "";
+
+    @CommandLine.Option(
+            names = {"--method", "--target-method"},
+            defaultValue = "",
+            description = "Specify the method to test." +
+                    "By default, DSpot does not consider target method."
+    )
+    private String targetMethod = "";
+
+    @CommandLine.Option(
+            names = {"--branch", "--target-branch"},
+            defaultValue = "",
+            description = "Specify the branch to cover." +
+                    "By default, DSpot does not consider target branch."
+    )
+    private String targetBranch = "";
+
     /*
         advanced amplification process configuration
      */
@@ -618,10 +642,35 @@ public class UserInput {
         return devFriendlyAmplification;
     }
 
+    public UserInput setTargetClass(String targetClass) {
+        this.targetClass = targetClass;
+        return this;
+    }
+
+    public UserInput setTargetMethod(String targetMethod) {
+        this.targetMethod = targetMethod;
+        return this;
+    }
+
+    public UserInput setTargetBranch(String targetBranch) {
+        this.targetBranch = targetBranch;
+        return this;
+    }
+
     public UserInput setDevFriendlyAmplification(boolean devFriendlyAmplification) {
         this.devFriendlyAmplification = devFriendlyAmplification;
         return this;
     }
+
+    public String getTargetClass() {
+        return targetClass;
+    }
+
+    public String getTargetMethod() {
+        return targetMethod;
+    }
+
+    public String getTargetBranch() { return targetBranch;}
 
     public String getAbsolutePathToTopProjectRoot() {
         return absolutePathToProjectRoot;

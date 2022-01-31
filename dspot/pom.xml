@@ -161,6 +161,12 @@
             <artifactId>picocli</artifactId>
             <version>4.0.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.openclover</groupId>
+            <artifactId>clover</artifactId>
+            <version>4.2.1</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 
@@ -233,8 +239,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
             <plugin>

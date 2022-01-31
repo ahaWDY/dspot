@@ -41,6 +41,10 @@ public class TextualDistanceInputAmplDistributor extends AbstractInputAmplDistri
                 .flatMap(amplifier -> amplifier.amplify(test, i));
     }
 
+    public List<CtMethod<?>> inputAmplify(List<CtMethod<?>> testMethods, int i, String targetMethodName){
+        return null;
+    }
+
     /**
      * Input amplification of multiple tests.
      *

@@ -251,4 +251,9 @@ public class FastLiteralAmplifier implements Amplifier {
 	private void addComment(CtElement element, String kind, Object oldValue, Object newValue) {
 		DSpotUtils.addComment(element, "FastLiteralAmplifier: change " + kind + " from '" + oldValue + "' to '" + newValue + "'", CtComment.CommentType.INLINE, CommentEnum.Amplifier);
 	}
+
+	@Override
+	public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+		return amplify(testMethod, iteration);
+	}
 }

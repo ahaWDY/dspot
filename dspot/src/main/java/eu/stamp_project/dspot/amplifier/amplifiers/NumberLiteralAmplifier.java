@@ -11,6 +11,7 @@ import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtFieldReference;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class NumberLiteralAmplifier extends AbstractLiteralAmplifier<Number> {
 
@@ -127,5 +128,10 @@ public class NumberLiteralAmplifier extends AbstractLiteralAmplifier<Number> {
     @Override
     protected Class<?> getTargetedClass() {
         return Number.class;
+    }
+
+    @Override
+    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+        return amplify(testMethod, iteration);
     }
 }

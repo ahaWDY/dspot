@@ -68,4 +68,9 @@ public class TestMethodCallRemover implements Amplifier {
     private boolean containsIteratorNext(CtStatement stmt) {
         return stmt.toString().contains(".next()");
     }
+
+    @Override
+    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+        return amplify(testMethod, iteration);
+    }
 }

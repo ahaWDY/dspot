@@ -39,6 +39,11 @@ public class RandomInputAmplDistributor extends AbstractInputAmplDistributor {
                 .flatMap(amplifier -> amplifier.amplify(test, i));
     }
 
+    protected Stream<CtMethod<?>> inputAmplifyTest(CtMethod<?> test, int i, String targetMethodName) {
+        return this.amplifiers.parallelStream()
+                .flatMap(amplifier -> amplifier.amplify(test, i, targetMethodName));
+    }
+
     /**
      * Input amplification of multiple tests.
      *
@@ -52,6 +57,18 @@ public class RandomInputAmplDistributor extends AbstractInputAmplDistributor {
         List<CtMethod<?>> inputAmplifiedTests = testMethods.parallelStream()
                 .flatMap(test -> {
                     final Stream<CtMethod<?>> inputAmplifiedTestMethods = inputAmplifyTest(test, i);
+                    DSpotUtils.printProgress(testMethods.indexOf(test), testMethods.size());
+                    return inputAmplifiedTestMethods;
+                }).collect(Collectors.toList());
+        LOGGER.info("{} new tests generated", inputAmplifiedTests.size());
+        return reduce(inputAmplifiedTests);
+    }
+
+    public List<CtMethod<?>> inputAmplify(List<CtMethod<?>> testMethods, int i, String targetMethodName){
+        LOGGER.info("Amplification of inputs...");
+        List<CtMethod<?>> inputAmplifiedTests = testMethods.parallelStream()
+                .flatMap(test -> {
+                    final Stream<CtMethod<?>> inputAmplifiedTestMethods = inputAmplifyTest(test, i, targetMethodName);
                     DSpotUtils.printProgress(testMethods.indexOf(test), testMethods.size());
                     return inputAmplifiedTestMethods;
                 }).collect(Collectors.toList());
