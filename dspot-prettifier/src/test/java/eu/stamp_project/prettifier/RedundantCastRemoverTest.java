@@ -23,12 +23,11 @@ public class RedundantCastRemoverTest {
     public void test() {
 
         /*
-            This test that we can remove some redundant cast.
+            This tests that we can remove some redundant cast.
 
-            The last statement should keeps its cast
+            The last statement should keep its cast
          */
 
-        LOGGER.info("TEST TEST TEST");
         Launcher launcher = new Launcher();
         launcher.addInputResource("src/test/java/eu/stamp_project/resources/AmplifiedTest.java");
         launcher.buildModel();

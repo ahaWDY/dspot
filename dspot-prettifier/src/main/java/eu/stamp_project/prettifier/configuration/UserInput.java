@@ -14,7 +14,7 @@ import static eu.stamp_project.dspot.common.configuration.DSpotState.GLOBAL_REPO
  * benjamin.danglot@inria.fr
  * on 11/02/19
  */
-@CommandLine.Command(name = "eu.stamp_project.Main", mixinStandardHelpOptions = true)
+@CommandLine.Command(name = "eu.stamp_project.prettifier.Main", mixinStandardHelpOptions = true)
 public class UserInput extends eu.stamp_project.dspot.common.configuration.UserInput {
 
     public UserInput() {
@@ -25,8 +25,8 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
             names = "--path-to-amplified-test-class",
             description = "Specify the path to the java test class that has been amplified " +
                     "and that contains some amplified test methods to be \"prettified\"." +
-                          "If the test class is not in the package with the standard test classes, you need to set " +
-                          "this parameter!"
+                    "If the test class is not in the package with the standard test classes, you need to set " +
+                    "this parameter!"
     )
     private String pathToAmplifiedTestClass = "";
 
@@ -46,7 +46,7 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
     @CommandLine.Option(
             names = "--path-to-dspot-reports",
             description = "Specify the path to the reporting jsons provided by DSpot." +
-                          " Default value: ${DEFAULT-VALUE}",
+                    " Default value: ${DEFAULT-VALUE}",
             defaultValue = "target/dspot/output"
     )
     private String pathToDSpotReports = "target" + File.separator + "dspot" + File.separator + "output";
@@ -204,7 +204,7 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
     @CommandLine.Option(
             names = "--generate-descriptions",
             description = "Generate textual descriptions of the test case's contributions." +
-                          " Default value: ${DEFAULT-VALUE}",
+                    " Default value: ${DEFAULT-VALUE}",
             defaultValue = "false"
     )
     private boolean generateTestDescriptions;
@@ -280,7 +280,7 @@ public class UserInput extends eu.stamp_project.dspot.common.configuration.UserI
         this.timeToWaitForCode2vecInMillis = timeToWaitForCode2vecInMillis;
         return this;
     }
-    
+
     // Context2Name
 
     private String pathToRootOfContext2Name;
