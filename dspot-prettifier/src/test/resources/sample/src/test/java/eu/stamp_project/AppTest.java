@@ -71,4 +71,26 @@ public class AppTest {
         // moment
         Assert.assertTrue(true);
     }
+
+    // used for prioritization
+    @Test(timeout = 10000)
+    public void testAddingOneLineOfCoverageInOneMethod() throws Exception {
+        // this test should be left in, even if it only adds coverage in a simple getter, because it tests an
+        // exception according to the modification report
+        Assert.assertTrue(true);
+    }
+
+    @Test(timeout = 10000)
+    public void testAddingTwoLinesOfCoverageInOneMethod() throws Exception {
+        // this test should be filtered as it adds coverage in hashcode, which we can't test in a useful way at the
+        // moment
+        Assert.assertTrue(true);
+    }
+
+    @Test(timeout = 10000)
+    public void testAddingOneLineOfCoverageInTwoMethods() throws Exception {
+        // this test should be filtered as it adds coverage in hashcode, which we can't test in a useful way at the
+        // moment
+        Assert.assertTrue(true);
+    }
 }

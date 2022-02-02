@@ -36,7 +36,7 @@ class DevFriendlyTestFilterTest extends AbstractTest {
         methods.add(factory.Class().get("eu.stamp_project.AppTest")
                 .getMethodsByName("testSimpleGetter").get(0));
         List<CtMethod<?>> filteredMethods = devFriendlyTestFilter.prettify(methods);
-        assertEquals(filteredMethods.size(), 0);
+        assertEquals(0, filteredMethods.size());
     }
 
     @Test
@@ -47,7 +47,7 @@ class DevFriendlyTestFilterTest extends AbstractTest {
         methods.add(factory.Class().get("eu.stamp_project.AppTest")
                 .getMethodsByName("testException").get(0));
         List<CtMethod<?>> filteredMethods = devFriendlyTestFilter.prettify(methods);
-        assertEquals(filteredMethods.size(), 1);
+        assertEquals(1, filteredMethods.size());
     }
 
     @Test
@@ -58,6 +58,6 @@ class DevFriendlyTestFilterTest extends AbstractTest {
         methods.add(factory.Class().get("eu.stamp_project.AppTest")
                 .getMethodsByName("testHashCode").get(0));
         List<CtMethod<?>> filteredMethods = devFriendlyTestFilter.prettify(methods);
-        assertEquals(filteredMethods.size(), 0);
+        assertEquals(0, filteredMethods.size());
     }
 }

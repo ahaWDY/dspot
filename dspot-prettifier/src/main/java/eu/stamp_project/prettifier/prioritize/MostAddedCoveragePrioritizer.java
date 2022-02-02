@@ -6,6 +6,7 @@ import eu.stamp_project.prettifier.Main;
 import eu.stamp_project.prettifier.Prettifier;
 import spoon.reflect.declaration.CtMethod;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class MostAddedCoveragePrioritizer implements Prettifier {
 
         amplifiedTestsToBePrettified.sort(Comparator.comparingInt(test ->
                 mapTestNameToResult.get(test.getSimpleName()).getCoverageImprovement().totalCoverageIncrease()));
+        Collections.reverse(amplifiedTestsToBePrettified);
         return amplifiedTestsToBePrettified;
     }
 
