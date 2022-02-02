@@ -97,6 +97,96 @@
           }
         }
       }
+    },
+    {
+      "name": "testSimpleGetter",
+      "nbAssertionAdded": 1,
+      "nbInputAdded": 1,
+      "coverageImprovement": {
+        "instructionImprovement": {
+          "classCoverageMaps": {
+            "eu.stamp_project.App": {
+              "methodCoverageMap": {
+                "getSomething": {
+                  "lineCoverage": [
+                    5
+                  ],
+                  "methodDescriptor": "()V"
+                }
+              }
+            }
+          }
+        }
+      },
+      "fullCoverage": {
+        "instructionsProjectCoverageMap": {
+          "classCoverageMaps": {
+            "eu.stamp_project.App": {
+              "methodCoverageMap": {
+                "\u003cinit\u003e": {
+                  "lineCoverage": [
+                    2,
+                    3,
+                    1
+                  ],
+                  "methodDescriptor": "(I)V"
+                },
+                "throwException": {
+                  "lineCoverage": [
+                    5
+                  ],
+                  "methodDescriptor": "()V"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "testHashCode",
+      "nbAssertionAdded": 1,
+      "nbInputAdded": 1,
+      "coverageImprovement": {
+        "instructionImprovement": {
+          "classCoverageMaps": {
+            "eu.stamp_project.App": {
+              "methodCoverageMap": {
+                "hashCode": {
+                  "lineCoverage": [
+                    5
+                  ],
+                  "methodDescriptor": "()V"
+                }
+              }
+            }
+          }
+        }
+      },
+      "fullCoverage": {
+        "instructionsProjectCoverageMap": {
+          "classCoverageMaps": {
+            "eu.stamp_project.App": {
+              "methodCoverageMap": {
+                "\u003cinit\u003e": {
+                  "lineCoverage": [
+                    2,
+                    3,
+                    1
+                  ],
+                  "methodDescriptor": "(I)V"
+                },
+                "throwException": {
+                  "lineCoverage": [
+                    5
+                  ],
+                  "methodDescriptor": "()V"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   ],
   "initialCoverage": {

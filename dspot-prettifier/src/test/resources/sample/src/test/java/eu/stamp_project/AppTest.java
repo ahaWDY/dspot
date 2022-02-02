@@ -49,4 +49,26 @@ public class AppTest {
             Assert.assertEquals("Illegal Arg", expected.getMessage());
         }
     }
+
+    // the content of the following few tests doesn't matter, only the additional coverage define in the report is
+    // used for filtering
+    @Test(timeout = 10000)
+    public void testSimpleGetter() throws Exception {
+        // this test should be filtered out, as it only adds coverage in a simple getter
+        Assert.assertTrue(true);
+    }
+
+    @Test(timeout = 10000)
+    public void testException() throws Exception {
+        // this test should be left in, even if it only adds coverage in a simple getter, because it tests an
+        // exception according to the modification report
+        Assert.assertTrue(true);
+    }
+
+    @Test(timeout = 10000)
+    public void testHashCode() throws Exception {
+        // this test should be filtered as it adds coverage in hashcode, which we can't test in a useful way at the
+        // moment
+        Assert.assertTrue(true);
+    }
 }

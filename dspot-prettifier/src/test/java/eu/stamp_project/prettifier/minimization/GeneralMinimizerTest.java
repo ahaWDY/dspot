@@ -1,6 +1,6 @@
 package eu.stamp_project.prettifier.minimization;
 
-import eu.stamp_project.AbstractTest;
+import eu.stamp_project.prettifier.AbstractTest;
 import eu.stamp_project.Utils;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import org.junit.Test;

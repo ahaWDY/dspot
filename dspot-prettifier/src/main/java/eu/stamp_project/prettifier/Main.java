@@ -97,12 +97,12 @@ public class Main {
 
         if (dSpotState.getTestClassesToBeAmplified().size() > 1) {
             LOGGER.error("More than one test class passed! The prettifier can only process one amplified test class " +
-                         "at a time.");
+                    "at a time.");
             return;
         }
         if (dSpotState.getTestClassesToBeAmplified().size() < 1 && configuration.getPathToAmplifiedTestClass().isEmpty()) {
             LOGGER.error("No test class passed! Please pass the class to be prettified with --test or --path-to" +
-                         "-amplified-test-class");
+                    "-amplified-test-class");
             return;
         }
         CtType<?> amplifiedTestClass;

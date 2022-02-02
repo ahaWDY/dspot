@@ -17,10 +17,10 @@ import java.util.Map;
 /**
  * Filters test cases with the aim to only keep test cases that are valued by developers.
  * Requires test cases that were selected by the ExtendedCoverageSelector.
- *
+ * <p>
  * Keeps:
  * - tests for an exception
- *
+ * <p>
  * Discards:
  * - tests of simple getters or setters (name starts with get/set + only instruction improvement in first line)
  * - tests of hashCode (as they are simple value comparisons until now)
@@ -75,11 +75,9 @@ public class DevFriendlyTestFilter implements Prettifier {
                     reports.getReportType().equals(ExceptionAssertionReport.class.getCanonicalName()))) {
                 // an assertion expecting an exception was generated
                 filteredTests.add(test);
-            } else {
-                remainingTests.add(test);
             }
         }
-        tests = remainingTests;
+        tests.removeAll(filteredTests);
         return filteredTests;
     }
 
@@ -91,16 +89,13 @@ public class DevFriendlyTestFilter implements Prettifier {
      */
     private List<CtMethod<?>> filterSimpleGetterSetterTests(List<CtMethod<?>> tests, Map<String, TestCaseJSON> mapTestNameToResult) {
         List<CtMethod<?>> filteredTests = new ArrayList<>();
-        List<CtMethod<?>> remainingTests = new ArrayList<>();
         for (CtMethod<?> test : tests) {
             TestCaseJSON coverageResult = mapTestNameToResult.get(test.getSimpleName());
             if (testsOnlySimpleGetterOrSetter(test, coverageResult)) {
                 filteredTests.add(test);
-            } else {
-                remainingTests.add(test);
             }
         }
-        tests = remainingTests;
+        tests.removeAll(filteredTests);
         return filteredTests;
     }
 
@@ -138,17 +133,14 @@ public class DevFriendlyTestFilter implements Prettifier {
      */
     private List<CtMethod<?>> filterHashCodeTests(List<CtMethod<?>> tests, Map<String, TestCaseJSON> mapTestNameToResult) {
         List<CtMethod<?>> filteredTests = new ArrayList<>();
-        List<CtMethod<?>> remainingTests = new ArrayList<>();
         for (CtMethod<?> test : tests) {
             TestCaseJSON coverageResult = mapTestNameToResult.get(test.getSimpleName());
             if (!coverageResult.getCoverageImprovement().getInstructionImprovement().getCoverageForMethodsMatching(
                     "hashCode").isEmpty()) {
                 filteredTests.add(test);
-            } else {
-                remainingTests.add(test);
             }
         }
-        tests = remainingTests;
+        tests.removeAll(filteredTests);
         return filteredTests;
     }
 
