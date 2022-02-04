@@ -14,11 +14,16 @@ import java.io.FileReader;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class MainTest {
 
     public static String PATH_INPUT_TEST_CLASS = "src/test/resources/sample/src/test/java/fr/inria/amplified/AmplifiedTest.java";
     public static String OUTPUT_PATH_AMPLIFIED_TEST = "target/dspot/output/fr/inria/amplified/AmplifiedTest.java";
+
+    public static String OUTPUT_PATH_TEST_SUITE_EXAMPLE = "target/dspot/output/example/TestSuiteExample2.java";
+    public static String REPORT_PATH_TEST_SUITE_EXAMPLE = "target/dspot/output/example.TestSuiteExample2_prettifier_report.json";
+
     public static String OUTPUT_PATH_APP_TEST = "target/dspot/output/eu/stamp_project/AppTest.java";
     public static String REPORT_PATH_APP_TEST = "target/dspot/output/eu.stamp_project.AppTest_prettifier_report.json";
 
@@ -61,6 +66,7 @@ public class MainTest {
                 "--apply-general-minimizer"
         });
         assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
+        assertFileContains("Local variable was inlined", "assertEquals(5, 5);", OUTPUT_PATH_AMPLIFIED_TEST);
     }
 
     @Test
@@ -72,6 +78,11 @@ public class MainTest {
                 "--apply-pit-minimizer"
         });
         assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
+        assertFileContains("Duplicate assertion was removed", "    @Test\n" +
+                "    public void amplifiedTest2() throws Exception {\n" +
+                "        Integer __DSPOT_1 = 5;\n" +
+                "        assertEquals(5, __DSPOT_1.intValue());\n" +
+                "    }", OUTPUT_PATH_AMPLIFIED_TEST);
     }
 
     @Test
@@ -112,9 +123,9 @@ public class MainTest {
                 "--rename-local-variables=SimpleVariableRenamer"
         });
         assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
-        assertOutputClassContains("int1");
-        assertOutputClassContains("Integer1");
-        assertOutputClassContains("Non-DSpot named variables are not modified","testingAnInt");
+        assertFileContains("Primitive was renamed to typeN", "int1", OUTPUT_PATH_AMPLIFIED_TEST);
+        assertFileContains("Object type was renamed to typeN", "Integer1", OUTPUT_PATH_AMPLIFIED_TEST);
+        assertFileContains("Non-DSpot named variables are not modified", "testingAnInt", OUTPUT_PATH_AMPLIFIED_TEST);
     }
 
     @Test
@@ -141,10 +152,65 @@ public class MainTest {
                 "--verbose",
                 //                "--test-cases", "test1_mg12_assSep41,test1_mg13_failAssert0"
         });
-        assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
-        //        assertFileContains("Added description to method", "* Checks compute.", OUTPUT_PATH_APP_TEST);
-        //        assertFileContains("Added description to method", "* Checks throwException.", OUTPUT_PATH_APP_TEST);
-        //        assertFileContains("Description included in json report", "Checks throwException.", REPORT_PATH_APP_TEST);
+        assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
+        assertFileContains("Added description to method", "* Test that", OUTPUT_PATH_TEST_SUITE_EXAMPLE);
+        assertFileContains("Description included in json report", "Test that ", OUTPUT_PATH_TEST_SUITE_EXAMPLE);
+    }
+
+    @Test
+    public void testFilterDevFriendly() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--with-comment", "All",
+                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
+                "--test", "example.TestSuiteExample2",
+                "--verbose",
+                "--filter-dev-friendly",
+        });
+        assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
+    }
+
+    @Test
+    public void testPrioritizeMostCoverage() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--with-comment", "All",
+                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
+                "--test", "example.TestSuiteExample2",
+                "--verbose",
+                "--prioritize-most-coverage",
+        });
+        assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
+    }
+
+    @Test
+    public void testExtendedCoverageMinimizer() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--with-comment", "All",
+                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
+                "--test", "example.TestSuiteExample2",
+                "--verbose",
+                "--apply-extended-coverage-minimizer",
+        });
+        assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
+        assertFileDoesNotContain("Redundant object creation removed", "char findChar = ex.charAt(\"abcd\", 3);",
+                OUTPUT_PATH_TEST_SUITE_EXAMPLE);
+    }
+
+    @Test
+    public void testRemoveRedundantCasts() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--with-comment", "All",
+                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
+                "--test", "example.TestSuiteExample2",
+                "--verbose",
+                "--remove-redundant-casts",
+        });
+        assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
+        assertFileDoesNotContain("Removed redundant cast to same type as expected in assertEquals", "(char)",
+                OUTPUT_PATH_TEST_SUITE_EXAMPLE);
     }
 
     @Test
@@ -164,80 +230,34 @@ public class MainTest {
                 "--generate-descriptions",
                 "--prioritize-most-coverage",
         });
-        assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
+        assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
+        assertFileContains("Added description to method", "/**\n" +
+                "     * Test that ", OUTPUT_PATH_TEST_SUITE_EXAMPLE);
+        assertFileContains("Full prettified test case", " */\n" +
+                "    @Test(timeout = 10000)\n" +
+                "    public void testCharAt() throws Exception {\n" +
+                "        Example ex = new Example();\n" +
+                "        Assert.assertEquals('?', ex.charAt(\"?i!rb0/|]6^FT)-ef&bk\", -839241703));\n" +
+                "    }", OUTPUT_PATH_TEST_SUITE_EXAMPLE);
     }
 
-    @Test
-    public void testFilterDevFriendly() throws Exception {
-        Main.main(new String[]{
-                "--absolute-path-to-project-root", "src/test/resources/sample/",
-                "--with-comment", "All",
-                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
-                "--test", "example.TestSuiteExample2",
-                "--verbose",
-                "--filter-dev-friendly",
-        });
-        assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
-    }
-
-    @Test
-    public void testPrioritizeMostCoverage() throws Exception {
-        Main.main(new String[]{
-                "--absolute-path-to-project-root", "src/test/resources/sample/",
-                "--with-comment", "All",
-                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
-                "--test", "example.TestSuiteExample2",
-                "--verbose",
-                "--prioritize-most-coverage",
-        });
-        assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
-    }
-
-    @Test
-    public void testExtendedCoverageMinimizer() throws Exception {
-        Main.main(new String[]{
-                "--absolute-path-to-project-root", "src/test/resources/sample/",
-                "--with-comment", "All",
-                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
-                "--test", "example.TestSuiteExample2",
-                "--verbose",
-                "--apply-extended-coverage-minimizer",
-        });
-        assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
-    }
-
-    @Test
-    public void testRemoveRedundantCasts() throws Exception {
-        Main.main(new String[]{
-                "--absolute-path-to-project-root", "src/test/resources/sample/",
-                "--with-comment", "All",
-                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
-                "--test", "example.TestSuiteExample2",
-                "--verbose",
-                "--remove-redundant-casts",
-        });
-        assertTrue(new File("target/dspot/output/example/TestSuiteExample2.java").exists());
-    }
-
-    private void assertOutputClassContains(String expected) throws Exception {
-        assertOutputClassContains(null, expected);
-    }
-
-    private void assertOutputClassContains(String message, String expected) throws Exception {
-        final File amplifiedTestClass = new File(OUTPUT_PATH_AMPLIFIED_TEST);
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(amplifiedTestClass))) {
-            String content = reader.lines().collect(Collectors.joining(AmplificationHelper.LINE_SEPARATOR));
-            assertTrue(message, content.contains(expected));
-        }
-    }
-
-    private void assertFileContains(String message, String expected, String path) throws Exception{
+    private void assertFileContains(String message, String expected, String path) throws Exception {
         final File amplifiedTestClass = new File(path);
 
         try (BufferedReader reader = new BufferedReader(new FileReader(amplifiedTestClass))) {
             String content = reader.lines().collect(Collectors.joining(AmplificationHelper.LINE_SEPARATOR));
+            System.out.println(content);
             assertTrue(message, content.contains(expected));
+        }
+    }
+
+    private void assertFileDoesNotContain(String message, String forbidden, String path) throws Exception {
+        final File amplifiedTestClass = new File(path);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(amplifiedTestClass))) {
+            String content = reader.lines().collect(Collectors.joining(AmplificationHelper.LINE_SEPARATOR));
+            System.out.println(content);
+            assertFalse(message, content.contains(forbidden));
         }
     }
 }

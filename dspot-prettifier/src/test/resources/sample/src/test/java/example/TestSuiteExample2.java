@@ -1,6 +1,8 @@
 package example;
+
 import org.junit.Assert;
 import org.junit.Test;
+
 public class TestSuiteExample2 {
 
     @Test(timeout = 10000)
@@ -10,6 +12,6 @@ public class TestSuiteExample2 {
         Example ex = new Example();
         char findChar = ex.charAt("abcd", 3);
         char o_test2_mg63__7 = ex.charAt(__DSPOT_s_8, __DSPOT_index_9);
-        Assert.assertEquals('?', o_test2_mg63__7);
+        Assert.assertEquals('?', (char) o_test2_mg63__7);
     }
 }
