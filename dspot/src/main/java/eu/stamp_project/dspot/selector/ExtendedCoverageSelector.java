@@ -37,6 +37,8 @@ public class ExtendedCoverageSelector extends TakeAllSelector {
 
     Map<CtMethod<?>, ExtendedCoverage> fullCoveragePerAmplifiedMethod;
 
+    private TestSelectorElementReport lastReport;
+
     public ExtendedCoverageSelector(AutomaticBuilder automaticBuilder, UserInput configuration) {
         super(automaticBuilder, configuration);
         this.coverageImprovementPerAmplifiedMethod = new HashMap<>();
@@ -108,11 +110,13 @@ public class ExtendedCoverageSelector extends TakeAllSelector {
 
     @Override
     public TestSelectorElementReport report() {
+        if (currentClassTestToBeAmplified == null) {
+            return lastReport;
+        }
         final String report = "Amplification results with " + this.selectedAmplifiedTest.size() + " new tests.";
-        TestSelectorElementReportImpl testSelectorElementReport =
-                new TestSelectorElementReportImpl(report, jsonReport(), Collections.emptyList(), "");
+        lastReport = new TestSelectorElementReportImpl(report, jsonReport(), Collections.emptyList(), "");
         reset();
-        return testSelectorElementReport;
+        return lastReport;
     }
 
     private TestClassJSON jsonReport() {
