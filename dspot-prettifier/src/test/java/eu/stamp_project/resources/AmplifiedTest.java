@@ -1,8 +1,8 @@
 package eu.stamp_project.resources;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.Assert.assertEquals;
 
 /**
  * created by Benjamin DANGLOT
@@ -55,14 +55,14 @@ public class AmplifiedTest {
         final MyObject myObject = new MyObject();
 
         // should be removed
-        Assertions.assertEquals(0, (int) ((AmplifiedTest) amplifiedTest).getInt());
-        Assertions.assertEquals(0, (int) amplifiedTest.getInt());
-        Assertions.assertEquals(0, (int) ((MyObject) myObject).getInt());
-        Assertions.assertEquals(0, (int) ((MyInternalObject) ((MyObject) myObject).getMyInternalObject()).getInt());
-        Assertions.assertEquals(0, (int) ((MySecondInternalObject) ((MyInternalObject) ((MyObject) myObject).getMyInternalObject()).getMySecondIntegernalObject()).getInt());
-        Assertions.assertEquals(0, (int) ((MyObject) ((MyInternalObject) ((MyObject) myObject).getMyInternalObject()).getMySecondIntegernalObject()).getInt());
+        assertEquals(0, (int) ((AmplifiedTest) amplifiedTest).getInt());
+        assertEquals(0, (int) amplifiedTest.getInt());
+        assertEquals(0, (int) ((MyObject) myObject).getInt());
+        assertEquals(0, (int) ((MyInternalObject) ((MyObject) myObject).getMyInternalObject()).getInt());
+        assertEquals(0, (int) ((MySecondInternalObject) ((MyInternalObject) ((MyObject) myObject).getMyInternalObject()).getMySecondIntegernalObject()).getInt());
+        assertEquals(0, (int) ((MyObject) ((MyInternalObject) ((MyObject) myObject).getMyInternalObject()).getMySecondIntegernalObject()).getInt());
 
         // should not be removed
-        Assertions.assertEquals(0, ((MySecondInternalObject) myObject.getMyInternalObject().getMySecondIntegernalObject().getObject()).getSecondInt());
+        assertEquals(0, ((MySecondInternalObject) myObject.getMyInternalObject().getMySecondIntegernalObject().getObject()).getSecondInt());
     }
 }
