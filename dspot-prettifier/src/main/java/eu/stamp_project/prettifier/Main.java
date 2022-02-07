@@ -106,10 +106,10 @@ public class Main {
             return;
         }
         CtType<?> amplifiedTestClass;
-        if (!configuration.getPathToAmplifiedTestClass().isEmpty()) {
-            amplifiedTestClass = loadAmplifiedTestClassFromFile(configuration);
-        } else {
+        if (configuration.getPathToAmplifiedTestClass().isEmpty()) {
             amplifiedTestClass = dSpotState.getTestClassesToBeAmplified().get(0);
+        } else {
+            amplifiedTestClass = loadAmplifiedTestClassFromFile(configuration);
         }
 
         final List<CtMethod<?>> testMethods =
@@ -269,7 +269,7 @@ public class Main {
     }
 
     public static <T extends Number & Comparable<T>> Double getMedian(List<T> list) {
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             return (double) 0;
         }
         Collections.sort(list);

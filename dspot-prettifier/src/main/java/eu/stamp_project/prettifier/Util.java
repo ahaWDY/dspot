@@ -25,7 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-public class Util {
+public final class Util {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Util.class);
 

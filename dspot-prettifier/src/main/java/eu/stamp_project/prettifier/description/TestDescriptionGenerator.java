@@ -118,7 +118,24 @@ public class TestDescriptionGenerator implements Prettifier {
         List<AmplifierReport> valueAssertionReports =
                 modifications.getOrDefault(ValueAssertionReport.class.getCanonicalName(), emptyList());
 
-        if (!valueAssertionReports.isEmpty()) {
+        if (valueAssertionReports.isEmpty()) {
+            List<AmplifierReport> exceptionAssertionReports =
+                    modifications.getOrDefault(ExceptionAssertionReport.class.getCanonicalName(), emptyList());
+
+            if (exceptionAssertionReports.isEmpty()) {
+                LOGGER.warn("Tried to generate description for test without any reported assertion modifications, no " +
+                        "assertion text added.");
+            } else {
+                for (AmplifierReport report : exceptionAssertionReports) {
+                    ExceptionAssertionReport exceptionAssertionReport = (ExceptionAssertionReport) report;
+                    description.append("a ");
+                    description.append(exceptionAssertionReport.getExceptionName());
+                    description.append(" and ");
+                }
+                replaceEndIfThere(description, " and ", "");
+                description.append(" is thrown");
+            }
+        } else {
             for (AmplifierReport report : valueAssertionReports) {
                 ValueAssertionReport valueAssertionReport = (ValueAssertionReport) report;
 
@@ -149,28 +166,13 @@ public class TestDescriptionGenerator implements Prettifier {
                         description.append(" is equal to the array ");
                         description.append(valueAssertionReport.getExpectedValue());
                         break;
+                    default:
+                        break;
                 }
 
                 description.append(" and ");
             }
             replaceEndIfThere(description, " and ", "");
-        } else {
-            List<AmplifierReport> exceptionAssertionReports =
-                    modifications.getOrDefault(ExceptionAssertionReport.class.getCanonicalName(), emptyList());
-
-            if (!exceptionAssertionReports.isEmpty()) {
-                for (AmplifierReport report : exceptionAssertionReports) {
-                    ExceptionAssertionReport exceptionAssertionReport = (ExceptionAssertionReport) report;
-                    description.append("a ");
-                    description.append(exceptionAssertionReport.getExceptionName());
-                    description.append(" and ");
-                }
-                replaceEndIfThere(description, " and ", "");
-                description.append(" is thrown");
-            } else {
-                LOGGER.warn("Tried to generate description for test without any reported assertion modifications, no " +
-                        "assertion text added.");
-            }
         }
     }
 

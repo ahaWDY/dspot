@@ -57,7 +57,6 @@ public class ExtendedCoverageMinimizer implements Minimizer {
     private final UserInput configuration;
 
     private final CtType<?> testClass;
-    private CtType<?> currentTestClass;
 
     private long startTime;
 
@@ -428,8 +427,6 @@ public class ExtendedCoverageMinimizer implements Minimizer {
      * @return True if the extended coverage did not get worse, false if it did get worse.
      */
     public boolean runTestCase(CtMethod<?> minimizedTest) {
-        CtType<?> clone = CloneHelper.cloneTestClassRemoveOldTestsAndAddGivenTest(testClass, Collections.singletonList(minimizedTest));
-
         ExtendedCoverageSelector selector = new ExtendedCoverageSelector(builder, configuration, testClass);
         CoveragePerTestMethod coveragePerTestMethod = selector.computeCoverageForGivenTestMethods(Collections.singletonList(minimizedTest));
 
