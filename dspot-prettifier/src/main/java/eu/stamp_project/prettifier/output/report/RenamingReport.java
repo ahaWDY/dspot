@@ -25,9 +25,10 @@ public class RenamingReport {
 
     /**
      * Reports the renaming of a variable within a test.
-     * @param test the test containing the variable.
-     * @param oldName
-     * @param newName
+     *
+     * @param test    the test containing the variable.
+     * @param oldName the old name of the variable.
+     * @param newName the new name of the variable.
      */
     public void addVariableRenaming(CtMethod<?> test, String oldName, String newName) {
         renamedVariables.put(test.getSimpleName() + "#" + oldName, newName);

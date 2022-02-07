@@ -21,6 +21,7 @@ import spoon.reflect.visitor.filter.TypeFilter;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -96,14 +97,9 @@ public class Util {
                     new ArrayList<>(classCoverageMap.methodCoverageMap.entrySet());
 
             // put the methods with most additional coverage first (to be first in the name later)
-            methodNamesAndMethodCoverages.sort((e1, e2) ->
-                    Integer.compare(e1.getValue().sum(),
-                            e2.getValue().sum())
-            );
+            methodNamesAndMethodCoverages.sort(Comparator.comparingInt(e -> e.getValue().sum()));
 
-            methodNamesAndMethodCoverages.forEach((entry) -> {
-                methodNames.add(entry.getKey());
-            });
+            methodNamesAndMethodCoverages.forEach((entry) -> methodNames.add(entry.getKey()));
         });
         return methodNames;
     }

@@ -85,7 +85,7 @@ public class GeneralMinimizer implements Minimizer {
     private void removeUselessDuplicateAssertions(CtBlock<?> block,
                                                   CtInvocation<?> duplicatesAssertion,
                                                   List<CtStatement> statements) {
-        final CtVariableReference variable = ((CtVariableRead<?>) duplicatesAssertion
+        final CtVariableReference<?> variable = ((CtVariableRead<?>) duplicatesAssertion
                 .filterChildren(new TypeFilter<CtVariableRead<?>>(CtVariableRead.class))
                 .first())
                 .getVariable();

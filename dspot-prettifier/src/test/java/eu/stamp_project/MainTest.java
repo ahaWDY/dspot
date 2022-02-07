@@ -12,17 +12,18 @@ import java.util.stream.Collectors;
 
 public class MainTest {
 
-    public static String PATH_INPUT_TEST_CLASS = "src/test/resources/sample/src/test/java/fr/inria/amplified/AmplifiedTest.java";
-    public static String OUTPUT_PATH_AMPLIFIED_TEST = "target/dspot/output/fr/inria/amplified/AmplifiedTest.java";
+    public static final String PATH_INPUT_TEST_CLASS = "src/test/resources/sample/src/test/java/fr/inria/amplified/AmplifiedTest.java";
+    public static final String OUTPUT_PATH_AMPLIFIED_TEST = "target/dspot/output/fr/inria/amplified/AmplifiedTest.java";
 
-    public static String OUTPUT_PATH_TEST_SUITE_EXAMPLE = "target/dspot/output/example/TestSuiteExample2.java";
-    public static String REPORT_PATH_TEST_SUITE_EXAMPLE = "target/dspot/output/example.TestSuiteExample2_prettifier_report.json";
+    public static final String OUTPUT_PATH_TEST_SUITE_EXAMPLE = "target/dspot/output/example/TestSuiteExample2.java";
+    public static final String REPORT_PATH_TEST_SUITE_EXAMPLE = "target/dspot/output/example" +
+            ".TestSuiteExample2_prettifier_report.json";
 
-    public static String OUTPUT_PATH_APP_TEST = "target/dspot/output/eu/stamp_project/AppTest.java";
-    public static String REPORT_PATH_APP_TEST = "target/dspot/output/eu.stamp_project.AppTest_prettifier_report.json";
+    public static final String OUTPUT_PATH_APP_TEST = "target/dspot/output/eu/stamp_project/AppTest.java";
+    public static final String REPORT_PATH_APP_TEST = "target/dspot/output/eu.stamp_project.AppTest_prettifier_report.json";
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         try {
             FileUtils.deleteDirectory(new File("target/dspot/output/"));
             FileUtils.deleteDirectory(new File("src/test/resources/sample/target"));
@@ -32,7 +33,7 @@ public class MainTest {
     }
 
     @AfterEach
-    public void tearDown() throws Exception {
+    public void tearDown() {
         try {
             FileUtils.deleteDirectory(new File("target/dspot/output/"));
             FileUtils.deleteDirectory(new File("src/test/resources/sample/target"));
@@ -42,7 +43,7 @@ public class MainTest {
     }
 
     @Test
-    public void testNoPrettifiers() throws Exception {
+    public void testNoPrettifiers() {
         Main.main(new String[]{
                 "--absolute-path-to-project-root", "src/test/resources/sample/",
                 "--path-to-amplified-test-class", PATH_INPUT_TEST_CLASS,
@@ -96,7 +97,7 @@ public class MainTest {
 
     @Disabled // DOES NOT WORK ON TRAVIS, CANNOT FIND python3 cmd
     @Test
-    public void testCode2VecTestNames() throws Exception {
+    public void testCode2VecTestNames() {
         Main.main(new String[]{
                 "--absolute-path-to-project-root", "src/test/resources/sample/",
                 "--path-to-amplified-test-class", PATH_INPUT_TEST_CLASS,
@@ -123,7 +124,7 @@ public class MainTest {
     }
 
     @Test
-    public void testContext2VecLocalVariableNames() throws Exception {
+    public void testContext2VecLocalVariableNames() {
         Main.main(new String[]{
                 "--absolute-path-to-project-root", "src/test/resources/sample/",
                 "--path-to-amplified-test-class", PATH_INPUT_TEST_CLASS,
@@ -152,7 +153,7 @@ public class MainTest {
     }
 
     @Test
-    public void testFilterDevFriendly() throws Exception {
+    public void testFilterDevFriendly() {
         Main.main(new String[]{
                 "--absolute-path-to-project-root", "src/test/resources/sample/",
                 "--with-comment", "All",
@@ -165,7 +166,7 @@ public class MainTest {
     }
 
     @Test
-    public void testPrioritizeMostCoverage() throws Exception {
+    public void testPrioritizeMostCoverage() {
         Main.main(new String[]{
                 "--absolute-path-to-project-root", "src/test/resources/sample/",
                 "--with-comment", "All",

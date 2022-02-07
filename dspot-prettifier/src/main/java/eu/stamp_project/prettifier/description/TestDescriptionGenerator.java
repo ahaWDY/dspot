@@ -319,8 +319,6 @@ public class TestDescriptionGenerator implements Prettifier {
 
     /**
      * Remembers name & value of a created local variable to use in the description later.
-     *
-     * @param report
      */
     private void rememberLocalVariable(AddLocalVariableAmplifierReport report) {
         variableValues.put(report.getVariableName(), report.getVariableValue());

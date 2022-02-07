@@ -15,9 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeTrue;
 
 public class Context2NameTest {
 
@@ -70,7 +67,7 @@ public class Context2NameTest {
                 "    }" + AmplificationHelper.LINE_SEPARATOR +
                 "}" + AmplificationHelper.LINE_SEPARATOR;
 
-        CtClass ctClass = Launcher.parseClass(codeStr);
+        CtClass<?> ctClass = Launcher.parseClass(codeStr);
         // make sure all methods are always in order
         List<CtMethod<?>> methodListBeforeC2N = new ArrayList<>();
         methodListBeforeC2N.addAll(ctClass.getMethodsByName("mess"));

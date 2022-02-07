@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.Assertions;
 
-import static org.junit.Assert.assertTrue;
-
 /**
  * created by Benjamin DANGLOT
  * benjamin.danglot@inria.fr

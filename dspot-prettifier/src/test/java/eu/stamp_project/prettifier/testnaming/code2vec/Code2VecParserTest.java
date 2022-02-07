@@ -4,8 +4,6 @@ import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertEquals;
-
 /**
  * created by Benjamin DANGLOT
  * benjamin.danglot@inria.fr

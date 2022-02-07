@@ -15,7 +15,7 @@ public class Context2NameVariableRenamer implements Prettifier {
     @Override
     public List<CtMethod<?>> prettify(List<CtMethod<?>> amplifiedTestsToBePrettified) {
         Context2Name context2name = new Context2Name();
-        CtClass tmpClass = Launcher.parseClass("class Tmp {}");
+        CtClass<?> tmpClass = Launcher.parseClass("class Tmp {}");
         // remember the order
         List<String> methodNameList = new ArrayList<>();
         for (CtMethod<?> amplifiedTestMethod : amplifiedTestsToBePrettified) {
@@ -25,7 +25,7 @@ public class Context2NameVariableRenamer implements Prettifier {
         tmpClass.setMethods(new HashSet<>(amplifiedTestsToBePrettified));
         String strTmpClass = tmpClass.toString();
         String strProcessedClass = context2name.process(strTmpClass);
-        CtClass processedClass = Launcher.parseClass(strProcessedClass);
+        CtClass<?> processedClass = Launcher.parseClass(strProcessedClass);
         // restore the order
         List<CtMethod<?>> prettifiedMethodList = new ArrayList<>();
         methodNameList.forEach(methodName -> {

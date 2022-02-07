@@ -1,20 +1,17 @@
 package eu.stamp_project.prettifier.minimization;
 
-import eu.stamp_project.prettifier.AbstractTest;
 import eu.stamp_project.Utils;
 import eu.stamp_project.dspot.common.test_framework.TestFramework;
 import eu.stamp_project.dspot.selector.pitmutantscoreselector.AbstractPitResult;
+import eu.stamp_project.prettifier.AbstractTest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
 
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * created by Benjamin DANGLOT
