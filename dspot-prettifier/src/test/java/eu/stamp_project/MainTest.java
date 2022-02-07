@@ -3,18 +3,12 @@ package eu.stamp_project;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
 import eu.stamp_project.prettifier.Main;
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 public class MainTest {
 
@@ -27,7 +21,7 @@ public class MainTest {
     public static String OUTPUT_PATH_APP_TEST = "target/dspot/output/eu/stamp_project/AppTest.java";
     public static String REPORT_PATH_APP_TEST = "target/dspot/output/eu.stamp_project.AppTest_prettifier_report.json";
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         try {
             FileUtils.deleteDirectory(new File("target/dspot/output/"));
@@ -37,11 +31,11 @@ public class MainTest {
         }
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         try {
-            //            FileUtils.deleteDirectory(new File("target/dspot/output/"));
-            //            FileUtils.deleteDirectory(new File("src/test/resources/sample/target"));
+            FileUtils.deleteDirectory(new File("target/dspot/output/"));
+            FileUtils.deleteDirectory(new File("src/test/resources/sample/target"));
         } catch (Exception ignored) {
 
         }
@@ -54,7 +48,7 @@ public class MainTest {
                 "--path-to-amplified-test-class", PATH_INPUT_TEST_CLASS,
                 "--test", "fr.inria.amplified.AmplifiedTest",
         });
-        assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
+        Assertions.assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
     }
 
     @Test
@@ -65,7 +59,7 @@ public class MainTest {
                 "--test", "fr.inria.amplified.AmplifiedTest",
                 "--apply-general-minimizer"
         });
-        assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
+        Assertions.assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
         assertFileContains("Local variable was inlined", "assertEquals(5, 5);", OUTPUT_PATH_AMPLIFIED_TEST);
     }
 
@@ -77,7 +71,7 @@ public class MainTest {
                 "--test", "fr.inria.amplified.AmplifiedTest",
                 "--apply-pit-minimizer"
         });
-        assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
+        Assertions.assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
         assertFileContains("Duplicate assertion was removed", "    @Test\n" +
                 "    public void amplifiedTest2() throws Exception {\n" +
                 "        Integer __DSPOT_1 = 5;\n" +
@@ -94,13 +88,13 @@ public class MainTest {
                 "--test", "eu.stamp_project.AppTest",
                 "--test-cases", "test1_mg12_assSep41,test1_mg13_failAssert0"
         });
-        assertTrue(new File(OUTPUT_PATH_APP_TEST).exists());
+        Assertions.assertTrue(new File(OUTPUT_PATH_APP_TEST).exists());
         assertFileContains("Name changed to covered methods in test", "testCompute", OUTPUT_PATH_APP_TEST);
         assertFileContains("Name changed to covered methods in test", "testThrowException", OUTPUT_PATH_APP_TEST);
         assertFileContains("New name included in json report", "testThrowException", REPORT_PATH_APP_TEST);
     }
 
-    @Ignore // DOES NOT WORK ON TRAVIS, CANNOT FIND python3 cmd
+    @Disabled // DOES NOT WORK ON TRAVIS, CANNOT FIND python3 cmd
     @Test
     public void testCode2VecTestNames() throws Exception {
         Main.main(new String[]{
@@ -111,7 +105,7 @@ public class MainTest {
                 "--path-to-code2vec-model", "../model",
                 "--rename-test-methods=Code2VecTestRenamer"
         });
-        assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
+        Assertions.assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
     }
 
     @Test
@@ -122,7 +116,7 @@ public class MainTest {
                 "--test", "fr.inria.amplified.AmplifiedTest",
                 "--rename-local-variables=SimpleVariableRenamer"
         });
-        assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
+        Assertions.assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
         assertFileContains("Primitive was renamed to typeN", "int1", OUTPUT_PATH_AMPLIFIED_TEST);
         assertFileContains("Object type was renamed to typeN", "Integer1", OUTPUT_PATH_AMPLIFIED_TEST);
         assertFileContains("Non-DSpot named variables are not modified", "testingAnInt", OUTPUT_PATH_AMPLIFIED_TEST);
@@ -138,7 +132,7 @@ public class MainTest {
                 "--path-to-code2vec-model", "../model",
                 "--rename-local-variables=Context2NameVariableRenamer"
         });
-        assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
+        Assertions.assertTrue(new File(OUTPUT_PATH_AMPLIFIED_TEST).exists());
     }
 
     @Test
@@ -152,7 +146,7 @@ public class MainTest {
                 "--verbose",
                 //                "--test-cases", "test1_mg12_assSep41,test1_mg13_failAssert0"
         });
-        assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
+        Assertions.assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
         assertFileContains("Added description to method", "* Test that", OUTPUT_PATH_TEST_SUITE_EXAMPLE);
         assertFileContains("Description included in json report", "Test that ", OUTPUT_PATH_TEST_SUITE_EXAMPLE);
     }
@@ -167,7 +161,7 @@ public class MainTest {
                 "--verbose",
                 "--filter-dev-friendly",
         });
-        assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
+        Assertions.assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
     }
 
     @Test
@@ -180,7 +174,7 @@ public class MainTest {
                 "--verbose",
                 "--prioritize-most-coverage",
         });
-        assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
+        Assertions.assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
     }
 
     @Test
@@ -193,7 +187,7 @@ public class MainTest {
                 "--verbose",
                 "--apply-extended-coverage-minimizer",
         });
-        assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
+        Assertions.assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
         assertFileDoesNotContain("Redundant object creation removed", "char findChar = ex.charAt(\"abcd\", 3);",
                 OUTPUT_PATH_TEST_SUITE_EXAMPLE);
     }
@@ -208,7 +202,7 @@ public class MainTest {
                 "--verbose",
                 "--remove-redundant-casts",
         });
-        assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
+        Assertions.assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
         assertFileDoesNotContain("Removed redundant cast to same type as expected in assertEquals", "(char)",
                 OUTPUT_PATH_TEST_SUITE_EXAMPLE);
     }
@@ -230,7 +224,7 @@ public class MainTest {
                 "--generate-descriptions",
                 "--prioritize-most-coverage",
         });
-        assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
+        Assertions.assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
         assertFileContains("Added description to method", "/**\n" +
                 "     * Test that ", OUTPUT_PATH_TEST_SUITE_EXAMPLE);
         assertFileContains("Full prettified test case", " */\n" +
@@ -247,7 +241,7 @@ public class MainTest {
         try (BufferedReader reader = new BufferedReader(new FileReader(amplifiedTestClass))) {
             String content = reader.lines().collect(Collectors.joining(AmplificationHelper.LINE_SEPARATOR));
             System.out.println(content);
-            assertTrue(message, content.contains(expected));
+            Assertions.assertTrue(content.contains(expected), message);
         }
     }
 
@@ -257,7 +251,7 @@ public class MainTest {
         try (BufferedReader reader = new BufferedReader(new FileReader(amplifiedTestClass))) {
             String content = reader.lines().collect(Collectors.joining(AmplificationHelper.LINE_SEPARATOR));
             System.out.println(content);
-            assertFalse(message, content.contains(forbidden));
+            Assertions.assertFalse(content.contains(forbidden), message);
         }
     }
 }

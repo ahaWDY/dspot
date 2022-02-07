@@ -1,7 +1,8 @@
 package eu.stamp_project.prettifier.testnaming.code2vec;
 
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -48,10 +49,10 @@ public class Code2VecParserTest {
 
         final Code2VecParser code2VecParser = new Code2VecParser();
         String parse = code2VecParser.parse(outputOfCode2Vec);
-        assertEquals("testEqualslitString" , parse);
-        for (int i = 1 ; i < 11 ; i ++) {
+        Assertions.assertEquals("testEqualslitString", parse);
+        for (int i = 1; i < 11; i++) {
             parse = code2VecParser.parse(outputOfCode2Vec);
-            assertEquals("testEqualslitString" + i , parse);
+            Assertions.assertEquals("testEqualslitString" + i, parse);
         }
     }
 }

@@ -1,12 +1,11 @@
 package eu.stamp_project.prettifier.minimization;
 
-import eu.stamp_project.prettifier.AbstractTest;
 import eu.stamp_project.Utils;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationHelper;
-import org.junit.Test;
+import eu.stamp_project.prettifier.AbstractTest;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import spoon.reflect.declaration.CtMethod;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Benjamin DANGLOT
@@ -34,7 +33,7 @@ public class GeneralMinimizerTest extends AbstractTest {
         final String expectedBody = "{" + AmplificationHelper.LINE_SEPARATOR +
                 "    org.junit.Assert.assertEquals(5, 5);" + AmplificationHelper.LINE_SEPARATOR +
                 "}";
-        assertEquals(expectedBody, minimize.getBody().toString());
+        Assertions.assertEquals(expectedBody, minimize.getBody().toString());
     }
 
     @Test
@@ -52,7 +51,7 @@ public class GeneralMinimizerTest extends AbstractTest {
                 "    java.lang.System.out.println(__DSPOT_1.intValue());" + AmplificationHelper.LINE_SEPARATOR +
                 "    org.junit.Assert.assertEquals(5, __DSPOT_1.intValue());" + AmplificationHelper.LINE_SEPARATOR +
                 "}";
-        assertEquals(expectedBody, minimize.getBody().toString());
+        Assertions.assertEquals(expectedBody, minimize.getBody().toString());
     }
 
     @Test
@@ -68,6 +67,6 @@ public class GeneralMinimizerTest extends AbstractTest {
                 "    java.lang.Integer __DSPOT_1 = 5;" + AmplificationHelper.LINE_SEPARATOR +
                 "    org.junit.Assert.assertEquals(5, __DSPOT_1.intValue());" + AmplificationHelper.LINE_SEPARATOR +
                 "}";
-        assertEquals(expectedBody, minimize.getBody().toString());
+        Assertions.assertEquals(expectedBody, minimize.getBody().toString());
     }
 }
