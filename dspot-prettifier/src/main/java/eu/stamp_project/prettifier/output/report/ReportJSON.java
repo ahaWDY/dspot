@@ -1,6 +1,7 @@
 package eu.stamp_project.prettifier.output.report;
 
 import eu.stamp_project.dspot.common.report.output.ClassModificationReport;
+import eu.stamp_project.dspot.common.report.output.ModificationReportImpl;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestCaseJSON;
 import eu.stamp_project.dspot.common.report.output.selector.extendedcoverage.json.TestClassJSON;
 import eu.stamp_project.prettifier.Main;
@@ -67,7 +68,7 @@ public class ReportJSON {
 
     /**
      * @param prettifierToApply name of the prettifier that needs the report (used in error message)
-     * @return whether the {@link eu.stamp_project.dspot.common.report.output.ModificationReport} from DSpot was found
+     * @return whether the {@link ModificationReportImpl} from DSpot was found
      * at the configured DSpot output location. Logs an error if not.
      */
     public boolean isModificationReportPresent(String prettifierToApply) {

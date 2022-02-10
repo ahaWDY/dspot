@@ -50,6 +50,7 @@ public class ReturnValueAmplifier implements Amplifier {
                         CtExpression<?> target = AmplifierHelper.createLocalVarRef(localVar);
                         CtMethod<?> methodClone = CloneHelper.cloneTestMethodForAmp(testMethod, ""); // no need to suffix here,
                         // since it will be recloned after that
+                        testMethod.getDeclaringType().addMethod(methodClone);
                         replaceInvocationByLocalVariable(
                                 methodClone.getElements(new TypeFilter<>(CtStatement.class)).get(indexOfInvocation),
                                 localVar

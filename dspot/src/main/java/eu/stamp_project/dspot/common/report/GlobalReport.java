@@ -4,6 +4,7 @@ import eu.stamp_project.dspot.common.report.error.Error;
 import eu.stamp_project.dspot.common.report.error.ErrorReport;
 import eu.stamp_project.dspot.common.report.output.AmplifierReport;
 import eu.stamp_project.dspot.common.report.output.ModificationReport;
+import eu.stamp_project.dspot.common.report.output.ModificationReportImpl;
 import eu.stamp_project.dspot.common.report.output.OutputReport;
 import eu.stamp_project.dspot.common.report.output.selector.TestSelectorElementReport;
 import eu.stamp_project.dspot.common.report.output.selector.TestSelectorReport;
@@ -17,18 +18,18 @@ import java.util.List;
  * benjamin.danglot@inria.fr
  * on 29/10/18
  */
-public class GlobalReport implements Report, ErrorReport, OutputReport, TestSelectorReport {
+public class GlobalReport implements Report, ErrorReport, OutputReport, TestSelectorReport, ModificationReport {
 
-    private OutputReport outputReport;
+    private final OutputReport outputReport;
 
-    private ErrorReport errorReport;
+    private final ErrorReport errorReport;
 
-    private TestSelectorReport testSelectorReport;
+    private final TestSelectorReport testSelectorReport;
 
-    private ModificationReport modificationReport;
+    private final ModificationReportImpl modificationReport;
 
     public GlobalReport(OutputReport outputReport, ErrorReport errorReport, TestSelectorReport testSelectorReport,
-                        ModificationReport modificationReport) {
+                        ModificationReportImpl modificationReport) {
         this.outputReport = outputReport;
         this.errorReport = errorReport;
         this.testSelectorReport = testSelectorReport;
@@ -43,6 +44,14 @@ public class GlobalReport implements Report, ErrorReport, OutputReport, TestSele
         this.errorReport.output(outputDirectory);
         this.outputReport.output(outputDirectory);
         this.modificationReport.output(outputDirectory);
+    }
+
+    @Override
+    public void outputForClass(String outputDirectory, CtType<?> testClass) {
+        this.testSelectorReport.outputForClass(outputDirectory, testClass);
+        this.errorReport.outputForClass(outputDirectory, testClass);
+        this.outputReport.outputForClass(outputDirectory, testClass);
+        this.modificationReport.outputForClass(outputDirectory, testClass);
     }
 
     @Override
@@ -90,16 +99,20 @@ public class GlobalReport implements Report, ErrorReport, OutputReport, TestSele
     }
 
     @Override
-    public void addPrintedTestClasses(String line) {
-        this.outputReport.addPrintedTestClasses(line);
+    public void addPrintedTestClasses(String line, boolean printedAmplifiedTestClass) {
+        this.outputReport.addPrintedTestClasses(line, printedAmplifiedTestClass);
     }
 
+    /* MODIFICATION REPORT METHODS */
+
+    @Override
     public void reportModification(CtType<?> testClass, String testNameBeforeModification,
                                    String testNameAfterModification, AmplifierReport report) {
         this.modificationReport.reportModification(testClass, testNameBeforeModification, testNameAfterModification,
                 report);
     }
 
+    @Override
     public void filterModifications(CtType<?> testClass, List<CtMethod<?>> selectedTests) {
         this.modificationReport.filterModifications(testClass, selectedTests);
     }
