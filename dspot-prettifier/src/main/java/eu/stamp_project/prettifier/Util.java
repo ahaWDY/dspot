@@ -99,7 +99,9 @@ public final class Util {
             // put the methods with most additional coverage first (to be first in the name later)
             methodNamesAndMethodCoverages.sort(Comparator.comparingInt(e -> e.getValue().sum()));
 
-            methodNamesAndMethodCoverages.forEach((entry) -> methodNames.add(entry.getKey()));
+            methodNamesAndMethodCoverages.forEach((entry) ->
+                    methodNames.add(getSimpleNameFromFQ(className) + "." + entry.getKey())
+            );
         });
         return methodNames;
     }
@@ -112,5 +114,10 @@ public final class Util {
      */
     public static boolean variableNamedByDSpot(String variableName) {
         return variableName.startsWith("__DSPOT_") || (variableName.startsWith("o_") && variableName.contains("__"));
+    }
+
+    public static String getSimpleNameFromFQ(String fullyQualifiedClassName) {
+        String[] split = fullyQualifiedClassName.split("\\.");
+        return split[split.length - 1];
     }
 }

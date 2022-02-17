@@ -34,6 +34,7 @@ public class MethodAdderOnExistingObjectsAmplifierReport extends AmplifierReport
      */
     public static class MethodInvocation {
 
+        // TODO: also save (simple) class name to give a better indication which method is meant
         private final String name;
         private final String returnType;
         List<MethodParameter> parameters;

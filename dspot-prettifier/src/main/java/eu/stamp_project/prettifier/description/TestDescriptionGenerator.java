@@ -284,16 +284,17 @@ public class TestDescriptionGenerator implements Prettifier {
             if (amplifierReport.getReportType().equals(MethodDuplicationAmplifierReport.class.getCanonicalName())) {
                 MethodDuplicationAmplifierReport methodDuplicationAmplifierReport = (MethodDuplicationAmplifierReport) amplifierReport;
                 description.append(methodDuplicationAmplifierReport.getDuplicatedCall());
-                description.append(" is called");
+                description.append("() is called");
             } else if (amplifierReport.getReportType().equals(MethodAdderOnExistingObjectsAmplifierReport.class.getCanonicalName())) {
                 MethodAdderOnExistingObjectsAmplifierReport methodAdderOnExistingObjectsAmplifierReport =
                         (MethodAdderOnExistingObjectsAmplifierReport) amplifierReport;
                 description.append(methodAdderOnExistingObjectsAmplifierReport.getInvokedMethod().getName());
-                description.append(" is called");
-
                 List<MethodAdderOnExistingObjectsAmplifierReport.MethodParameter> parameters =
                         methodAdderOnExistingObjectsAmplifierReport.getInvokedMethod().getParameters();
-                if (!parameters.isEmpty()) {
+                if (parameters.isEmpty()) {
+                    description.append("() is called");
+                } else {
+                    description.append("(...) is called");
                     description.append(" with the parameter");
                     if (parameters.size() > 1) {
                         description.append("s ");
