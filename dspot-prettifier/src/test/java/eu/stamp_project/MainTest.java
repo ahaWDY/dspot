@@ -153,6 +153,23 @@ public class MainTest {
     }
 
     @Test
+    public void testTestDescriptionsAndCastRemover() throws Exception {
+        Main.main(new String[]{
+                "--absolute-path-to-project-root", "src/test/resources/sample/",
+                "--generate-descriptions",
+                "--remove-redundant-casts",
+                "--with-comment", "All",
+                "--path-to-dspot-reports", "src/test/resources/sample/amplified-output",
+                "--test", "example.TestSuiteExample2",
+                "--verbose",
+                //                "--test-cases", "test1_mg12_assSep41,test1_mg13_failAssert0"
+        });
+        Assertions.assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
+        assertFileContains("Description has cast removed", "* Test that ex.charAx", OUTPUT_PATH_TEST_SUITE_EXAMPLE);
+    }
+
+
+    @Test
     public void testFilterDevFriendly() {
         Main.main(new String[]{
                 "--absolute-path-to-project-root", "src/test/resources/sample/",

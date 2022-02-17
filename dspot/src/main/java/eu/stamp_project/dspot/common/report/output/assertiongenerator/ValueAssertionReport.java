@@ -22,6 +22,10 @@ public class ValueAssertionReport extends AmplifierReport {
         CtInvocation<?> assertInvocation = (CtInvocation<?>) assertStatement;
         this.assertMethodName = assertInvocation.getExecutable().getSimpleName();
         this.assertMethodDeclaredType = assertInvocation.getExecutable().getDeclaringType().getQualifiedName();
+
+        // TODO for single argument, testedValue should be assigend and expected value should be null (if changed:
+        //  change in description generator too)
+
         if (assertInvocation.getArguments().size() > 1) {
             this.testedValue = assertInvocation.getArguments().get(1).toString();
         } else {

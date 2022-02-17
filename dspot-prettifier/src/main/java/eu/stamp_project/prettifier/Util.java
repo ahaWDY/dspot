@@ -53,7 +53,7 @@ public final class Util {
 
     private static Object readReportJSON(UserInput configuration, String specifier, Class<?> targetClass) {
         RuntimeTypeAdapterFactory<AmplifierReport> runtimeTypeAdapterFactory = RuntimeTypeAdapterFactory
-                .of(AmplifierReport.class, "reportType")
+                .of(AmplifierReport.class, "reportType", true)
                 .registerSubtype(AddLocalVariableAmplifierReport.class,
                         AddLocalVariableAmplifierReport.class.getCanonicalName())
                 .registerSubtype(LiteralAmplifierReport.class, LiteralAmplifierReport.class.getCanonicalName())

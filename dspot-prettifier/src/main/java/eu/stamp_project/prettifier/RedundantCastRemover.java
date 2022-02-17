@@ -34,17 +34,19 @@ public class RedundantCastRemover implements Prettifier {
             // at the moment DSpot does not add a message to the assertion, so if there are two values we expect both to
             // be the compared values
             if (assertion.getArguments().size() >= 2) {
-                this.removeCastsInComparingAssertion(assertion);
-            } else { // assertTrue or assertFalse
-                removeCastsInBooleanAssertion(assertion);
+                this.removeCastsInComparingAssertion(assertion, testMethod);
+            } else { // assertTrue or assertFalse, assertNull has no assertions generated
+                removeCastsInBooleanAssertion(assertion, testMethod);
             }
         }
         return testMethod;
     }
 
-    private void removeCastsInComparingAssertion(CtInvocation<?> assertion) {
+    private void removeCastsInComparingAssertion(CtInvocation<?> assertion, CtMethod<?> testMethod) {
         final CtExpression<?> actualValue = assertion.getArguments().get(assertion.getArguments().size() - 1);
         final CtExpression<?> expectedValue = assertion.getArguments().get(assertion.getArguments().size() - 2);
+        // save expression of actual value to report cast reduction
+        String oldExpression = actualValue.toString();
         // top cast compared to the expected value
         if (!actualValue.getTypeCasts().isEmpty() &&
                 actualValue.getTypeCasts().get(0).equals(expectedValue.getType())) {
@@ -52,13 +54,17 @@ public class RedundantCastRemover implements Prettifier {
         }
         // inner casts that can be removed
         removeCastInvocations(actualValue);
+        Main.report.renamingReport.addCastReduction(testMethod, oldExpression, actualValue.toString());
     }
 
-    private void removeCastsInBooleanAssertion(CtInvocation<?> assertion) {
+    private void removeCastsInBooleanAssertion(CtInvocation<?> assertion, CtMethod<?> testMethod) {
         final CtExpression<?> actualValue = assertion.getArguments().get(0);
+        // save expression of actual value to report cast reduction
+        String oldExpression = actualValue.toString();
         // in the produced tests there is no final casting of the result value to boolean, so we skip removing casts
         // on the actualValue (and only on the invocations it contains)
         removeCastInvocations(actualValue);
+        Main.report.renamingReport.addCastReduction(testMethod, oldExpression, actualValue.toString());
     }
 
     private void removeCastInvocations(CtExpression<?> current) {

@@ -249,6 +249,7 @@ public class Main {
         List<CtMethod<?>> prettifiedTestMethods = testMethods;
         if (configuration.isApplyAllPrettifiers() || configuration.getTestRenamer() == TestRenamerEnum.ImprovedCoverageTestRenamer) {
             prettifiedTestMethods = new ImprovedCoverageTestRenamer(configuration).prettify(prettifiedTestMethods);
+            Main.report.renamingReport.updateOtherReportsAfterTestRenaming();
         }
         if (configuration.isApplyAllPrettifiers() || configuration.getTestRenamer() == TestRenamerEnum.Code2VecTestRenamer) {
             prettifiedTestMethods = new Code2VecTestRenamer(configuration).prettify(prettifiedTestMethods);

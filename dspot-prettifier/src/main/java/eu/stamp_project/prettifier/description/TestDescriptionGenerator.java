@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
@@ -99,7 +100,7 @@ public class TestDescriptionGenerator implements Prettifier {
         // The test is based on ...
         addOriginalTestText(description, amplifiedTest, testCaseResult);
 
-        String testDescription = replaceRenamedVariableNamesIfPresent(description.toString(), amplifiedTest);
+        String testDescription = replaceRenamedTextsIfPresent(description.toString(), amplifiedTest);
 
         DSpotUtils.addComment(amplifiedTest, testDescription, CtComment.CommentType.JAVADOC, CommentEnum.All);
         Main.report.extendedCoverageReport.updateTestCase(testCaseResult,
@@ -139,30 +140,44 @@ public class TestDescriptionGenerator implements Prettifier {
             for (AmplifierReport report : valueAssertionReports) {
                 ValueAssertionReport valueAssertionReport = (ValueAssertionReport) report;
 
-                description.append(replaceLocalVariableIfPresent(valueAssertionReport.getTestedValue()));
-
+                // TODO: move adding only "testedValue" to the top here again when it is assigned properly for
+                //  single-parameter assertions
                 switch (valueAssertionReport.getAssertionType()) {
                     case ASSERT_NULL:
+                        description.append(replaceLocalVariableIfPresent(valueAssertionReport.getExpectedValue(),
+                                test));
                         description.append(" is null");
                         break;
                     case ASSERT_NOT_NULL:
+                        description.append(replaceLocalVariableIfPresent(valueAssertionReport.getExpectedValue(),
+                                test));
                         description.append(" is not null");
                         break;
                     case ASSERT_TRUE:
+                        description.append(replaceLocalVariableIfPresent(valueAssertionReport.getExpectedValue(),
+                                test));
                         description.append(" is true");
                         break;
                     case ASSERT_FALSE:
+                        description.append(replaceLocalVariableIfPresent(valueAssertionReport.getExpectedValue(),
+                                test));
                         description.append(" is false");
                         break;
                     case ASSERT_EQUALS:
+                        description.append(replaceLocalVariableIfPresent(valueAssertionReport.getTestedValue(),
+                                test));
                         description.append(" is equal to ");
                         description.append(valueAssertionReport.getExpectedValue());
                         break;
                     case ASSERT_NOT_EQUALS:
+                        description.append(replaceLocalVariableIfPresent(valueAssertionReport.getTestedValue(),
+                                test));
                         description.append(" is not equal to ");
                         description.append(valueAssertionReport.getExpectedValue());
                         break;
                     case ASSERT_ARRAY_EQUALS:
+                        description.append(replaceLocalVariableIfPresent(valueAssertionReport.getTestedValue(),
+                                test));
                         description.append(" is equal to the array ");
                         description.append(valueAssertionReport.getExpectedValue());
                         break;
@@ -179,18 +194,21 @@ public class TestDescriptionGenerator implements Prettifier {
     private void addChangeText(StringBuilder description, CtMethod<?> test, Map<String, List<AmplifierReport>> modifications) {
         description.append(" when ");
 
+        // NOTE: Insert " and " in between these when there is more than one large modification in the amplified test!
+
         addLiteralChangedText(description, modifications.getOrDefault(LiteralAmplifierReport.class.getCanonicalName(),
-                emptyList()));
+                emptyList()), test);
 
         List<AmplifierReport> methodAdderReports =
                 modifications.getOrDefault(MethodDuplicationAmplifierReport.class.getCanonicalName(), new ArrayList<>());
         methodAdderReports.addAll(modifications.getOrDefault(MethodAdderOnExistingObjectsAmplifierReport.class.getCanonicalName(), emptyList()));
-        addMethodCalledOrDuplicationText(description, methodAdderReports);
+        addMethodCalledOrDuplicationText(description, methodAdderReports, test);
 
         addMethodCallRemovedText(description,
                 modifications.getOrDefault(MethodRemoveAmplifierReport.class.getCanonicalName(), emptyList()));
         addLocalVariableText(description,
-                modifications.getOrDefault(AddLocalVariableAmplifierReport.class.getCanonicalName(), emptyList()));
+                modifications.getOrDefault(AddLocalVariableAmplifierReport.class.getCanonicalName(), emptyList()),
+                test);
 
         replaceEndByPeriodIfThere(description, " when ");
     }
@@ -198,7 +216,8 @@ public class TestDescriptionGenerator implements Prettifier {
     /**
      * reports for {@link AddLocalVariableAmplifierReport}
      */
-    private void addLocalVariableText(StringBuilder description, List<AmplifierReport> modifications) {
+    private void addLocalVariableText(StringBuilder description, List<AmplifierReport> modifications,
+                                      CtMethod<?> test) {
         for (AmplifierReport amplifierReport : modifications) {
             if (amplifierReport.isAssertionReport()) {
                 // local variable used in assertion, so it is not mentioned when describing the change.
@@ -208,9 +227,12 @@ public class TestDescriptionGenerator implements Prettifier {
                 AddLocalVariableAmplifierReport localVariableAmplifierReport = (AddLocalVariableAmplifierReport) amplifierReport;
                 if (description.indexOf(localVariableAmplifierReport.getVariableName()) != -1) {
                     // variable is used in description until now, so we should report its value!
+                    description.append(" ");
                     description.append(localVariableAmplifierReport.getVariableName());
-                    description.append(" is ");
-                    description.append(replaceLocalVariableIfPresent(localVariableAmplifierReport.getVariableValue()));
+                    description.append(" is \"");
+                    description.append(replaceLocalVariableIfPresent(localVariableAmplifierReport.getVariableValue(),
+                            test));
+                    description.append("\"");
                     description.append(" and ");
                 }
             }
@@ -221,7 +243,8 @@ public class TestDescriptionGenerator implements Prettifier {
     /**
      * reports for {@link LiteralAmplifierReport}
      */
-    private void addLiteralChangedText(StringBuilder description, List<AmplifierReport> modifications) {
+    private void addLiteralChangedText(StringBuilder description, List<AmplifierReport> modifications,
+                                       CtMethod<?> test) {
         for (AmplifierReport amplifierReport : modifications) {
             if (amplifierReport.getReportType().equals(LiteralAmplifierReport.class.getCanonicalName())) {
                 LiteralAmplifierReport literalAmplifierReport = (LiteralAmplifierReport) amplifierReport;
@@ -229,7 +252,7 @@ public class TestDescriptionGenerator implements Prettifier {
                     description.append(literalAmplifierReport.getVariableName());
                     // TODO maybe only add " when it's a string? would need to save type of literal then
                     description.append(" is \"");
-                    description.append(replaceLocalVariableIfPresent(literalAmplifierReport.getNewValue()));
+                    description.append(replaceLocalVariableIfPresent(literalAmplifierReport.getNewValue(), test));
                     description.append("\"");
                 } else {
                     // new literal is method call parameter
@@ -238,7 +261,7 @@ public class TestDescriptionGenerator implements Prettifier {
                     description.append(" of the method ");
                     description.append(literalAmplifierReport.getMethodName());
                     description.append(" is set to \"");
-                    description.append(replaceLocalVariableIfPresent(literalAmplifierReport.getNewValue()));
+                    description.append(replaceLocalVariableIfPresent(literalAmplifierReport.getNewValue(), test));
                     description.append("\"");
                 }
                 description.append(" and ");
@@ -250,7 +273,8 @@ public class TestDescriptionGenerator implements Prettifier {
     /**
      * reports for {@link MethodDuplicationAmplifierReport} and {@link MethodAdderOnExistingObjectsAmplifierReport}
      */
-    private void addMethodCalledOrDuplicationText(StringBuilder description, List<AmplifierReport> modifications) {
+    private void addMethodCalledOrDuplicationText(StringBuilder description, List<AmplifierReport> modifications,
+                                                  CtMethod<?> test) {
         for (AmplifierReport amplifierReport : modifications) {
             if (amplifierReport.getReportType().equals(MethodDuplicationAmplifierReport.class.getCanonicalName())) {
                 MethodDuplicationAmplifierReport methodDuplicationAmplifierReport = (MethodDuplicationAmplifierReport) amplifierReport;
@@ -260,14 +284,25 @@ public class TestDescriptionGenerator implements Prettifier {
                 MethodAdderOnExistingObjectsAmplifierReport methodAdderOnExistingObjectsAmplifierReport =
                         (MethodAdderOnExistingObjectsAmplifierReport) amplifierReport;
                 description.append(methodAdderOnExistingObjectsAmplifierReport.getInvokedMethod().getName());
-                description.append(" is called with the parameters ");
-                for (MethodAdderOnExistingObjectsAmplifierReport.MethodParameter parameter : methodAdderOnExistingObjectsAmplifierReport.getInvokedMethod().getParameters()) {
-                    description.append(parameter.getName());
-                    description.append(" = ");
-                    description.append(replaceLocalVariableIfPresent(parameter.getValue()));
-                    description.append(" and ");
+                description.append(" is called");
+
+                List<MethodAdderOnExistingObjectsAmplifierReport.MethodParameter> parameters =
+                        methodAdderOnExistingObjectsAmplifierReport.getInvokedMethod().getParameters();
+                if (!parameters.isEmpty()) {
+                    description.append(" with the parameter");
+                    if (parameters.size() > 1) {
+                        description.append("s ");
+                    } else {
+                        description.append(" ");
+                    }
+                    for (MethodAdderOnExistingObjectsAmplifierReport.MethodParameter parameter : parameters) {
+                        description.append(parameter.getName());
+                        description.append(" = ");
+                        description.append(replaceLocalVariableIfPresent(parameter.getValue(), test));
+                        description.append(" and ");
+                    }
+                    replaceEndIfThere(description, " and ", "");
                 }
-                replaceEndIfThere(description, " and ", "");
             }
             description.append(" and ");
         }
@@ -292,10 +327,14 @@ public class TestDescriptionGenerator implements Prettifier {
 
     private void addCoverageText(StringBuilder description, CtMethod<?> test,
                                  TestCaseJSON testCaseResult) {
-        description.append(" This tests the methods ");
-        Map<CtMethod<?>, List<String>> testToCoveredMethods = new HashMap<>();
-        testToCoveredMethods.put(test, Util.getCoveredMethods(testCaseResult.getCoverageImprovement()));
-        for (String methodName : testToCoveredMethods.get(test)) {
+        List<String> coveredMethods = Util.getCoveredMethods(testCaseResult.getCoverageImprovement());
+        description.append(" This tests the method");
+        if (coveredMethods.size() > 1) {
+            description.append("s ");
+        } else {
+            description.append(" ");
+        }
+        for (String methodName : coveredMethods) {
             description.append(methodName);
             description.append(" and ");
         }
@@ -330,28 +369,56 @@ public class TestDescriptionGenerator implements Prettifier {
      * Replaces any remembered local variables with their value.
      * This is a plain string.replace, no actual parsing of code takes place.
      */
-    private String replaceLocalVariableIfPresent(String codeSnippet) {
+    private String replaceLocalVariableIfPresent(String codeSnippet, CtMethod<?> test) {
+        return replaceLocalVariableIfPresent(codeSnippet, test, 4);
+    }
+
+    /**
+     * Replaces any remembered local variables with their value.
+     * This is a plain string.replace, no actual parsing of code takes place.
+     * Recursion-supporting version if a variable earlier in the list is used in a replaced expression later in the
+     * list.
+     */
+    private String replaceLocalVariableIfPresent(String codeSnippet, CtMethod<?> test, int recursionStepsLeft) {
         if (codeSnippet == null) {
             return null;
         }
+        if (recursionStepsLeft == 0) {
+            LOGGER.info("Reached end of recursion steps in replacing local variables with values. Continuing with " +
+                    "description that might contain unreplaced variables.");
+            return codeSnippet;
+        }
+
+        // Before we replace we need to also remove any casts that were also removed by the redundant cast remover
+        // (won't be detected anymore by string.contains when we replace the variable name with its value)
+        String newSnippet = replaceInDescription(codeSnippet, test, Main.report.renamingReport.getReducedCasts());
+
         for (String variableName : variableValues.keySet()) {
-            if (codeSnippet.contains(variableName)) {
-                codeSnippet = codeSnippet.replace(variableName, variableValues.get(variableName));
+            if (newSnippet.contains(variableName)) {
+                newSnippet = newSnippet.replace(variableName,
+                        replaceLocalVariableIfPresent(variableValues.get(variableName), test, recursionStepsLeft - 1));
             }
         }
-        return codeSnippet;
+
+        return newSnippet;
     }
 
-    private String replaceRenamedVariableNamesIfPresent(String description, CtMethod<?> test) {
-        // check if a variable name that was renamed by a VariableRenamer is present in the description
-        for (Map.Entry<String, String> renamingEntry : Main.report.renamingReport.getRenamedVariables().entrySet()) {
-            // testName#oldVariableName
+    private String replaceRenamedTextsIfPresent(String description, CtMethod<?> test) {
+        String replacedCasts =
+                replaceInDescription(description, test, Main.report.renamingReport.getReducedCasts());
+        return replaceInDescription(replacedCasts, test, Main.report.renamingReport.getRenamedVariables());
+    }
+
+    private String replaceInDescription(String description, CtMethod<?> test, Map<String, String> replacementMap) {
+        // check if a string that was renamed is present in the description
+        for (Map.Entry<String, String> renamingEntry : replacementMap.entrySet()) {
+            // testName#oldString
             String[] keyParts = renamingEntry.getKey().split("#");
             if (!test.getSimpleName().equals(keyParts[0])) {
                 continue;
             }
 
-            if (description.contains(keyParts[1])) {
+            if (description.contains(Pattern.quote(keyParts[1]))) {
                 description = description.replace(keyParts[1], renamingEntry.getValue());
             }
         }
