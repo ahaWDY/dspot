@@ -112,6 +112,10 @@ public class Main {
             amplifiedTestClass = loadAmplifiedTestClassFromFile(configuration);
         }
 
+        // already enable auto-imports, to make the replacements be recorded in the same text that will be in the
+        // final printed class
+        amplifiedTestClass.getFactory().getEnvironment().setAutoImports(true);
+
         final List<CtMethod<?>> testMethods =
                 dSpotState.getTestFinder().findTestMethods(amplifiedTestClass,
                         dSpotState.getTestMethodsToBeAmplifiedNames());

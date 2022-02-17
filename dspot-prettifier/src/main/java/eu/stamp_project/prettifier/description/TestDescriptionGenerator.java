@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
@@ -418,7 +417,7 @@ public class TestDescriptionGenerator implements Prettifier {
                 continue;
             }
 
-            if (description.contains(Pattern.quote(keyParts[1]))) {
+            if (description.contains(keyParts[1])) {
                 description = description.replace(keyParts[1], renamingEntry.getValue());
             }
         }

@@ -165,7 +165,7 @@ public class MainTest {
                 //                "--test-cases", "test1_mg12_assSep41,test1_mg13_failAssert0"
         });
         Assertions.assertTrue(new File(OUTPUT_PATH_TEST_SUITE_EXAMPLE).exists());
-        assertFileContains("Description has cast removed", "* Test that ex.charAx", OUTPUT_PATH_TEST_SUITE_EXAMPLE);
+        assertFileContains("Description has cast removed", "* Test that ex.charAt", OUTPUT_PATH_TEST_SUITE_EXAMPLE);
     }
 
 
