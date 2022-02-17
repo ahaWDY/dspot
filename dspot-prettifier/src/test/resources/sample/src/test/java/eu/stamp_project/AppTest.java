@@ -59,6 +59,12 @@ public class AppTest {
     }
 
     @Test(timeout = 10000)
+    public void testSimpleBooleanGetter() throws Exception {
+        // this test should be filtered out, as it only adds coverage in a simple getter
+        Assert.assertTrue(true);
+    }
+
+    @Test(timeout = 10000)
     public void testException() throws Exception {
         // this test should be left in, even if it only adds coverage in a simple getter, because it tests an
         // exception according to the modification report

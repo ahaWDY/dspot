@@ -101,7 +101,7 @@ public class DevFriendlyTestFilter implements Prettifier {
 
     private boolean testsOnlySimpleGetterOrSetter(CtMethod<?> test, TestCaseJSON coverageResult) {
         List<MethodCoverage> getterSetterCoverage = coverageResult.getCoverageImprovement().getInstructionImprovement().getCoverageForMethodsMatching(
-                "(get|set).*");
+                "(get|set|is).*");
         if (getterSetterCoverage.isEmpty()) {
             // covers no getters or setters
             return false;
@@ -109,7 +109,7 @@ public class DevFriendlyTestFilter implements Prettifier {
 
         List<MethodCoverage> notGetterSetterCoverage =
                 coverageResult.getCoverageImprovement().getInstructionImprovement().getCoverageForMethodsMatching(
-                        "^(?!(get|set)).+");
+                        "^(?!(get|set|is)).+");
         if (!notGetterSetterCoverage.isEmpty()) {
             // covers other methods than getters & setters
             return false;

@@ -35,6 +35,8 @@ class DevFriendlyTestFilterTest extends AbstractTest {
 
         methods.add(factory.Class().get("eu.stamp_project.AppTest")
                 .getMethodsByName("testSimpleGetter").get(0));
+        methods.add(factory.Class().get("eu.stamp_project.AppTest")
+                .getMethodsByName("testSimpleBooleanGetter").get(0));
         List<CtMethod<?>> filteredMethods = devFriendlyTestFilter.prettify(methods);
         assertEquals(0, filteredMethods.size());
     }
