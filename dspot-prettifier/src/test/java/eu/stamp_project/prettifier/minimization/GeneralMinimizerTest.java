@@ -69,4 +69,20 @@ public class GeneralMinimizerTest extends AbstractTest {
                 "}";
         Assertions.assertEquals(expectedBody, minimize.getBody().toString());
     }
+
+    @Test
+    public void testKeepOriginalVariable() throws Exception {
+
+        /*
+            - redundant assertion must be removed if the assertion value is not used between the two assertions
+         */
+
+        final GeneralMinimizer generalMinimizer = new GeneralMinimizer();
+        final CtMethod<?> minimize = generalMinimizer.minimize(Utils.findMethod("fr.inria.amplified.AmplifiedTest", "amplifiedTestWithOldVariable"));
+        final String expectedBody = "{" + AmplificationHelper.LINE_SEPARATOR +
+                "    int testingAnInt = 5;" + AmplificationHelper.LINE_SEPARATOR +
+                "    org.junit.Assert.assertEquals(5, testingAnInt);" + AmplificationHelper.LINE_SEPARATOR +
+                "}";
+        Assertions.assertEquals(expectedBody, minimize.getBody().toString());
+    }
 }

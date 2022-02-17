@@ -247,6 +247,12 @@ public class TestDescriptionGenerator implements Prettifier {
         for (AmplifierReport amplifierReport : modifications) {
             if (amplifierReport.getReportType().equals(LiteralAmplifierReport.class.getCanonicalName())) {
                 LiteralAmplifierReport literalAmplifierReport = (LiteralAmplifierReport) amplifierReport;
+                if (literalAmplifierReport.getVariableName().equals("unknown") && literalAmplifierReport.getMethodName().equals("")) {
+                    // could not retrieve enough information during the amplification -> better to skip than to
+                    // confuse the user
+                    continue;
+                }
+
                 if (literalAmplifierReport.isLocalVariable()) {
                     description.append(literalAmplifierReport.getVariableName());
                     // TODO maybe only add " when it's a string? would need to save type of literal then
