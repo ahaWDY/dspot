@@ -23,10 +23,6 @@ public class BooleanLiteralAmplifier extends AbstractLiteralAmplifier<Boolean> {
         return Collections.singleton(factory.createLiteral(!((CtLiteral<Boolean>)original).getValue()));
     }
 
-    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
-        return amplify(testMethod, iteration);
-    }
-
     @Override
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
         return amplify(testMethod, iteration);

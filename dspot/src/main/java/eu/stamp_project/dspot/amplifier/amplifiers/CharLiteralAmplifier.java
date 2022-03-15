@@ -27,10 +27,6 @@ public class CharLiteralAmplifier extends AbstractLiteralAmplifier<Character> {
         return values;
     }
 
-    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
-        return amplify(testMethod, iteration);
-    }
-
     @Override
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
         return amplify(testMethod, iteration);

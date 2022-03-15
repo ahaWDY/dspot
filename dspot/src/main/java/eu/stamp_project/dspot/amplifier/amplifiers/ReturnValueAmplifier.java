@@ -67,6 +67,7 @@ public class ReturnValueAmplifier implements Amplifier {
         return ampMethods.stream();
     }
 
+    @Override
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
         return amplify(testMethod, iteration);
     }
@@ -112,8 +113,4 @@ public class ReturnValueAmplifier implements Amplifier {
 
     }
 
-    @Override
-    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
-        return amplify(testMethod, iteration);
-    }
 }

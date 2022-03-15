@@ -61,6 +61,7 @@ public class StringLiteralAmplifier extends AbstractLiteralAmplifier<String> {
         return values;
     }
 
+    @Override
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
         return amplify(testMethod, iteration);
     }
@@ -114,10 +115,5 @@ public class StringLiteralAmplifier extends AbstractLiteralAmplifier<String> {
                 ((String) ((CtLiteral) binaryOperator.getLeftHandOperand()).getValue())
                         + ((String) ((CtLiteral) binaryOperator.getRightHandOperand()).getValue())
         );
-    }
-
-    @Override
-    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
-        return amplify(testMethod, iteration);
     }
 }

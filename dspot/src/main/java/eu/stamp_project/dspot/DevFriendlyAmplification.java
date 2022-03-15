@@ -156,19 +156,15 @@ public class DevFriendlyAmplification {
                     .inputAmplify(selectedForInputAmplification, 0, dSpotState.getTargetMethod());
 
             // Add new assertions
-<<<<<<< HEAD
             List<CtMethod<?>> amplifiedTestsWithAssertions = dSpotState.getAssertionGenerator()
                     .assertionAmplification(classWithTestMethods, inputAmplifiedTests);
 
-            amplifiedTests = amplifiedTestsWithAssertions;
+            amplifiedTests = limit(amplifiedTestsWithAssertions, 200);
+            if(amplifiedTests.isEmpty()){
+                amplifiedTests.addAll(inputAmplifiedTests);
+            }
             // add those without assertions (what if we do not have)
 //            amplifiedTests.addAll(inputAmplifiedTests);
-=======
-            List<CtMethod<?>> amplifiedTestsWithAssertion = dSpotState.getAssertionGenerator()
-                    .assertionAmplification(classWithTestMethods, inputAmplifiedTests);
-
-            amplifiedTests = inputAmplifiedTests;
->>>>>>> 83a95628a0d0628be0e156673f0269e213b08878
 
         } catch (Exception | java.lang.Error e) {
             GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
@@ -202,7 +198,6 @@ public class DevFriendlyAmplification {
         return improvingTests;
     }
 
-<<<<<<< HEAD
     private List<CtMethod<?>> selectPassingTests(List<CtMethod<?>> amplifiedTests,
                                                  CtType<?> classWithTestMethods,
                                                  int path){
@@ -219,24 +214,15 @@ public class DevFriendlyAmplification {
         return amplifiedPassingTests;
     }
 
-=======
->>>>>>> 83a95628a0d0628be0e156673f0269e213b08878
     private List<CtMethod<?>> selectPassingAndTargetTests(List<CtMethod<?>> amplifiedTests,
                                                           CtType<?> classWithTestMethods,
                                                           int path) throws IOException {
         if (amplifiedTests.isEmpty()) {
             return Collections.emptyList();
         }
-<<<<<<< HEAD
         final List<CtMethod<?>> amplifiedPassingTests = dSpotState.getTestCompiler()
                 .compileRunAndDiscardUncompilableAndFailingTestMethods(classWithTestMethods, amplifiedTests, dSpotState
                         .getCompiler());
-=======
-//        final List<CtMethod<?>> amplifiedPassingTests = dSpotState.getTestCompiler()
-//                .compileRunAndDiscardUncompilableAndFailingTestMethods(classWithTestMethods, amplifiedTests, dSpotState
-//                        .getCompiler());
-        final List<CtMethod<?>> amplifiedPassingTests = amplifiedTests;
->>>>>>> 83a95628a0d0628be0e156673f0269e213b08878
 
         final List<CtMethod<?>> improvingTests = new ArrayList<>();
         try {
@@ -251,7 +237,6 @@ public class DevFriendlyAmplification {
         return improvingTests;
     }
 
-<<<<<<< HEAD
     public List<CtMethod<?>> limit(List<CtMethod<?>> tests, int maxNumTests) {
         final List<CtMethod<?>> reducedTests = new ArrayList<>();
 
@@ -269,18 +254,5 @@ public class DevFriendlyAmplification {
         }
         return reducedTests;
     }
-=======
-//    private void deleteFile(String pathname){
-//        File file = new File(pathname);
-//        file.delete();
-//    }
-
-//    private void computeCoverage(List<CtType<?>> testClasses){
-//        for(CtType testClass: testClasses) {
-//            new CloverExecutor().instrumentAndRunGivenTestClass(dSpotState.getUserInput().getAbsolutePathToProjectRoot(), testClass.getQualifiedName());
-//            Coverage result = new CloverReader().read(dSpotState.getUserInput().getAbsolutePathToProjectRoot());
-//        }
-//    }
->>>>>>> 83a95628a0d0628be0e156673f0269e213b08878
 
 }

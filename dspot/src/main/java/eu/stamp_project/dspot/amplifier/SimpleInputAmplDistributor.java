@@ -26,10 +26,6 @@ public class SimpleInputAmplDistributor extends AbstractInputAmplDistributor {
     public SimpleInputAmplDistributor(int maxNumTests, List<Amplifier> amplifiers) {
         super(maxNumTests, amplifiers);
     }
-
-    public List<CtMethod<?>> inputAmplify(List<CtMethod<?>> testMethods, int i, String targetMethodName){
-        return null;
-    }
     /**
      * Input amplification of multiple tests.
      *

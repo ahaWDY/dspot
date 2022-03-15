@@ -30,10 +30,6 @@ public class AllLiteralAmplifiers implements Amplifier {
         return this.literalAmplifiers.stream().flatMap(amplifier -> amplifier.amplify(testMethod, 0));
     }
 
-    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
-        return amplify(testMethod, iteration);
-    }
-
     @Override
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
         return amplify(testMethod, iteration);

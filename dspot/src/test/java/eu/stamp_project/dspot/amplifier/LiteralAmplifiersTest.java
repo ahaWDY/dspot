@@ -109,10 +109,6 @@ public class LiteralAmplifiersTest extends AbstractTestOnSample {
                 return Collections.singleton(testMethod.getFactory().createLiteral(0));
             }
 
-            public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
-                return null;
-            }
-
             @Override
             public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
                 return null;

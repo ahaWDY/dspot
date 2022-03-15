@@ -39,6 +39,7 @@ public class ObjectGenerator implements Amplifier {
 		return gen_o1;
 	}
 
+	@Override
 	public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
 		return amplify(testMethod, iteration);
 	}
@@ -57,10 +58,5 @@ public class ObjectGenerator implements Amplifier {
 	@Override
 	public void reset(CtType testClass) {
 
-	}
-
-	@Override
-	public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
-		return amplify(testMethod, iteration);
 	}
 }

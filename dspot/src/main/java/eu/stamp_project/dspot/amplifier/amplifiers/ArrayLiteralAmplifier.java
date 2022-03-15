@@ -138,6 +138,7 @@ public class ArrayLiteralAmplifier extends AbstractLiteralAmplifier<CtNewArrayIm
         return values;
     }
 
+    @Override
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
         return amplify(testMethod, iteration);
     }
@@ -186,10 +187,5 @@ public class ArrayLiteralAmplifier extends AbstractLiteralAmplifier<CtNewArrayIm
             sb.append("}");
         }
         return sb.toString();
-    }
-
-    @Override
-    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
-        return amplify(testMethod, iteration);
     }
 }

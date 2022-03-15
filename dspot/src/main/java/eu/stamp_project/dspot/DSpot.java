@@ -52,10 +52,6 @@ public class DSpot {
     }
 
     public void run() throws IOException {
-<<<<<<< HEAD
-        System.out.println(dSpotState.getTargetMethod());
-=======
->>>>>>> 83a95628a0d0628be0e156673f0269e213b08878
         for (CtType<?> testClassToBeAmplified : dSpotState.getTestClassesToBeAmplified()) {
             TestTuple tuple = setup.preAmplification(testClassToBeAmplified, dSpotState.getTestMethodsToBeAmplifiedNames());
             final List<CtMethod<?>> amplifiedTestMethods;

@@ -44,6 +44,7 @@ public class NumberLiteralAmplifier extends AbstractLiteralAmplifier<Number> {
         return createValues(valueIsNull,value,classOfLiteral,factory);
     }
 
+    @Override
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
         return amplify(testMethod, iteration);
     }
@@ -132,10 +133,5 @@ public class NumberLiteralAmplifier extends AbstractLiteralAmplifier<Number> {
     @Override
     protected Class<?> getTargetedClass() {
         return Number.class;
-    }
-
-    @Override
-    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
-        return amplify(testMethod, iteration);
     }
 }
