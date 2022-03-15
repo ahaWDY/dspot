@@ -53,7 +53,7 @@ public class DevFriendlyAmplification {
     public List<CtMethod<?>> devFriendlyAmplification(CtType<?> testClassToBeAmplified,
                                                       List<CtMethod<?>> testMethodsToBeAmplified) throws IOException {
 
-        //firstSelectSetup -> get passing testmethods
+        // first we setup the selector so it can compute the complete coverage of the whole existing test suite
         final List<CtMethod<?>> selectedToBeAmplified = dSpot
                 .setupSelector(testClassToBeAmplified, testMethodsToBeAmplified);
 
@@ -118,11 +118,11 @@ public class DevFriendlyAmplification {
             testTuple = dSpotState.getAssertionGenerator()
                     .removeAssertions(testClassToBeAmplified, testMethodsToBeAmplified);
             classWithTestMethods = testTuple.testClassToBeAmplified;
-
-            // it seems to be useless
+            
             List<CtMethod<?>> selectedForInputAmplification = setup
                     .fullSelectorSetup(classWithTestMethods, testTuple.testMethodsToBeAmplified);
 
+            // Amplify input
             List<CtMethod<?>> inputAmplifiedTests = dSpotState.getInputAmplDistributor()
                     .inputAmplify(testTuple.testMethodsToBeAmplified, 0);
 

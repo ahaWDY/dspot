@@ -448,5 +448,5 @@ For more information on development, see the dedicated [README-developers.md](ht
 
 ### Acknowledgement
 
-Dspot is funded by [EU H2020 research project STAMP](https://www.stamp-project.eu/).
+DSpot is funded by [EU H2020 research project STAMP](https://www.stamp-project.eu/).
 
