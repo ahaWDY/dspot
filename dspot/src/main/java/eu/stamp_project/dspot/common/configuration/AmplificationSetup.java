@@ -143,14 +143,7 @@ public class AmplificationSetup {
             GLOBAL_REPORT.addError(new Error(ERROR_EXEC_TEST_BEFORE_AMPLIFICATION, e));
             throw new Exception();
         }
-        final List<CtMethod<?>> selectedToBeAmplified;
-        try {
-            selectedToBeAmplified = testSelector.selectToAmplify(testClassToBeAmplified, passingTests);
-        } catch (Exception | java.lang.Error e) {
-            GLOBAL_REPORT.addError(new Error(ERROR_PRE_SELECTION, e));
-            throw new Exception();
-        }
-        return selectedToBeAmplified;
+        return fullSelectorSetup(testClassToBeAmplified, passingTests);
     }
 
     public List<CtMethod<?>> fullSelectorSetup(CtType<?> testClassToBeAmplified,

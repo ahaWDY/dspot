@@ -133,4 +133,9 @@ public class NumberLiteralAmplifier extends AbstractLiteralAmplifier<Number> {
     protected Class<?> getTargetedClass() {
         return Number.class;
     }
+
+    @Override
+    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+        return amplify(testMethod, iteration);
+    }
 }

@@ -108,6 +108,10 @@ public class RecoveryDSpotTest extends AbstractTestOnSample {
         public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
             throw new RuntimeException();
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 83a95628a0d0628be0e156673f0269e213b08878
         @Override
         public void reset(CtType<?> testClass) {
 

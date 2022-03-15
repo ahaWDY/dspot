@@ -28,6 +28,11 @@ public class BooleanLiteralAmplifier extends AbstractLiteralAmplifier<Boolean> {
     }
 
     @Override
+    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+        return amplify(testMethod, iteration);
+    }
+
+    @Override
     protected String getSuffix() {
         return "litBool";
     }

@@ -187,4 +187,9 @@ public class ArrayLiteralAmplifier extends AbstractLiteralAmplifier<CtNewArrayIm
         }
         return sb.toString();
     }
+
+    @Override
+    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+        return amplify(testMethod, iteration);
+    }
 }

@@ -40,6 +40,11 @@ public class RandomInputAmplDistributor extends AbstractInputAmplDistributor {
                 .flatMap(amplifier -> amplifier.amplify(test, i));
     }
 
+//    protected Stream<CtMethod<?>> inputAmplifyTest(CtMethod<?> test, int i, String targetMethodName) {
+//        return this.amplifiers.parallelStream()
+//                .flatMap(amplifier -> amplifier.amplify(test, i, targetMethodName));
+//    }
+
     /**
      * Input amplification for a single test.
      *

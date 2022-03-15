@@ -20,6 +20,7 @@ public class TargetMethodAdderOnExistingObjectsAmplifier implements Amplifier {
         return null;
     }
 
+    @Override
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
         List<CtLocalVariable<?>> existingObjects = getExistingObjects(testMethod);
         return existingObjects.stream()

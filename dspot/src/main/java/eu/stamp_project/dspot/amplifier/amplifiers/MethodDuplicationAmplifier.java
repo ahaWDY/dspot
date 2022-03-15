@@ -85,4 +85,8 @@ public class MethodDuplicationAmplifier implements Amplifier {
         removeTypeCastIfSame(current);
     }
 
+    @Override
+    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+        return amplify(testMethod, iteration);
+    }
 }

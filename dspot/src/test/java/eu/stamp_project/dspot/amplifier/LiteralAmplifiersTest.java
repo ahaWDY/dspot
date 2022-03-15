@@ -114,6 +114,10 @@ public class LiteralAmplifiersTest extends AbstractTestOnSample {
             }
 
             @Override
+            public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+                return null;
+            }
+            @Override
             protected String getSuffix() {
                 return "zero-amplifier";
             }

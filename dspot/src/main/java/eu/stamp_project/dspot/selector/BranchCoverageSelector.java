@@ -143,6 +143,7 @@ public class BranchCoverageSelector extends TakeAllSelector {
         return new TestSelectorElementReportImpl(report, jsonReport(), Collections.emptyList(), "");
     }
 
+
     private TestClassBranchCoverageJSON jsonReport() {
         TestClassBranchCoverageJSON testClassJSON;
         testClassJSON = new TestClassBranchCoverageJSON(this.initialBranchCoverage, this.initialLineCoverage);

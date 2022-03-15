@@ -32,6 +32,11 @@ public class CharLiteralAmplifier extends AbstractLiteralAmplifier<Character> {
     }
 
     @Override
+    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+        return amplify(testMethod, iteration);
+    }
+
+    @Override
     protected String getSuffix() {
         return "litChar";
     }

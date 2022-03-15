@@ -85,6 +85,7 @@ public class NullifierAmplifier extends AbstractAmplifier<CtExpression<?>> {
         return Collections.singleton(testMethod.getFactory().createLiteral(null));
     }
 
+    @Override
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
         return amplify(testMethod, iteration);
     }

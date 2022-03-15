@@ -76,7 +76,10 @@ public class MethodReconstructor {
      */
     public List<CtMethod<?>> addAssertions(CtType<?> testClass, List<CtMethod<?>> testCases) {
         Map<String, Observation> observations;
+
         if (devFriendlyAmplification) {
+            // We add the test cases before the input amplification, so that we also observe the values there.
+            // Later we only pick values for an assertion when the value is different than in the parent
             testCases.addAll(AmplificationHelper.getFirstParentsIfExist(testCases));
         }
 
@@ -146,6 +149,9 @@ public class MethodReconstructor {
 
     /**
      * Adds new assertions one by one to generate several new test cases.
+     *
+     * Jumps over assertions that would have been identical in the parent test case (before the amplification
+     * modifications). This helps us generate assertions that are related to the modifications.
      *
      * @param test Original test method
      * @param observations Observation points of the test suite

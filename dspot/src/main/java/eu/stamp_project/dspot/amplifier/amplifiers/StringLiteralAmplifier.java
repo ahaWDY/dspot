@@ -115,4 +115,9 @@ public class StringLiteralAmplifier extends AbstractLiteralAmplifier<String> {
                         + ((String) ((CtLiteral) binaryOperator.getRightHandOperand()).getValue())
         );
     }
+
+    @Override
+    public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration, String targetMethodName){
+        return amplify(testMethod, iteration);
+    }
 }
