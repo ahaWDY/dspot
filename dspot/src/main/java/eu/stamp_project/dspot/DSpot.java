@@ -2,7 +2,6 @@ package eu.stamp_project.dspot;
 
 import eu.stamp_project.dspot.common.configuration.*;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationException;
-import eu.stamp_project.dspot.common.configuration.UserInput;
 import eu.stamp_project.dspot.common.report.GlobalReport;
 import eu.stamp_project.dspot.common.report.error.Error;
 import eu.stamp_project.dspot.selector.branchcoverageselector.clover.CloverExecutor;
@@ -15,9 +14,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import static eu.stamp_project.dspot.common.report.error.ErrorEnum.ERROR_ASSERT_AMPLIFICATION;
-import static eu.stamp_project.dspot.common.report.error.ErrorEnum.ERROR_INPUT_AMPLIFICATION;
-import static eu.stamp_project.dspot.common.report.error.ErrorEnum.ERROR_SELECTION;
+
+import static eu.stamp_project.dspot.common.report.error.ErrorEnum.*;
 
 /**
  * User: Simon
@@ -57,7 +55,7 @@ public class DSpot {
             final List<CtMethod<?>> amplifiedTestMethods;
             if (dSpotState.isDevFriendlyAmplification()) {
                 amplifiedTestMethods =
-                        new DevFriendlyAmplification(this, dSpotState, setup, LOGGER, GLOBAL_REPORT)
+                        new DevFriendlyAmplification(this, dSpotState, LOGGER, GLOBAL_REPORT)
                                 .devFriendlyAmplification(tuple.testClassToBeAmplified, tuple.testMethodsToBeAmplified);
             } else {
                 amplifiedTestMethods = amplification(tuple.testClassToBeAmplified,

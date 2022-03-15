@@ -1,7 +1,5 @@
 package eu.stamp_project.dspot;
 
-import eu.stamp_project.dspot.common.collector.NullCollector;
-import eu.stamp_project.dspot.common.configuration.AmplificationSetup;
 import eu.stamp_project.dspot.common.configuration.DSpotState;
 import eu.stamp_project.dspot.common.configuration.TestTuple;
 import eu.stamp_project.dspot.common.miscellaneous.AmplificationException;
@@ -30,15 +28,13 @@ public class DevFriendlyAmplification {
 
     private final DSpot dSpot;
     private final DSpotState dSpotState;
-    private final AmplificationSetup setup;
     private final Logger LOGGER;
     private final GlobalReport GLOBAL_REPORT;
 
-    public DevFriendlyAmplification(DSpot dSpot, DSpotState dSpotState, AmplificationSetup setup, Logger LOGGER,
+    public DevFriendlyAmplification(DSpot dSpot, DSpotState dSpotState, Logger LOGGER,
                                     GlobalReport GLOBAL_REPORT) {
         this.dSpot = dSpot;
         this.dSpotState = dSpotState;
-        this.setup = setup;
         this.LOGGER = LOGGER;
         this.GLOBAL_REPORT = GLOBAL_REPORT;
     }
@@ -118,9 +114,6 @@ public class DevFriendlyAmplification {
             testTuple = dSpotState.getAssertionGenerator()
                     .removeAssertions(testClassToBeAmplified, testMethodsToBeAmplified);
             classWithTestMethods = testTuple.testClassToBeAmplified;
-            
-            List<CtMethod<?>> selectedForInputAmplification = setup
-                    .fullSelectorSetup(classWithTestMethods, testTuple.testMethodsToBeAmplified);
 
             // Amplify input
             List<CtMethod<?>> inputAmplifiedTests = dSpotState.getInputAmplDistributor()
@@ -134,8 +127,24 @@ public class DevFriendlyAmplification {
             GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));
             return Collections.emptyList();
         }
+        if (amplifiedTests.size() >= 1000) {
+            // executing too many tests over the command line fails because the argument list is too long
+            // that is why we split in smaller chunks that we execute separately
 
-        return selectPassingAndImprovingTests(amplifiedTests,classWithTestMethods,2);
+            List<CtMethod<?>> accumulateSelectedTests = new ArrayList<>();
+            int rounds = amplifiedTests.size() % 1000 + 1;
+            LOGGER.info("Too many tests to run at once. Dividing {} tests into {} rounds", amplifiedTests.size(),
+                    rounds);
+            for (int i = 0; i <= rounds; i++) {
+                List<CtMethod<?>> roundTests = amplifiedTests.subList(i, Math.min((i + 1) * 1000,
+                        amplifiedTests.size()));
+                accumulateSelectedTests.addAll(selectPassingAndImprovingTests(roundTests, classWithTestMethods, 2));
+            }
+            return accumulateSelectedTests;
+
+        } else {
+            return selectPassingAndImprovingTests(amplifiedTests,classWithTestMethods,2);
+        }
     }
 
     public List<CtMethod<?>> targetMethodAmplification(CtType<?> testClassToBeAmplified,
@@ -178,6 +187,7 @@ public class DevFriendlyAmplification {
                                                              CtType<?> classWithTestMethods,
                                                              int path) {
         if (amplifiedTests.isEmpty()) {
+            LOGGER.info("Dev friendly amplification, path {}: 0 test method(s) passed to improvement selection.", path);
             return Collections.emptyList();
         }
         final List<CtMethod<?>> amplifiedPassingTests = dSpotState.getTestCompiler()
