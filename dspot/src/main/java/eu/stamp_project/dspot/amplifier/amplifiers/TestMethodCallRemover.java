@@ -56,8 +56,8 @@ public class TestMethodCallRemover implements Amplifier {
             ctStatementList.getStatements().get(indexOfInvocation).insertAfter(invocation);
         }
         Counter.updateInputOf(cloned, 1);
-        DSpotUtils.addComment(ctStatementList,"MethodCallRemover: removed call '" + invocation + "'",
-                CtComment.CommentType.INLINE, CommentEnum.Amplifier);
+//        DSpotUtils.addComment(ctStatementList,"MethodCallRemover: removed call '" + invocation + "'",
+//                CtComment.CommentType.INLINE, CommentEnum.Amplifier);
         return cloned;
     }
 
