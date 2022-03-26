@@ -100,38 +100,47 @@ public class BranchCoverageSelector extends TakeAllSelector {
         deleteFile(pathname);
 
         final List<CtMethod<?>> methodsKept = new ArrayList<>();
-        //parse target branch
-        if(targetBranch.equals("noBranch")){
-            for (CtMethod<?> ctMethod : amplifiedTestToBeKept) {
-                List<LineCoverage> lineCoverageList = result.getLineCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod);
+//        //parse target branch
+//        if(targetBranch.equals("noBranch")){
+//            for (CtMethod<?> ctMethod : amplifiedTestToBeKept) {
+//                List<LineCoverage> lineCoverageList = result.getLineCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod);
+//                    if (!(lineCoverageList==null) && !(lineCoverageList.size()==0)){
+//                        methodsKept.add(ctMethod);
+//                        lineCoveragePerPerTestCase.put(ctMethod, lineCoverageList);
+//                        branchCoveragePerTestCase.put(ctMethod, result.getBranchCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod));
+//                    }
+//            }
+//        }
+//        else {
+//            String[] splits = targetBranch.split(":");
+//            int branchLine = Integer.valueOf(splits[0]).intValue();
+//            int symbol = targetBranch.contains("True") ? 1 : 0;
+//            for (CtMethod<?> ctMethod : amplifiedTestToBeKept) {
+//                List<BranchCoverage> branchCoverageList = result.getBranchCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod);
+//                if (symbol == 0) {
+//                    if (!(branchCoverageList==null) && branchCoverageList.stream().filter(branchCoverage -> branchCoverage.getRegion().getStartLine() == branchLine && branchCoverage.getFalseHitCount() > 0).findAny().isPresent()) {
+//                        methodsKept.add(ctMethod);
+//                        branchCoveragePerTestCase.put(ctMethod, branchCoverageList);
+//                        lineCoveragePerPerTestCase.put(ctMethod, result.getLineCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod));
+//                    }
+//                } else {
+//                    if (!(branchCoverageList==null) && branchCoverageList.stream().filter(branchCoverage -> branchCoverage.getRegion().getStartLine() == branchLine && branchCoverage.getTrueHitCount() > 0).findAny().isPresent()) {
+//                        methodsKept.add(ctMethod);
+//                        branchCoveragePerTestCase.put(ctMethod, branchCoverageList);
+//                        lineCoveragePerPerTestCase.put(ctMethod, result.getLineCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod));
+//                    }
+//                }
+//            }
+//        }
+        // report all result without selection
+        for (CtMethod<?> ctMethod : amplifiedTestToBeKept) {
+                List<LineCoverage> lineCoverageList = result.getLineCoverageForTestClassTestMethodAndClassName(amplifiedClassName, ctMethod.getSimpleName(), targetClass);
                     if (!(lineCoverageList==null) && !(lineCoverageList.size()==0)){
                         methodsKept.add(ctMethod);
                         lineCoveragePerPerTestCase.put(ctMethod, lineCoverageList);
-                        branchCoveragePerTestCase.put(ctMethod, result.getBranchCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod));
+                        branchCoveragePerTestCase.put(ctMethod, result.getBranchCoverageForTestClassTestMethodAndClassName(amplifiedClassName, ctMethod.getSimpleName(), targetClass));
                     }
             }
-        }
-        else {
-            String[] splits = targetBranch.split(":");
-            int branchLine = Integer.valueOf(splits[0]).intValue();
-            int symbol = targetBranch.contains("True") ? 1 : 0;
-            for (CtMethod<?> ctMethod : amplifiedTestToBeKept) {
-                List<BranchCoverage> branchCoverageList = result.getBranchCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod);
-                if (symbol == 0) {
-                    if (!(branchCoverageList==null) && branchCoverageList.stream().filter(branchCoverage -> branchCoverage.getRegion().getStartLine() == branchLine && branchCoverage.getFalseHitCount() > 0).findAny().isPresent()) {
-                        methodsKept.add(ctMethod);
-                        branchCoveragePerTestCase.put(ctMethod, branchCoverageList);
-                        lineCoveragePerPerTestCase.put(ctMethod, result.getLineCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod));
-                    }
-                } else {
-                    if (!(branchCoverageList==null) && branchCoverageList.stream().filter(branchCoverage -> branchCoverage.getRegion().getStartLine() == branchLine && branchCoverage.getTrueHitCount() > 0).findAny().isPresent()) {
-                        methodsKept.add(ctMethod);
-                        branchCoveragePerTestCase.put(ctMethod, branchCoverageList);
-                        lineCoveragePerPerTestCase.put(ctMethod, result.getLineCoverageForTestClassTestMethodAndClassNameMethodName(amplifiedClassName, ctMethod.getSimpleName(), targetClass, targetMethod));
-                    }
-                }
-            }
-        }
         this.selectedAmplifiedTest.addAll(methodsKept);
         return methodsKept;
     }

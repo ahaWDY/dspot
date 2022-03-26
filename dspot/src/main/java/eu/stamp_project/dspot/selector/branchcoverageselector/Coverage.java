@@ -1,5 +1,7 @@
 package eu.stamp_project.dspot.selector.branchcoverageselector;
 
+import com.atlassian.clover.registry.entities.MethodSignature;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,13 +47,9 @@ public class Coverage {
 //        return this.testClassCoverageMap.get(testClassName).getTestMethods();
 //    }
 
-//    public Map<String, MethodCoverage> getCoverageForTestClassTestMethodAndClassName(String testClassName, String testMethodName, String className) {
-//        return this.testClassCoverageMap.get(testClassName).getCoverageForTestMethodAndClassNames(testMethodName, className);
-//    }
-//
-//    public Map<String, ClassCoverage> getTestMethodCoverageForClassName(String testClassName, String testMethodName) {
-//        return this.testClassCoverageMap.get(testClassName).getTestMethodCoverage(testMethodName);
-//    }
+    public Map<String, MethodCoverage> getCoverageForTestClassTestMethodAndClassName(String testClassName, String testMethodName, String className) {
+        return this.testClassCoverageMap.get(testClassName).getCoverageForTestMethodAndClassNames(testMethodName, className);
+    }
 
     public List<BranchCoverage> getBranchCoverageForTestClassAndClassNameMethodName(String testClassName, String className, String methodName){
         List<BranchCoverage> result = new ArrayList<>();
@@ -88,16 +86,42 @@ public class Coverage {
         return null;
     }
 
+
     public List<LineCoverage> getLineCoverageForTestClassTestMethodAndClassNameMethodName(String testClassName, String testMethodName, String className, String methodName){
         if(!testClassCoverageMap.containsKey(testClassName)){
             return null;
         }
         TestMethodCoverage testMethodCoverage =  this.testClassCoverageMap.get(testClassName).getTestMethodCoverage(testMethodName);
         if(testMethodCoverage!=null) {
-           return testMethodCoverage.getLineCoverageForClassAndMethod(className, methodName);
+            return testMethodCoverage.getLineCoverageForClassAndMethod(className, methodName);
         }
         return null;
     }
+
+    public List<LineCoverage> getLineCoverageForTestClassTestMethodAndClassName(String testClassName, String testMethodName, String className){
+        Map<String, MethodCoverage> methodCoverageMap = getCoverageForTestClassTestMethodAndClassName(testClassName, testMethodName, className);
+        List<LineCoverage> result = new ArrayList<>();
+        if(methodCoverageMap==null){
+            return result;
+        }
+        for(MethodCoverage methodCoverage: methodCoverageMap.values()){
+            result.addAll(methodCoverage.getLineCoverageList());
+        }
+        return result;
+    }
+
+    public List<BranchCoverage> getBranchCoverageForTestClassTestMethodAndClassName(String testClassName, String testMethodName, String className){
+        Map<String, MethodCoverage> methodCoverageMap = getCoverageForTestClassTestMethodAndClassName(testClassName, testMethodName, className);
+        List<BranchCoverage> result = new ArrayList<>();
+        if(methodCoverageMap==null){
+            return result;
+        }
+        for(MethodCoverage methodCoverage: methodCoverageMap.values()){
+            result.addAll(methodCoverage.getBranchCoverageList());
+        }
+        return result;
+    }
+
 
     @Override
     public String toString() {
