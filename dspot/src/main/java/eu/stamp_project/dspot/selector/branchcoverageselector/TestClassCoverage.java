@@ -36,14 +36,6 @@ public class TestClassCoverage {
         return testMethodsCoverage;
     }
 
-//    public Set<String> getTestMethods() {
-//        return this.testMethodsCoverage.keySet();
-//    }
-
-//    public Set<String> getClassesForTestMethodName(String testMethodName) {
-//        return this.testMethodsCoverage.get(testMethodName).getClasses();
-//    }
-
     public Map<String, MethodCoverage> getCoverageForTestMethodAndClassNames(String testMethodName, String className) {
         return this.testMethodsCoverage.get(testMethodName).getCoverageForClass(className);
     }

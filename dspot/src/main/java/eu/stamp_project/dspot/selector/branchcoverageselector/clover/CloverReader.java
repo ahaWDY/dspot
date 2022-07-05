@@ -34,9 +34,6 @@ public class CloverReader {
         HtmlReporter.runReport(new String[]{
                 "-i", rootDirectoryOfCloverFiles.getAbsolutePath() + DATABASE_FILE,
                 "-o", rootDirectoryOfCloverFiles.getAbsolutePath() + REPORT_DIRECTORY,
-//                "--lineinfo",
-//                "--showinner",
-//                "--showlambda",
         });
         return coverage;
     }

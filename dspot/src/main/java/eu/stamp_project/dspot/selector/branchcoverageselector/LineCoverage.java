@@ -18,9 +18,6 @@ public class LineCoverage {
         return this.hitCount;
     }
 
-//    public void merge(LineCoverage that) {
-//        this.hitCount += that.hitCount;
-//    }
 
     @Override
     public String toString() {

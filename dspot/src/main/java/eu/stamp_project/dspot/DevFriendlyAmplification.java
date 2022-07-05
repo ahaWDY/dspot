@@ -172,8 +172,6 @@ public class DevFriendlyAmplification {
             if(amplifiedTests.isEmpty()){
                 amplifiedTests.addAll(inputAmplifiedTests);
             }
-            // add those without assertions (what if we do not have)
-//            amplifiedTests.addAll(inputAmplifiedTests);
 
         } catch (Exception | java.lang.Error e) {
             GLOBAL_REPORT.addError(new Error(ERROR_ASSERT_AMPLIFICATION, e));

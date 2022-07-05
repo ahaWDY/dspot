@@ -313,8 +313,6 @@ public class RenderFileAction implements Callable {
          */
 
         final JSONObject jsonTestTargets = JSONObjectFactory.getJSONTestTargets(targetMethods, targetElements);
-//        final String targetClassName = this.fileInfo.getContainingPackage().getName() + "." + this.fileInfo.getName().split("\\.")[0];
-//        this.buildCoverage(sublist, jsonTestTargets, targetClassName);
         velocity.put("jsonTestTargets", jsonTestTargets);
         velocity.put("jsonPageData", JSONObjectFactory.getJSONPageData(fileInfo));
 
@@ -325,38 +323,6 @@ public class RenderFileAction implements Callable {
         return fcopy;
     }
 
-//    private void buildCoverage(List<Map.Entry<TestCaseInfo, BlockMetrics>> sublist,
-//                               JSONObject jsonTestTargets,
-//                               String targetClassName) throws JSONException {
-//        final Iterator keys = jsonTestTargets.keys();
-//        while (keys.hasNext()) {
-//            final String key = (String) keys.next();
-//            final TestCaseInfo testCaseInfo = getTestCaseInfo(sublist, key.split("_")[1]);
-//            final String testClassName = testCaseInfo.getRuntimeTypeName();
-//            final String testName = testCaseInfo.getTestName();
-//            JSONObject currentValues = jsonTestTargets.getJSONObject((String) key);
-//
-//                 this.fileInfo.getNamedClass(this.fileInfo.getName().split("\\.")[0])
-//                        .getAllMethods()
-//                        .stream()
-//                                .forEach(methodInfo -> {
-//                                    for (BranchInfo branch : methodInfo.getBranches()) {
-//                                        Region region = new Region(branch.getStartLine(), branch.getStartColumn(), branch.getEndLine(), branch.getEndColumn());
-//                                        int trueHitCount = branch.getTrueHitCount();
-//                                        int falseHitCount = branch.getFalseHitCount();
-//                                        CloverReader.coverage.addBranchCoverage(testClassName, testName, this.fileInfo.getName().split("\\.")[0],methodInfo.getSimpleName(),region,trueHitCount, falseHitCount);
-//                                    }
-//                                    for(StatementInfo statement: methodInfo.getStatements()){
-//                                        int hitCount = statement.getHitCount();
-//                                        if(hitCount>0){
-//                                            for(int sl = statement.getStartLine(); sl<=statement.getEndLine(); sl++){
-//                                                CloverReader.coverage.addLineCoverage(testClassName, testName, this.fileInfo.getName().split("\\.")[0], methodInfo.getName(), sl, hitCount);
-//                                            }
-//                                        }
-//                                    }
-//                                });
-//        }
-//    }
 
     private TestCaseInfo getTestCaseInfo(List<Map.Entry<TestCaseInfo, BlockMetrics>> sublist, String s) {
         return sublist.stream().filter(entry -> entry.getKey().getId().equals(Integer.parseInt(s))).findFirst().get().getKey();

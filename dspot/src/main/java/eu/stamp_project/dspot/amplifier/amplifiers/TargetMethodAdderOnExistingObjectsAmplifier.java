@@ -14,6 +14,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Created by Danyao Wang
+ * wangdanyaoa@gmail.com
+ * on 22/05/18
+ */
+
 public class TargetMethodAdderOnExistingObjectsAmplifier implements Amplifier {
     @Override
     public Stream<CtMethod<?>> amplify(CtMethod<?> testMethod, int iteration) {

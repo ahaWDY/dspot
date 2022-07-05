@@ -29,6 +29,9 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Selects amplified test cases based on whether they cover a given branch.
+ */
 public class BranchCoverageSelector extends TakeAllSelector {
     protected String absolutePathToProjectRoot;
     protected String absolutePathToTestSourceCode;
@@ -45,8 +48,6 @@ public class BranchCoverageSelector extends TakeAllSelector {
     Map<CtMethod<?>, List<BranchCoverage>> branchCoveragePerTestCase;
 
     Map<CtMethod<?>, List<LineCoverage>> lineCoveragePerPerTestCase;
-
-    ExtendedCoverage initialCoverage2;
 
     public BranchCoverageSelector(AutomaticBuilder automaticBuilder, UserInput configuration) {
         super(automaticBuilder, configuration);
@@ -100,6 +101,8 @@ public class BranchCoverageSelector extends TakeAllSelector {
         deleteFile(pathname);
 
         final List<CtMethod<?>> methodsKept = new ArrayList<>();
+
+//  filter thoes that cover the given branch
 //        //parse target branch
 //        if(targetBranch.equals("noBranch")){
 //            for (CtMethod<?> ctMethod : amplifiedTestToBeKept) {
@@ -148,7 +151,6 @@ public class BranchCoverageSelector extends TakeAllSelector {
     @Override
     public TestSelectorElementReport report() {
         final String report = "Amplification results with " + this.selectedAmplifiedTest.size() + " new tests.";
-//        return new TestSelectorElementReportImpl(report, jsonReport(), Collections.emptyList(), "");
         return new TestSelectorElementReportImpl(report, jsonReport(), Collections.emptyList(), "");
     }
 
